@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iOS Calculator</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+}
+
+body{
+  min-height:100vh;
+  background:linear-gradient(180deg,#0f172a,#020617);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ===== CALCULATOR ===== */
+.calculator{
+  width:320px;
+  padding:20px;
+  border-radius:36px;
+  background:#000;
+  box-shadow:
+    0 40px 100px rgba(0,0,0,.8),
+    inset 0 0 0 1px rgba(255,255,255,.06);
+}
+
+/* DISPLAY */
+.display{
+  height:120px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:flex-end;
+  padding:10px;
+  color:#fff;
+  font-size:52px;
+  font-weight:300;
+  overflow:hidden;
+  transition:.3s;
+}
+
+/* GRID */
+.keys{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+/* BUTTON */
+.btn{
+  height:64px;
+  border-radius:50%;
+  border:none;
+  font-size:24px;
+  cursor:pointer;
+  transition:
+    transform .12s ease,
+    box-shadow .12s ease,
+    filter .12s;
+  box-shadow:0 6px 0 rgba(0,0,0,.4);
+}
+
+.btn:active{
+  transform:translateY(4px) scale(.96);
+  box-shadow:0 2px 0 rgba(0,0,0,.4);
+  filter:brightness(.9);
+}
+
+/* COLORS */
+.gray{background:#a5a5a5;color:#000;}
+.dark{background:#333;color:#fff;}
+.orange{background:#ff9f0a;color:#fff;}
+
+/* ZERO */
+.zero{
+  grid-column:span 2;
+  border-radius:32px;
+  text-align:left;
+  padding-left:26px;
+}
+
+/* ACTIVE OPERATOR */
+.orange.active{
+  background:#fff;
+  color:#ff9f0a;
+}
+</style>
+</head>
+
+<body>
+
+<div class="calculator">
+  <div class="display" id="display">0</div>
+
+  <div class="keys">
+    <button class="btn gray" onclick="clearAll()">AC</button>
+    <button class="btn gray" onclick="toggleSign()">±</button>
+    <button class="btn gray" onclick="percent()">%</button>
+    <button class="btn orange" onclick="setOperator('/')">÷</button>
+
+    <button class="btn dark" onclick="append('7')">7</button>
+    <button class="btn dark" onclick="append('8')">8</button>
+    <button class="btn dark" onclick="append('9')">9</button>
+    <button class="btn orange" onclick="setOperator('*')">×</button>
+
+    <button class="btn dark" onclick="append('4')">4</button>
+    <button class="btn dark" onclick="append('5')">5</button>
+    <button class="btn dark" onclick="append('6')">6</button>
+    <button class="btn orange" onclick="setOperator('-')">−</button>
+
+    <button class="btn dark" onclick="append('1')">1</button>
+    <button class="btn dark" onclick="append('2')">2</button>
+    <button class="btn dark" onclick="append('3')">3</button>
+    <button class="btn orange" onclick="setOperator('+')">+</button>
+
+    <button class="btn dark zero" onclick="append('0')">0</button>
+    <button class="btn dark" onclick="append('.')">.</button>
+    <button class="btn orange" onclick="calculate()">=</button>
+  </div>
+</div>
+
+<script>
+let current = "0";
+let previous = null;
+let operator = null;
+
+const display = document.getElementById("display");
+const operators = document.querySelectorAll(".orange");
+
+function updateDisplay(){
+  display.textContent = current.length > 9
+    ? Number(current).toExponential(3)
+    : current;
+}
+
+function append(num){
+  if(current === "0" && num !== ".") current = num;
+  else if(num === "." && current.includes(".")) return;
+  else current += num;
+  updateDisplay();
+}
+
+function clearAll(){
+  current = "0";
+  previous = null;
+  operator = null;
+  operators.forEach(op => op.classList.remove("active"));
+  updateDisplay();
+}
+
+function toggleSign(){
+  current = String(Number(current) * -1);
+  updateDisplay();
+}
+
+function percent(){
+  current = String(Number(current) / 100);
+  updateDisplay();
+}
+
+function setOperator(op){
+  previous = current;
+  operator = op;
+  current = "0";
+
+  operators.forEach(btn => btn.classList.remove("active"));
+  event.target.classList.add("active");
+}
+
+function calculate(){
+  if(!operator || previous === null) return;
+
+  const a = Number(previous);
+  const b = Number(current);
+
+  let result = 0;
+  if(operator === "+") result = a + b;
+  if(operator === "-") result = a - b;
+  if(operator === "*") result = a * b;
+  if(operator === "/") result = b === 0 ? 0 : a / b;
+
+  current = String(result);
+  previous = null;
+  operator = null;
+
+  operators.forEach(btn => btn.classList.remove("active"));
+  updateDisplay();
+}
+</script>
+
+</body>
+</html>
