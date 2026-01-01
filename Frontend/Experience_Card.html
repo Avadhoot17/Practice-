@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern UI Card</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:radial-gradient(circle at top,#1b2735,#090a0f);
+  color:#fff;
+}
+
+/* ===== CARD ===== */
+.card{
+  width:360px;
+  padding:28px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(18px);
+  border-radius:20px;
+  box-shadow:0 25px 50px rgba(0,0,0,0.5);
+  transition:.4s;
+}
+
+.card:hover{
+  transform:translateY(-12px) scale(1.02);
+  box-shadow:0 35px 70px rgba(0,255,200,0.15);
+}
+
+/* PROFILE */
+.profile{
+  text-align:center;
+}
+
+.avatar{
+  width:90px;
+  height:90px;
+  margin:auto;
+  border-radius:50%;
+  background:linear-gradient(135deg,#00ffd5,#00aaff);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+  font-weight:600;
+  color:#000;
+}
+
+.profile h2{
+  margin-top:14px;
+  font-size:20px;
+  font-weight:600;
+}
+
+.profile p{
+  font-size:13px;
+  opacity:.7;
+  margin-top:4px;
+}
+
+/* STATS */
+.stats{
+  display:flex;
+  justify-content:space-between;
+  margin:22px 0;
+}
+
+.stat{
+  text-align:center;
+}
+
+.stat h3{
+  font-size:18px;
+  color:#00ffd5;
+}
+
+.stat span{
+  font-size:12px;
+  opacity:.6;
+}
+
+/* SKILLS */
+.skills{
+  margin-top:10px;
+}
+
+.skill{
+  margin-bottom:14px;
+}
+
+.skill label{
+  font-size:13px;
+  display:flex;
+  justify-content:space-between;
+  opacity:.8;
+}
+
+.bar{
+  width:100%;
+  height:8px;
+  background:rgba(255,255,255,0.15);
+  border-radius:10px;
+  overflow:hidden;
+  margin-top:6px;
+}
+
+.fill{
+  height:100%;
+  width:0;
+  border-radius:10px;
+  background:linear-gradient(90deg,#00ffd5,#00aaff);
+  animation:fillBar 1.5s forwards;
+}
+
+@keyframes fillBar{
+  to{width:var(--level);}
+}
+
+/* BUTTON */
+button{
+  width:100%;
+  padding:12px;
+  margin-top:16px;
+  border:none;
+  border-radius:14px;
+  background:linear-gradient(135deg,#00ffd5,#00aaff);
+  font-weight:600;
+  cursor:pointer;
+  transition:.3s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 30px rgba(0,255,200,0.4);
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <div class="profile">
+    <div class="avatar">A</div>
+    <h2>Avadhoot Welde</h2>
+    <p>Frontend / Full-Stack Developer</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <h3>12+</h3>
+      <span>Projects</span>
+    </div>
+    <div class="stat">
+      <h3>1+</h3>
+      <span>Years Exp</span>
+    </div>
+    <div class="stat">
+      <h3>5★</h3>
+      <span>Rating</span>
+    </div>
+  </div>
+
+  <div class="skills">
+    <div class="skill">
+      <label>HTML & CSS <span>90%</span></label>
+      <div class="bar"><div class="fill" style="--level:90%"></div></div>
+    </div>
+
+    <div class="skill">
+      <label>JavaScript <span>80%</span></label>
+      <div class="bar"><div class="fill" style="--level:80%"></div></div>
+    </div>
+
+    <div class="skill">
+      <label>React / PHP <span>70%</span></label>
+      <div class="bar"><div class="fill" style="--level:70%"></div></div>
+    </div>
+  </div>
+
+  <button>View Profile</button>
+</div>
+
+</body>
+</html>
