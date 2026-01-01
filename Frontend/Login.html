@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Login UI</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Inter',sans-serif;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:radial-gradient(circle at top,#1e293b,#020617);
+  color:#fff;
+}
+
+/* ===== CARD ===== */
+.login-card{
+  width:360px;
+  padding:34px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(18px);
+  border-radius:22px;
+  box-shadow:0 30px 70px rgba(0,0,0,.6);
+  animation:fadeUp .9s ease;
+}
+
+@keyframes fadeUp{
+  from{opacity:0; transform:translateY(30px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+/* HEADER */
+.login-card h2{
+  font-size:24px;
+  font-weight:600;
+  margin-bottom:6px;
+}
+
+.login-card p{
+  font-size:13px;
+  opacity:.6;
+  margin-bottom:28px;
+}
+
+/* INPUT GROUP */
+.input-group{
+  position:relative;
+  margin-bottom:22px;
+}
+
+.input-group input{
+  width:100%;
+  padding:14px 14px;
+  background:rgba(255,255,255,.1);
+  border:none;
+  outline:none;
+  border-radius:14px;
+  color:#fff;
+  font-size:14px;
+}
+
+.input-group label{
+  position:absolute;
+  left:14px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:13px;
+  opacity:.6;
+  pointer-events:none;
+  transition:.3s;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label{
+  top:-8px;
+  left:10px;
+  font-size:11px;
+  background:#020617;
+  padding:0 6px;
+  opacity:1;
+}
+
+/* OPTIONS */
+.options{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  opacity:.7;
+  margin-bottom:22px;
+}
+
+/* BUTTON */
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:16px;
+  background:linear-gradient(135deg,#38bdf8,#22d3ee);
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.3s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 35px rgba(56,189,248,.4);
+}
+
+/* FOOTER */
+.footer{
+  margin-top:22px;
+  text-align:center;
+  font-size:12px;
+  opacity:.6;
+}
+.footer span{
+  color:#38bdf8;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-card">
+  <h2>Welcome Back</h2>
+  <p>Login to continue</p>
+
+  <div class="input-group">
+    <input type="email" required placeholder=" ">
+    <label>Email</label>
+  </div>
+
+  <div class="input-group">
+    <input type="password" required placeholder=" ">
+    <label>Password</label>
+  </div>
+
+  <div class="options">
+    <span>Remember me</span>
+    <span>Forgot password?</span>
+  </div>
+
+  <button>Sign In</button>
+
+  <div class="footer">
+    Don’t have an account? <span>Sign up</span>
+  </div>
+</div>
+
+</body>
+</html>
