@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music Player UI</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+}
+
+body{
+  min-height:100vh;
+  background:linear-gradient(180deg,#0f172a,#020617);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* ===== PLAYER ===== */
+.player{
+  width:340px;
+  padding:24px;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(20px);
+  border-radius:32px;
+  box-shadow:0 40px 100px rgba(0,0,0,.8);
+  color:#fff;
+}
+
+/* ALBUM */
+.album{
+  width:100%;
+  height:260px;
+  border-radius:24px;
+  background:linear-gradient(135deg,#38bdf8,#22d3ee);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:48px;
+  font-weight:600;
+  animation:pulse 4s infinite ease-in-out;
+}
+
+@keyframes pulse{
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.03);}
+}
+
+/* INFO */
+.info{
+  margin:18px 0 12px;
+  text-align:center;
+}
+
+.info h2{
+  font-size:18px;
+  font-weight:500;
+}
+
+.info p{
+  font-size:13px;
+  opacity:.6;
+  margin-top:4px;
+}
+
+/* PROGRESS */
+.progress{
+  width:100%;
+  height:6px;
+  background:rgba(255,255,255,.2);
+  border-radius:10px;
+  overflow:hidden;
+  margin:14px 0 6px;
+}
+
+.bar{
+  width:0;
+  height:100%;
+  background:#fff;
+}
+
+/* TIME */
+.time{
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  opacity:.6;
+}
+
+/* CONTROLS */
+.controls{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:26px;
+  margin-top:18px;
+}
+
+.btn{
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  border:none;
+  background:rgba(255,255,255,.15);
+  color:#fff;
+  font-size:20px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.play{
+  width:68px;
+  height:68px;
+  background:#fff;
+  color:#000;
+  font-size:26px;
+}
+
+.btn:active{
+  transform:scale(.9);
+}
+</style>
+</head>
+
+<body>
+
+<div class="player">
+  <div class="album">♪</div>
+
+  <div class="info">
+    <h2>Midnight Drive</h2>
+    <p>Avadhoot Beats</p>
+  </div>
+
+  <div class="progress">
+    <div class="bar" id="bar"></div>
+  </div>
+
+  <div class="time">
+    <span id="current">0:00</span>
+    <span id="total">3:30</span>
+  </div>
+
+  <div class="controls">
+    <button class="btn">⏮</button>
+    <button class="btn play" id="playBtn">▶</button>
+    <button class="btn">⏭</button>
+  </div>
+</div>
+
+<script>
+let playing = false;
+let progress = 0;
+let duration = 210; // 3:30 in seconds
+const bar = document.getElementById("bar");
+const playBtn = document.getElementById("playBtn");
+const currentTime = document.getElementById("current");
+
+let interval;
+
+function formatTime(sec){
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m}:${s < 10 ? "0" : ""}${s}`;
+}
+
+playBtn.onclick = () => {
+  playing = !playing;
+  playBtn.textContent = playing ? "⏸" : "▶";
+
+  if(playing){
+    interval = setInterval(() => {
+      if(progress < duration){
+        progress++;
+        bar.style.width = (progress / duration) * 100 + "%";
+        currentTime.textContent = formatTime(progress);
+      } else {
+        clearInterval(interval);
+        playBtn.textContent = "▶";
+        playing = false;
+      }
+    },1000);
+  } else {
+    clearInterval(interval);
+  }
+};
+</script>
+
+</body>
+</html>
