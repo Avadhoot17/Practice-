@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Calendar – Themes</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
+}
+
+:root{
+  --bg: radial-gradient(circle at top,#0f172a,#020617);
+  --card: rgba(255,255,255,.12);
+  --accent1:#38bdf8;
+  --accent2:#a855f7;
+  --day:#ffffff14;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--bg);
+  color:#fff;
+  transition:background .6s ease;
+}
+
+/* ===== CALENDAR CARD ===== */
+.calendar{
+  width:360px;
+  padding:28px;
+  border-radius:32px;
+  background:var(--card);
+  backdrop-filter:blur(26px);
+  box-shadow:0 60px 120px rgba(0,0,0,.6);
+  transition:.6s;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.header h2{
+  font-size:20px;
+  font-weight:500;
+}
+
+.nav{
+  display:flex;
+  gap:10px;
+}
+
+.nav button{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  border:none;
+  cursor:pointer;
+  background:rgba(255,255,255,.2);
+  color:#fff;
+  transition:.3s;
+}
+
+.nav button:hover{
+  background:linear-gradient(135deg,var(--accent1),var(--accent2));
+}
+
+/* THEME SWITCH */
+.themes{
+  display:flex;
+  gap:8px;
+  margin:14px 0 18px;
+}
+
+.theme{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  cursor:pointer;
+  box-shadow:0 0 0 2px rgba(255,255,255,.3);
+}
+
+/* WEEK */
+.week{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  text-align:center;
+  font-size:12px;
+  opacity:.6;
+  margin-bottom:10px;
+}
+
+/* DAYS */
+.days{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:10px;
+  animation:fade .4s ease;
+}
+
+@keyframes fade{
+  from{opacity:0; transform:scale(.97);}
+  to{opacity:1; transform:scale(1);}
+}
+
+.day{
+  height:42px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:.35s;
+  background:var(--day);
+}
+
+.day:hover{
+  transform:translateY(-2px);
+  background:rgba(255,255,255,.22);
+}
+
+.day.inactive{
+  opacity:.25;
+  pointer-events:none;
+}
+
+.day.active{
+  background:linear-gradient(135deg,var(--accent1),var(--accent2));
+  box-shadow:0 10px 30px color-mix(in srgb, var(--accent2), transparent 40%);
+  transform:scale(1.1);
+}
+</style>
+</head>
+
+<body>
+
+<div class="calendar">
+  <div class="header">
+    <h2 id="monthYear"></h2>
+    <div class="nav">
+      <button onclick="prevMonth()">‹</button>
+      <button onclick="nextMonth()">›</button>
+    </div>
+  </div>
+
+  <!-- THEMES -->
+  <div class="themes">
+    <div class="theme" style="background:#38bdf8" onclick="setTheme('aurora')"></div>
+    <div class="theme" style="background:#fb7185" onclick="setTheme('sunset')"></div>
+    <div class="theme" style="background:#34d399" onclick="setTheme('emerald')"></div>
+    <div class="theme" style="background:#a78bfa" onclick="setTheme('midnight')"></div>
+  </div>
+
+  <div class="week">
+    <div>Sun</div><div>Mon</div><div>Tue</div>
+    <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+  </div>
+
+  <div class="days" id="days"></div>
+</div>
+
+<script>
+const monthYear = document.getElementById("monthYear");
+const daysBox = document.getElementById("days");
+
+let date = new Date();
+
+const themes = {
+  aurora:{
+    bg:"radial-gradient(circle at top,#0f172a,#020617)",
+    a1:"#38bdf8",
+    a2:"#a855f7"
+  },
+  sunset:{
+    bg:"radial-gradient(circle at top,#ffedd5,#7c2d12)",
+    a1:"#fb7185",
+    a2:"#f97316"
+  },
+  emerald:{
+    bg:"radial-gradient(circle at top,#064e3b,#022c22)",
+    a1:"#34d399",
+    a2:"#22c55e"
+  },
+  midnight:{
+    bg:"radial-gradient(circle at top,#020617,#000)",
+    a1:"#a78bfa",
+    a2:"#38bdf8"
+  }
+};
+
+function setTheme(name){
+  document.documentElement.style.setProperty("--bg",themes[name].bg);
+  document.documentElement.style.setProperty("--accent1",themes[name].a1);
+  document.documentElement.style.setProperty("--accent2",themes[name].a2);
+}
+
+function renderCalendar(){
+  daysBox.innerHTML="";
+  const year = date.getFullYear();
+  const month = date.getMonth();
+
+  const names=["January","February","March","April","May","June",
+               "July","August","September","October","November","December"];
+
+  monthYear.textContent = `${names[month]} ${year}`;
+
+  const firstDay = new Date(year,month,1).getDay();
+  const lastDate = new Date(year,month+1,0).getDate();
+
+  for(let i=0;i<firstDay;i++){
+    const d=document.createElement("div");
+    d.className="day inactive";
+    daysBox.appendChild(d);
+  }
+
+  for(let i=1;i<=lastDate;i++){
+    const d=document.createElement("div");
+    d.className="day";
+    d.textContent=i;
+    d.onclick=()=>{
+      document.querySelectorAll(".day").forEach(x=>x.classList.remove("active"));
+      d.classList.add("active");
+    };
+    daysBox.appendChild(d);
+  }
+}
+
+function prevMonth(){ date.setMonth(date.getMonth()-1); renderCalendar(); }
+function nextMonth(){ date.setMonth(date.getMonth()+1); renderCalendar(); }
+
+renderCalendar();
+</script>
+
+</body>
+</html>
