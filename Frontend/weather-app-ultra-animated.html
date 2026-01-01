@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Weather App</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(180deg,#020617,#020617);
+  overflow:hidden;
+}
+
+/* ===== ANIMATED SKY ===== */
+.sky{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,#0ea5e9,#38bdf8,#bae6fd);
+  animation:skyMove 12s ease-in-out infinite alternate;
+}
+
+@keyframes skyMove{
+  0%{filter:hue-rotate(0deg);}
+  100%{filter:hue-rotate(25deg);}
+}
+
+/* ===== CLOUDS ===== */
+.cloud{
+  position:absolute;
+  top:20%;
+  width:220px;
+  height:70px;
+  background:rgba(255,255,255,.8);
+  border-radius:50px;
+  filter:blur(2px);
+  animation:cloudMove 40s linear infinite;
+}
+
+.cloud::before,
+.cloud::after{
+  content:'';
+  position:absolute;
+  background:inherit;
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  top:-40px;
+}
+
+.cloud::before{left:30px;}
+.cloud::after{right:30px;}
+
+.cloud.one{left:-30%; animation-duration:60s; opacity:.6;}
+.cloud.two{left:-40%; top:35%; animation-duration:45s; opacity:.4;}
+
+@keyframes cloudMove{
+  to{transform:translateX(140vw);}
+}
+
+/* ===== RAIN ===== */
+.rain{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+.drop{
+  position:absolute;
+  width:2px;
+  height:14px;
+  background:rgba(255,255,255,.6);
+  animation:rainFall 1s linear infinite;
+}
+
+@keyframes rainFall{
+  from{transform:translateY(-20px);}
+  to{transform:translateY(100vh);}
+}
+
+/* ===== APP CARD ===== */
+.app{
+  position:relative;
+  z-index:5;
+  width:360px;
+  padding:28px;
+  border-radius:36px;
+  background:rgba(255,255,255,.18);
+  backdrop-filter:blur(26px);
+  box-shadow:0 60px 120px rgba(0,0,0,.6);
+  color:#fff;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.city{
+  font-size:22px;
+  font-weight:500;
+}
+
+.switch{
+  font-size:12px;
+  opacity:.7;
+  cursor:pointer;
+}
+
+/* ICON */
+.icon{
+  font-size:80px;
+  text-align:center;
+  margin:26px 0 10px;
+  animation:float 4s ease-in-out infinite;
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-14px);}
+}
+
+/* TEMP */
+.temp{
+  text-align:center;
+  font-size:64px;
+  font-weight:300;
+}
+
+.condition{
+  text-align:center;
+  opacity:.7;
+  margin-bottom:22px;
+}
+
+/* STATS */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.stat{
+  padding:14px;
+  border-radius:18px;
+  background:rgba(255,255,255,.2);
+  text-align:center;
+}
+
+.stat span{
+  font-size:12px;
+  opacity:.6;
+}
+
+.stat p{
+  margin-top:6px;
+  font-size:15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sky"></div>
+<div class="cloud one"></div>
+<div class="cloud two"></div>
+
+<div class="rain" id="rain"></div>
+
+<div class="app">
+  <div class="header">
+    <div class="city">Pune</div>
+    <div class="switch" onclick="changeWeather()">Change</div>
+  </div>
+
+  <div class="icon" id="icon">☀️</div>
+  <div class="temp" id="temp">32°</div>
+  <div class="condition" id="condition">Sunny</div>
+
+  <div class="stats">
+    <div class="stat">
+      <span>Humidity</span>
+      <p id="hum">42%</p>
+    </div>
+    <div class="stat">
+      <span>Wind</span>
+      <p id="wind">12 km/h</p>
+    </div>
+    <div class="stat">
+      <span>Feels</span>
+      <p id="feel">34°</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const states = [
+  {icon:"☀️", temp:32, text:"Sunny", hum:42, wind:12, feel:34, rain:false},
+  {icon:"☁️", temp:26, text:"Cloudy", hum:58, wind:10, feel:27, rain:false},
+  {icon:"🌧️", temp:22, text:"Rainy", hum:78, wind:18, feel:21, rain:true}
+];
+
+let i = 0;
+const rainBox = document.getElementById("rain");
+
+function createRain(){
+  rainBox.innerHTML = "";
+  for(let i=0;i<120;i++){
+    const d = document.createElement("div");
+    d.className = "drop";
+    d.style.left = Math.random()*100 + "vw";
+    d.style.animationDelay = Math.random()+"s";
+    rainBox.appendChild(d);
+  }
+}
+
+function changeWeather(){
+  i = (i+1)%states.length;
+  const w = states[i];
+
+  document.getElementById("icon").textContent = w.icon;
+  document.getElementById("temp").textContent = w.temp+"°";
+  document.getElementById("condition").textContent = w.text;
+  document.getElementById("hum").textContent = w.hum+"%";
+  document.getElementById("wind").textContent = w.wind+" km/h";
+  document.getElementById("feel").textContent = w.feel+"°";
+
+  if(w.rain) createRain();
+  else rainBox.innerHTML = "";
+}
+</script>
+
+</body>
+</html>
