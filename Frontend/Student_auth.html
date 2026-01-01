@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Login & Register</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Card animation on load */
+.container {
+    width: 380px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    animation: slideFade 0.8s ease forwards;
+}
+
+@keyframes slideFade {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 22px;
+    color: #333;
+}
+
+/* Input animation */
+.input-group {
+    position: relative;
+    margin-bottom: 22px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+}
+
+.input-group label {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    color: #888;
+    font-size: 13px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    transition: 0.3s;
+    background: #fff;
+    padding: 0 5px;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+    top: -7px;
+    font-size: 11px;
+    color: #667eea;
+}
+
+/* Button animation */
+button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: #667eea;
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+button:hover {
+    background: #5a67d8;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+/* Toggle animation */
+.toggle {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 14px;
+}
+
+.toggle span {
+    color: #667eea;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.toggle span:hover {
+    letter-spacing: 0.5px;
+}
+
+/* Form switch animation */
+form {
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.register {
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2 id="title">Student Login</h2>
+
+    <!-- Login -->
+    <form id="loginForm">
+        <div class="input-group">
+            <input type="email" required placeholder=" ">
+            <label>Email</label>
+        </div>
+
+        <div class="input-group">
+            <input type="password" required placeholder=" ">
+            <label>Password</label>
+        </div>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <!-- Register -->
+    <form id="registerForm" class="register">
+        <div class="input-group">
+            <input type="text" required placeholder=" ">
+            <label>Full Name</label>
+        </div>
+
+        <div class="input-group">
+            <input type="email" required placeholder=" ">
+            <label>Email</label>
+        </div>
+
+        <div class="input-group">
+            <input type="password" required placeholder=" ">
+            <label>Password</label>
+        </div>
+
+        <button type="submit">Register</button>
+    </form>
+
+    <div class="toggle">
+        <span id="toggleText">Create an account</span>
+    </div>
+</div>
+
+<script>
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+const toggleText = document.getElementById("toggleText");
+const title = document.getElementById("title");
+
+toggleText.onclick = () => {
+    if (loginForm.style.display !== "none") {
+        loginForm.style.display = "none";
+        registerForm.style.display = "block";
+        title.innerText = "Student Register";
+        toggleText.innerText = "Already have an account?";
+    } else {
+        loginForm.style.display = "block";
+        registerForm.style.display = "none";
+        title.innerText = "Student Login";
+        toggleText.innerText = "Create an account";
+    }
+};
+</script>
+
+</body>
+</html>
