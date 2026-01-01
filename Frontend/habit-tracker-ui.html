@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Habit Tracker UI</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:radial-gradient(circle at top,#0f172a,#020617);
+  color:#fff;
+}
+
+/* ===== APP ===== */
+.app{
+  width:380px;
+  padding:30px;
+  border-radius:34px;
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(26px);
+  box-shadow:0 60px 120px rgba(0,0,0,.6);
+}
+
+/* HEADER */
+.header{
+  text-align:center;
+  margin-bottom:28px;
+}
+
+.header h2{
+  font-size:22px;
+  font-weight:500;
+}
+
+.header p{
+  font-size:13px;
+  opacity:.6;
+  margin-top:6px;
+}
+
+/* ===== PROGRESS ===== */
+.progress-ring{
+  position:relative;
+  width:160px;
+  height:160px;
+  margin:0 auto 28px;
+}
+
+svg{
+  transform:rotate(-90deg);
+}
+
+circle{
+  fill:none;
+  stroke-width:10;
+}
+
+.bg{
+  stroke:rgba(255,255,255,.2);
+}
+
+.fg{
+  stroke:url(#grad);
+  stroke-dasharray:440;
+  stroke-dashoffset:440;
+  transition:stroke-dashoffset .8s ease;
+  filter:drop-shadow(0 0 12px #22d3ee);
+}
+
+/* % */
+.percent{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+  font-weight:300;
+}
+
+/* ===== HABITS ===== */
+.habits{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.habit{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 16px;
+  border-radius:18px;
+  background:rgba(255,255,255,.15);
+  cursor:pointer;
+  transition:.3s;
+}
+
+.habit:hover{
+  transform:translateY(-2px);
+  background:rgba(255,255,255,.22);
+}
+
+.habit span{
+  font-size:14px;
+}
+
+/* CHECK */
+.check{
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.3s;
+}
+
+.habit.active .check{
+  background:linear-gradient(135deg,#22d3ee,#a855f7);
+  border:none;
+  box-shadow:0 0 14px rgba(168,85,247,.7);
+}
+
+.habit.active .check::after{
+  content:"✓";
+  font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <div class="header">
+    <h2>Daily Habits</h2>
+    <p>Build consistency, one day at a time</p>
+  </div>
+
+  <!-- Progress Ring -->
+  <div class="progress-ring">
+    <svg width="160" height="160">
+      <defs>
+        <linearGradient id="grad">
+          <stop offset="0%" stop-color="#22d3ee"/>
+          <stop offset="100%" stop-color="#a855f7"/>
+        </linearGradient>
+      </defs>
+      <circle class="bg" cx="80" cy="80" r="70"/>
+      <circle class="fg" cx="80" cy="80" r="70" id="ring"/>
+    </svg>
+    <div class="percent" id="percent">0%</div>
+  </div>
+
+  <!-- Habits -->
+  <div class="habits">
+    <div class="habit" onclick="toggle(this)">🏃 Exercise <div class="check"></div></div>
+    <div class="habit" onclick="toggle(this)">📖 Read 20 min <div class="check"></div></div>
+    <div class="habit" onclick="toggle(this)">💧 Drink Water <div class="check"></div></div>
+    <div class="habit" onclick="toggle(this)">🧘 Meditation <div class="check"></div></div>
+  </div>
+</div>
+
+<script>
+const ring = document.getElementById("ring");
+const percent = document.getElementById("percent");
+const habits = document.querySelectorAll(".habit");
+const circumference = 440;
+
+function updateProgress(){
+  const done = document.querySelectorAll(".habit.active").length;
+  const total = habits.length;
+  const progress = Math.round((done / total) * 100);
+  const offset = circumference - (progress / 100) * circumference;
+
+  ring.style.strokeDashoffset = offset;
+  percent.textContent = progress + "%";
+}
+
+function toggle(el){
+  el.classList.toggle("active");
+  updateProgress();
+}
+</script>
+
+</body>
+</html>
