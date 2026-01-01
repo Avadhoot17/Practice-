@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing UI</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Inter',sans-serif;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:radial-gradient(circle at top,#1e293b,#020617);
+  color:#fff;
+}
+
+/* ===== CONTAINER ===== */
+.pricing-wrapper{
+  text-align:center;
+  width:100%;
+  max-width:1100px;
+  padding:40px 20px;
+}
+
+.pricing-wrapper h1{
+  font-size:34px;
+  margin-bottom:10px;
+}
+
+.pricing-wrapper p{
+  opacity:.6;
+  font-size:14px;
+  margin-bottom:30px;
+}
+
+/* ===== TOGGLE ===== */
+.toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:14px;
+  background:rgba(255,255,255,.08);
+  padding:8px 14px;
+  border-radius:30px;
+  margin-bottom:40px;
+}
+
+.toggle span{
+  font-size:13px;
+  opacity:.6;
+}
+
+.switch{
+  width:46px;
+  height:24px;
+  background:#020617;
+  border-radius:20px;
+  position:relative;
+  cursor:pointer;
+}
+
+.switch::before{
+  content:'';
+  width:18px;
+  height:18px;
+  background:#38bdf8;
+  border-radius:50%;
+  position:absolute;
+  top:3px;
+  left:4px;
+  transition:.4s;
+}
+
+.switch.active::before{
+  transform:translateX(20px);
+}
+
+/* ===== CARDS ===== */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:26px;
+}
+
+.card{
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(18px);
+  padding:30px;
+  border-radius:22px;
+  box-shadow:0 25px 60px rgba(0,0,0,.6);
+  transition:.4s;
+}
+
+.card:hover{
+  transform:translateY(-12px);
+  box-shadow:0 35px 80px rgba(56,189,248,.25);
+}
+
+.card h2{
+  font-size:20px;
+  margin-bottom:10px;
+}
+
+.price{
+  font-size:36px;
+  font-weight:600;
+  margin:14px 0;
+}
+
+.price span{
+  font-size:14px;
+  opacity:.6;
+}
+
+ul{
+  list-style:none;
+  margin:20px 0;
+}
+
+ul li{
+  font-size:13px;
+  opacity:.75;
+  margin-bottom:10px;
+}
+
+/* BUTTON */
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:16px;
+  background:linear-gradient(135deg,#38bdf8,#22d3ee);
+  font-weight:600;
+  cursor:pointer;
+  transition:.3s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 35px rgba(56,189,248,.4);
+}
+
+/* POPULAR */
+.popular{
+  border:1px solid rgba(56,189,248,.4);
+  position:relative;
+}
+
+.badge{
+  position:absolute;
+  top:-12px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#38bdf8;
+  color:#000;
+  padding:4px 12px;
+  font-size:11px;
+  border-radius:20px;
+  font-weight:600;
+}
+</style>
+</head>
+
+<body>
+
+<div class="pricing-wrapper">
+  <h1>Simple Pricing</h1>
+  <p>Choose a plan that fits your needs</p>
+
+  <div class="toggle">
+    <span>Monthly</span>
+    <div class="switch" id="toggle"></div>
+    <span>Yearly</span>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h2>Starter</h2>
+      <div class="price" data-month="₹499" data-year="₹4,999">₹499<span>/mo</span></div>
+      <ul>
+        <li>Basic features</li>
+        <li>1 project</li>
+        <li>Email support</li>
+      </ul>
+      <button>Get Started</button>
+    </div>
+
+    <div class="card popular">
+      <div class="badge">Most Popular</div>
+      <h2>Pro</h2>
+      <div class="price" data-month="₹999" data-year="₹9,999">₹999<span>/mo</span></div>
+      <ul>
+        <li>All starter features</li>
+        <li>Unlimited projects</li>
+        <li>Priority support</li>
+      </ul>
+      <button>Choose Pro</button>
+    </div>
+
+    <div class="card">
+      <h2>Enterprise</h2>
+      <div class="price" data-month="₹1,999" data-year="₹19,999">₹1,999<span>/mo</span></div>
+      <ul>
+        <li>Custom solutions</li>
+        <li>Dedicated support</li>
+        <li>Advanced security</li>
+      </ul>
+      <button>Contact Sales</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const toggle = document.getElementById("toggle");
+const prices = document.querySelectorAll(".price");
+
+toggle.addEventListener("click", () => {
+  toggle.classList.toggle("active");
+
+  prices.forEach(price => {
+    const isYearly = toggle.classList.contains("active");
+    price.innerHTML = isYearly
+      ? price.dataset.year + "<span>/yr</span>"
+      : price.dataset.month + "<span>/mo</span>";
+  });
+});
+</script>
+
+</body>
+</html>
