@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mind Blow UI</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
+  background-size: 300% 300%;
+  animation: bgMove 10s infinite alternate;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+@keyframes bgMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* glowing cursor */
+.cursor {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(0,255,255,0.35), transparent 60%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+/* glass card */
+.card {
+  width: 360px;
+  height: 420px;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(18px);
+  border-radius: 20px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+  color: white;
+  padding: 30px;
+  text-align: center;
+  transition: transform 0.2s ease;
+  position: relative;
+}
+
+.card h1 {
+  margin-top: 30px;
+  font-size: 28px;
+}
+
+.card p {
+  margin: 20px 0 40px;
+  opacity: 0.85;
+}
+
+.btn {
+  padding: 14px 32px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #00f2fe, #4facfe);
+  color: #000;
+  font-size: 16px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ripple */
+.btn span {
+  position: absolute;
+  background: rgba(255,255,255,0.6);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  border-radius: 50%;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.footer {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="cursor"></div>
+
+<div class="card" id="card">
+  <h1>Pure HTML</h1>
+  <p>
+    No frameworks.  
+    No libraries.  
+    Just clean code doing magic.
+  </p>
+  <button class="btn" id="btn">Click Me</button>
+</div>
+
+<div class="footer">Move mouse • Hover card • Click button</div>
+
+<script>
+const cursor = document.querySelector(".cursor");
+const card = document.getElementById("card");
+const btn = document.getElementById("btn");
+
+/* glowing cursor follow */
+document.addEventListener("mousemove", e => {
+  cursor.style.left = e.clientX + "px";
+  cursor.style.top = e.clientY + "px";
+
+  const x = (window.innerWidth / 2 - e.clientX) / 25;
+  const y = (window.innerHeight / 2 - e.clientY) / 25;
+  card.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+});
+
+/* reset tilt */
+document.addEventListener("mouseleave", () => {
+  card.style.transform = "rotateY(0) rotateX(0)";
+});
+
+/* ripple effect */
+btn.addEventListener("click", e => {
+  const span = document.createElement("span");
+  const rect = btn.getBoundingClientRect();
+  span.style.left = e.clientX - rect.left + "px";
+  span.style.top = e.clientY - rect.top + "px";
+  span.style.width = span.style.height = "20px";
+  btn.appendChild(span);
+
+  setTimeout(() => span.remove(), 600);
+});
+</script>
+
+</body>
+</html>
