@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-class BankAccount {
+public class BankAccount {
 
     private String accountHolder;
     private double balance;
@@ -33,9 +33,6 @@ class BankAccount {
     void showBalance() {
         System.out.println("Current Balance: ₹" + balance);
     }
-}
-
-public class BankAccountApp {
 
     public static void main(String[] args) {
 
@@ -63,20 +60,16 @@ public class BankAccountApp {
                     System.out.print("Enter amount to deposit: ");
                     account.deposit(sc.nextDouble());
                     break;
-
                 case 2:
                     System.out.print("Enter amount to withdraw: ");
                     account.withdraw(sc.nextDouble());
                     break;
-
                 case 3:
                     account.showBalance();
                     break;
-
                 case 4:
-                    System.out.println("Thank you for banking!");
+                    System.out.println("Thank you!");
                     break;
-
                 default:
                     System.out.println("Invalid option");
             }
