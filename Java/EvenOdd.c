@@ -8,9 +8,9 @@ int main() {
 
     // Check even or odd using modulus operator
     if (number % 2 == 0) {
-        printf("Even number\n");
+        printf("Even Number\n");
     } else {
-        printf("Odd number\n");
+        printf("Odd Number\n");
     }
 
     return 0;
