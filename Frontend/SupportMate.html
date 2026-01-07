@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SupportMate</title>
+
+<style>
+body {
+    height: 100vh;
+    background: #0f172a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    color: #e5e7eb;
+}
+
+.container {
+    width: 360px;
+    background: #020617;
+    padding: 20px;
+    border-radius: 14px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+select, textarea, button {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+}
+
+select, textarea {
+    background: #020617;
+    color: #e5e7eb;
+    border: 1px solid #1e293b;
+}
+
+textarea {
+    height: 120px;
+    resize: none;
+}
+
+button {
+    background: #22c55e;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.note {
+    font-size: 11px;
+    opacity: 0.6;
+    text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>SupportMate</h2>
+
+    <select id="situation">
+        <option value="">Select ticket status</option>
+        <option value="received">Ticket Received</option>
+        <option value="working">Working on Issue</option>
+        <option value="info">Need More Information</option>
+        <option value="delay">SLA Delay</option>
+        <option value="resolved">Issue Resolved</option>
+        <option value="escalation">Escalation Update</option>
+        <option value="followup">Follow-up Reminder</option>
+        <option value="workaround">Temporary Workaround</option>
+    </select>
+
+    <select id="tone">
+        <option value="">Select tone</option>
+        <option value="formal">Formal</option>
+        <option value="polite">Polite</option>
+        <option value="friendly">Friendly</option>
+    </select>
+
+    <button onclick="generateReply()">Generate Reply</button>
+
+    <textarea id="output" placeholder="Support reply will appear here..."></textarea>
+
+    <button onclick="copyReply()">Copy Reply</button>
+
+    <div class="note">Designed for support & customer success teams</div>
+</div>
+
+<script>
+function generateReply() {
+    const s = situation.value;
+    const t = tone.value;
+
+    if (!s || !t) {
+        alert("Please select both options");
+        return;
+    }
+
+    const replies = {
+        received: {
+            formal: "We have received your request and created a support ticket. Our team will review it shortly.",
+            polite: "Thanks for reaching out. Your request has been received and we’re looking into it.",
+            friendly: "Thanks for contacting us. We’ve received your ticket and are on it."
+        },
+        working: {
+            formal: "Our team is currently investigating the issue and will update you soon.",
+            polite: "We’re actively working on the issue and will keep you posted.",
+            friendly: "We’re on it and will share an update shortly."
+        },
+        info: {
+            formal: "To proceed further, we require additional information from your side.",
+            polite: "Could you please share a few more details so we can assist you better?",
+            friendly: "Can you share a bit more info so we can move ahead?"
+        },
+        delay: {
+            formal: "We apologize for the delay due to high request volume. We appreciate your patience.",
+            polite: "Sorry for the delay. Our team is working to resolve this as soon as possible.",
+            friendly: "Apologies for the delay. We’re working on it."
+        },
+        resolved: {
+            formal: "The reported issue has been resolved. Please confirm if everything is working as expected.",
+            polite: "The issue should now be resolved. Please let us know if you need anything else.",
+            friendly: "This should be fixed now. Let us know if everything looks good."
+        },
+        escalation: {
+            formal: "The issue has been escalated to the relevant team for further investigation.",
+            polite: "We’ve escalated this internally and will update you soon.",
+            friendly: "We’ve escalated this to the right team and will keep you posted."
+        },
+        followup: {
+            formal: "Following up regarding the previous update. Please let us know your availability.",
+            polite: "Just following up to check if you had a chance to review our last message.",
+            friendly: "Quick follow-up on this."
+        },
+        workaround: {
+            formal: "As a temporary solution, please follow the steps below until a permanent fix is applied.",
+            polite: "Here’s a temporary workaround you can use for now.",
+            friendly: "For now, you can use this quick workaround."
+        }
+    };
+
+    output.value = replies[s][t];
+}
+
+function copyReply() {
+    output.select();
+    document.execCommand("copy");
+    alert("Reply copied");
+}
+</script>
+
+</body>
+</html>
