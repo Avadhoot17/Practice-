@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>QuickReply Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #020617, #020617);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #e5e7eb;
+}
+
+.card {
+    width: 380px;
+    background: linear-gradient(180deg, #020617, #020617);
+    padding: 22px;
+    border-radius: 18px;
+    animation: fadeSlide 0.8s ease;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+@keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 18px;
+    font-weight: 600;
+}
+
+select, textarea, button {
+    width: 100%;
+    margin-bottom: 14px;
+    padding: 11px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+}
+
+select, textarea {
+    background: #020617;
+    color: #e5e7eb;
+    border: 1px solid #1e293b;
+    transition: border 0.3s;
+}
+
+select:hover, textarea:focus {
+    border-color: #22c55e;
+}
+
+textarea {
+    height: 120px;
+    resize: none;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: 0.4s ease;
+}
+
+textarea.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+button {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(34,197,94,0.3);
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+.footer {
+    text-align: center;
+    font-size: 11px;
+    opacity: 0.6;
+    margin-top: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>QuickReply Pro</h2>
+
+    <select id="situation">
+        <option value="">Select situation</option>
+        <option value="job">Job / Internship Follow-up</option>
+        <option value="interview">Interview Confirmation</option>
+        <option value="leave">Leave Request</option>
+        <option value="delay">Work Delay Update</option>
+        <option value="meeting">Meeting Reschedule</option>
+        <option value="task">Task Completed</option>
+        <option value="client">Client Follow-up</option>
+        <option value="availability">Availability Response</option>
+    </select>
+
+    <select id="tone">
+        <option value="">Select tone</option>
+        <option value="formal">Formal</option>
+        <option value="polite">Polite</option>
+        <option value="friendly">Friendly</option>
+        <option value="casual">Casual</option>
+    </select>
+
+    <button onclick="generate()">Generate Message</button>
+
+    <textarea id="output" placeholder="Generated message..."></textarea>
+
+    <button onclick="copyText()">Copy Message</button>
+
+    <div class="footer">Built with pure HTML • CSS • JS</div>
+</div>
+
+<script>
+function generate() {
+    const s = situation.value;
+    const t = tone.value;
+    const output = document.getElementById("output");
+
+    if (!s || !t) {
+        alert("Select situation and tone");
+        return;
+    }
+
+    const data = {
+        job: {
+            formal: "Thank you for reviewing my application. I look forward to your update regarding the next steps.",
+            polite: "Thanks for the update. I’m looking forward to hearing from you.",
+            friendly: "Thanks for checking in. Excited to hear what’s next.",
+            casual: "Thanks for the update. Let me know what’s next."
+        },
+        interview: {
+            formal: "I confirm my availability for the scheduled interview. Thank you for the opportunity.",
+            polite: "I confirm the interview schedule. Thank you for informing me.",
+            friendly: "Yes, the interview time works perfectly. Looking forward to it.",
+            casual: "Confirmed. Looking forward to it."
+        },
+        leave: {
+            formal: "I would like to request leave for the mentioned date. Please let me know if it works.",
+            polite: "I’m requesting leave for the mentioned day. Kindly let me know.",
+            friendly: "Requesting leave for the mentioned day. Please let me know if it’s okay.",
+            casual: "I’ll be on leave that day. Let me know."
+        },
+        delay: {
+            formal: "There has been a slight delay due to unforeseen reasons. I will update you shortly.",
+            polite: "There’s a small delay from my side. I’ll share the update soon.",
+            friendly: "Running a little behind. Will update shortly.",
+            casual: "A bit late on this. Will update."
+        },
+        meeting: {
+            formal: "I would like to request rescheduling the meeting. Please let me know a suitable time.",
+            polite: "Can we reschedule the meeting? Please let me know your availability.",
+            friendly: "Can we move the meeting to another time?",
+            casual: "Can we reschedule the meeting?"
+        },
+        task: {
+            formal: "The assigned task has been completed. Please review and let me know your feedback.",
+            polite: "The task is completed. Please let me know if any changes are required.",
+            friendly: "Task is done. Let me know if anything’s needed.",
+            casual: "Task completed."
+        },
+        client: {
+            formal: "Following up regarding our previous discussion. Please let me know your thoughts.",
+            polite: "Just following up on my last message.",
+            friendly: "Checking in to see if you had a chance to review.",
+            casual: "Following up on this."
+        },
+        availability: {
+            formal: "I am available during the mentioned time. Please confirm if it works for you.",
+            polite: "Yes, I’m available at that time.",
+            friendly: "That time works for me.",
+            casual: "Yes, I’m available."
+        }
+    };
+
+    output.value = data[s][t];
+    output.classList.add("show");
+}
+
+function copyText() {
+    const output = document.getElementById("output");
+    output.select();
+    document.execCommand("copy");
+    alert("Message copied");
+}
+</script>
+
+</body>
+</html>
