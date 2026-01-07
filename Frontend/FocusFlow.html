@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FocusFlow</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1d2671, #c33764);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.app {
+    width: 380px;
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(15px);
+    border-radius: 18px;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.input-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+}
+
+button {
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: none;
+    background: #00ffd5;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.task {
+    background: rgba(255,255,255,0.15);
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+.task-title {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.timer {
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.task button {
+    background: #ffdf6c;
+    margin-right: 5px;
+}
+
+.mood {
+    margin-top: 8px;
+}
+
+.mood span {
+    cursor: pointer;
+    font-size: 20px;
+    margin-right: 5px;
+}
+
+.score {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+    <h1>FocusFlow</h1>
+
+    <div class="input-box">
+        <input type="text" id="taskInput" placeholder="New focus task">
+        <button onclick="addTask()">Add</button>
+    </div>
+
+    <div id="taskList"></div>
+
+    <div class="score">
+        Productivity Score: <span id="score">0</span>
+    </div>
+</div>
+
+<script>
+let score = 0;
+
+function addTask() {
+    const taskText = document.getElementById("taskInput").value;
+    if (!taskText) return;
+
+    const task = document.createElement("div");
+    task.className = "task";
+
+    let time = 25 * 60;
+    let interval;
+
+    task.innerHTML = `
+        <div class="task-title">${taskText}</div>
+        <div class="timer">25:00</div>
+        <button>Start</button>
+        <button>Finish</button>
+        <div class="mood">
+            <span>😄</span>
+            <span>🙂</span>
+            <span>😐</span>
+            <span>😫</span>
+        </div>
+    `;
+
+    const timerEl = task.querySelector(".timer");
+    const startBtn = task.querySelectorAll("button")[0];
+    const finishBtn = task.querySelectorAll("button")[1];
+    const moods = task.querySelectorAll(".mood span");
+
+    startBtn.onclick = () => {
+        if (interval) return;
+        interval = setInterval(() => {
+            time--;
+            let min = Math.floor(time / 60);
+            let sec = time % 60;
+            timerEl.textContent = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+            if (time <= 0) clearInterval(interval);
+        }, 1000);
+    };
+
+    finishBtn.onclick = () => {
+        clearInterval(interval);
+        task.style.opacity = 0.6;
+    };
+
+    moods.forEach((mood, index) => {
+        mood.onclick = () => {
+            score += (4 - index) * 10;
+            document.getElementById("score").textContent = score;
+            task.remove();
+        };
+    });
+
+    document.getElementById("taskList").appendChild(task);
+    document.getElementById("taskInput").value = "";
+}
+</script>
+
+</body>
+</html>
