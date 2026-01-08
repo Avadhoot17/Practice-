@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moment Alchemy</title>
+
+<style>
+:root{
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --accent:linear-gradient(135deg,#7c3aed,#06b6d4);
+}
+[data-theme="dark"]{
+  --bg:#020617;
+  --card:#020617;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui;
+  background:var(--bg);
+  color:var(--text);
+  transition:.3s;
+}
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
+}
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+h1{font-size:1.4rem;margin:0}
+.toggle{
+  cursor:pointer;
+  padding:8px 14px;
+  border-radius:20px;
+  background:var(--card);
+}
+
+.card{
+  background:var(--card);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:16px;
+}
+label{
+  font-size:.8rem;
+  color:var(--muted);
+}
+.slider{
+  width:100%;
+}
+
+.row{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;
+}
+
+select,button{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+}
+button{
+  background:var(--accent);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.output{
+  display:grid;
+  gap:14px;
+  margin-top:20px;
+}
+.caption{
+  background:var(--card);
+  border-radius:14px;
+  padding:14px;
+  display:flex;
+  justify-content:space-between;
+  animation:fade .4s ease;
+}
+.caption p{margin:0}
+.actions{
+  display:flex;
+  gap:8px;
+}
+.small{
+  background:none;
+  border:1px solid var(--muted);
+  color:var(--text);
+  padding:6px 10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+@keyframes fade{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:none}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <div class="header">
+    <h1>✨ Moment Alchemy</h1>
+    <div class="toggle" id="theme">Toggle Theme</div>
+  </div>
+
+  <div class="card row">
+    <div>
+      <label>Happiness</label>
+      <input type="range" min="0" max="100" value="50" class="slider">
+    </div>
+    <div>
+      <label>Calm</label>
+      <input type="range" min="0" max="100" value="50" class="slider">
+    </div>
+    <div>
+      <label>Chaos</label>
+      <input type="range" min="0" max="100" value="20" class="slider">
+    </div>
+    <div>
+      <label>Nostalgia</label>
+      <input type="range" min="0" max="100" value="40" class="slider">
+    </div>
+  </div>
+
+  <div class="card row">
+    <select id="style">
+      <option value="short">Whisper</option>
+      <option value="mid" selected>Balanced</option>
+      <option value="long">Deep</option>
+    </select>
+    <select id="emoji">
+      <option>Off</option>
+      <option selected>Soft</option>
+      <option>Expressive</option>
+    </select>
+    <select id="lang">
+      <option>English</option>
+      <option>Hinglish</option>
+    </select>
+  </div>
+
+  <button id="generate">Create Captions</button>
+
+  <div class="output" id="output"></div>
+</div>
+
+<script>
+const fragments=[
+  "this moment stayed longer than expected",
+  "something about today felt honest",
+  "time slowed without asking",
+  "felt present without trying",
+  "not everything needs words",
+  "some memories whisper instead of shout",
+  "felt lighter for no reason",
+  "this version of me feels real"
+];
+
+const emojis={
+  Off:[],
+  Soft:["✨","🌿","🌙"],
+  Expressive:["✨","🌿","🌙","🔥","💫"]
+};
+
+const used=new Set();
+
+function rand(arr){return arr[Math.floor(Math.random()*arr.length)]}
+
+function buildCaption(){
+  let text=rand(fragments);
+
+  if(Math.random()>.5) text+=", and I noticed it";
+
+  const style=document.getElementById("style").value;
+  if(style==="long") text+=" — one of those moments you remember quietly.";
+  if(style==="short") text=text.split(" ").slice(0,5).join(" ");
+
+  const emojiLevel=document.getElementById("emoji").value;
+  if(emojis[emojiLevel].length) text+=" "+rand(emojis[emojiLevel]);
+
+  return text.charAt(0).toUpperCase()+text.slice(1);
+}
+
+document.getElementById("generate").onclick=()=>{
+  const out=document.getElementById("output");
+  out.innerHTML="";
+  let i=0;
+  while(i<4){
+    let c=buildCaption();
+    if(used.has(c)) continue;
+    used.add(c);
+    const div=document.createElement("div");
+    div.className="caption";
+    div.innerHTML=`
+      <p>${c}</p>
+      <div class="actions">
+        <button class="small" onclick="navigator.clipboard.writeText('${c}')">Copy</button>
+        <button class="small" onclick="this.parentElement.parentElement.remove()">Remove</button>
+      </div>`;
+    out.appendChild(div);
+    i++;
+  }
+};
+
+document.getElementById("theme").onclick=()=>{
+  const h=document.documentElement;
+  h.dataset.theme=h.dataset.theme==="dark"?"light":"dark";
+};
+</script>
+</body>
+</html>
