@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meaningful Indian Name Generator</title>
+
+<style>
+:root{
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --accent:linear-gradient(135deg,#f97316,#ec4899);
+}
+[data-theme="dark"]{
+  --bg:#020617;
+  --card:#020617;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui;
+  background:var(--bg);
+  color:var(--text);
+}
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
+}
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+h1{margin:0;font-size:1.4rem}
+.toggle{
+  cursor:pointer;
+  padding:8px 14px;
+  border-radius:20px;
+  background:var(--card);
+}
+
+.card{
+  background:var(--card);
+  padding:16px;
+  border-radius:16px;
+  margin-bottom:16px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;
+}
+label{
+  font-size:.8rem;
+  color:var(--muted);
+}
+input,select{
+  width:100%;
+  margin-top:6px;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid var(--muted);
+  background:transparent;
+  color:var(--text);
+}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:var(--accent);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.output{
+  margin-top:20px;
+  display:grid;
+  gap:14px;
+}
+.name-card{
+  background:var(--card);
+  border-radius:14px;
+  padding:14px;
+  animation:fade .3s ease;
+}
+.name-card strong{font-size:1.1rem}
+.meaning{
+  font-size:.85rem;
+  color:var(--muted);
+  margin-top:6px;
+}
+.copy{
+  margin-top:8px;
+  font-size:.75rem;
+  padding:6px 10px;
+  border-radius:8px;
+  border:1px solid var(--muted);
+  background:none;
+  cursor:pointer;
+}
+
+@keyframes fade{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:none}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+<header>
+  <h1>🪔 Meaningful Indian Name Generator</h1>
+  <div class="toggle" id="themeBtn">Toggle Theme</div>
+</header>
+
+<div class="card grid">
+  <div>
+    <label>Name 1</label>
+    <input id="n1" placeholder="e.g. Ganesha">
+  </div>
+  <div>
+    <label>Name 2</label>
+    <input id="n2" placeholder="e.g. Sakshi">
+  </div>
+  <div>
+    <label>Purpose</label>
+    <select id="purpose">
+      <option>Baby Name</option>
+      <option>Couple Name</option>
+      <option>Nickname</option>
+    </select>
+  </div>
+  <div>
+    <label>Gender Preference</label>
+    <select id="gender">
+      <option>Neutral</option>
+      <option>Boy</option>
+      <option>Girl</option>
+    </select>
+  </div>
+</div>
+
+<button id="generate">Generate Meaningful Names</button>
+
+<div class="output" id="output"></div>
+</div>
+
+<script>
+const roots = [
+  {key:"an", meaning:"breath, life"},
+  {key:"sh", meaning:"peace"},
+  {key:"sak", meaning:"presence"},
+  {key:"gan", meaning:"group, abundance"},
+  {key:"dev", meaning:"divine"},
+  {key:"vi", meaning:"strength"},
+  {key:"ra", meaning:"light"},
+  {key:"ya", meaning:"journey"},
+  {key:"esh", meaning:"lordship"},
+  {key:"sa", meaning:"truth"}
+];
+
+const endings = {
+  Boy:["an","esh","dev","raj"],
+  Girl:["a","i","ika","ya"],
+  Neutral:["a","an","esh"]
+};
+
+function clean(n){
+  return n.toLowerCase().replace(/[^a-z]/g,"");
+}
+
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
+
+function extractRoot(name){
+  for(const r of roots){
+    if(name.includes(r.key)) return r;
+  }
+  return pick(roots);
+}
+
+function generateNames(){
+  const a = clean(document.getElementById("n1").value);
+  const b = clean(document.getElementById("n2").value);
+  if(!a || !b) return;
+
+  const gender = document.getElementById("gender").value;
+  const out = document.getElementById("output");
+  out.innerHTML="";
+
+  const baseRoots = [extractRoot(a), extractRoot(b)];
+
+  let used = new Set();
+  let count = 0;
+
+  while(count < 6){
+    const r1 = pick(baseRoots);
+    const r2 = pick(roots);
+    const end = pick(endings[gender]);
+
+    let name = r1.key + r2.key + end;
+    name = name.replace(/(.)\1+/g,"$1");
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+
+    if(used.has(name)) continue;
+    used.add(name);
+
+    const meaning = `Derived from "${r1.key}" (${r1.meaning}) and "${r2.key}" (${r2.meaning}), symbolizing harmony and identity.`;
+
+    const div = document.createElement("div");
+    div.className="name-card";
+    div.innerHTML = `
+      <strong>${name}</strong>
+      <div class="meaning">${meaning}</div>
+      <button class="copy" onclick="navigator.clipboard.writeText('${name}')">Copy</button>
+    `;
+    out.appendChild(div);
+    count++;
+  }
+}
+
+document.getElementById("generate").onclick = generateNames;
+document.getElementById("themeBtn").onclick = ()=>{
+  const h=document.documentElement;
+  h.dataset.theme=h.dataset.theme==="dark"?"light":"dark";
+};
+</script>
+</body>
+</html>
