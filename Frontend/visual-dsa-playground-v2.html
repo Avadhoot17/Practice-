@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Visual DSA Playground v2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --bg:#f4f6fb;
+  --panel:#ffffff;
+  --text:#0f172a;
+  --active:#3b82f6;
+  --compare:#facc15;
+  --insert:#22c55e;
+  --remove:#ef4444;
+}
+[data-theme="dark"]{
+  --bg:#020617;
+  --panel:#020617;
+  --text:#e5e7eb;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui;
+  background:var(--bg);
+  color:var(--text);
+}
+.app{
+  display:grid;
+  grid-template-columns:260px 1fr 300px;
+  height:100vh;
+}
+.sidebar,.explain{
+  background:var(--panel);
+  padding:16px;
+}
+.visual{
+  display:flex;
+  gap:16px;
+  align-items:center;
+  justify-content:center;
+  min-height:260px;
+}
+.node{
+  width:60px;
+  height:60px;
+  border-radius:12px;
+  background:#e5e7eb;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  transition:all .6s ease;
+}
+.active{background:var(--active);color:#fff}
+.compare{background:var(--compare)}
+.insert{background:var(--insert);color:#fff}
+.remove{background:var(--remove);color:#fff}
+
+select,input,button{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h3>Data Structure</h3>
+  <select id="ds"></select>
+
+  <h3>Operation</h3>
+  <select id="op"></select>
+
+  <input id="value" placeholder="Value (optional)" />
+
+  <button onclick="play()">▶ Play</button>
+  <button onclick="reset()">🔁 Reset</button>
+
+  <label>Speed</label>
+  <input type="range" min="300" max="2000" value="800" id="speed">
+
+  <button onclick="toggleTheme()">🌗 Theme</button>
+</div>
+
+<!-- CANVAS -->
+<div class="canvas">
+  <div class="visual" id="visual"></div>
+</div>
+
+<!-- EXPLANATION -->
+<div class="explain">
+  <h3>Explanation</h3>
+  <p id="text">Select structure and operation.</p>
+  <h4>Complexity</h4>
+  <p id="complexity">—</p>
+</div>
+
+</div>
+
+<script>
+/* ================== GLOBAL ================== */
+let speed = 800;
+const visual = document.getElementById("visual");
+const text = document.getElementById("text");
+const complexity = document.getElementById("complexity");
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function clear(){ visual.innerHTML=""; }
+function node(v){
+  const d=document.createElement("div");
+  d.className="node";
+  d.textContent=v;
+  return d;
+}
+
+/* ================== ARRAY ================== */
+async function arrayInsert(){
+  clear();
+  const arr=[1,2,3,4];
+  arr.forEach(v=>visual.appendChild(node(v)));
+
+  text.textContent="Traversing to index 2";
+  complexity.textContent="O(n)";
+  visual.children[1].classList.add("compare");
+  await sleep(speed);
+
+  visual.children[1].classList.remove("compare");
+  text.textContent="Shifting elements right";
+
+  for(let i=visual.children.length-1;i>=2;i--){
+    visual.children[i].style.transform="translateX(80px)";
+    await sleep(speed/2);
+  }
+
+  text.textContent="Inserting new element";
+  const n=node("X");
+  n.classList.add("insert");
+  visual.insertBefore(n,visual.children[2]);
+}
+
+async function arrayDelete(){
+  clear();
+  [1,2,3,4].forEach(v=>visual.appendChild(node(v)));
+
+  text.textContent="Accessing index 2";
+  complexity.textContent="O(n)";
+  visual.children[2].classList.add("active");
+  await sleep(speed);
+
+  text.textContent="Removing element";
+  visual.children[2].classList.add("remove");
+  await sleep(speed);
+
+  visual.children[2].remove();
+}
+
+/* ================== STACK ================== */
+async function stackPush(){
+  clear();
+  [10,20,30].forEach(v=>visual.appendChild(node(v)));
+
+  text.textContent="Push element on top";
+  complexity.textContent="O(1)";
+  const n=node("X");
+  n.classList.add("insert");
+  visual.appendChild(n);
+}
+
+async function stackPop(){
+  clear();
+  [10,20,30].forEach(v=>visual.appendChild(node(v)));
+
+  text.textContent="Removing top element";
+  complexity.textContent="O(1)";
+  const top=visual.lastChild;
+  top.classList.add("remove");
+  await sleep(speed);
+  top.remove();
+}
+
+/* ================== QUEUE ================== */
+async function queueEnqueue(){
+  clear();
+  [5,6,7].forEach(v=>visual.appendChild(node(v)));
+
+  text.textContent="Rear moves forward";
+  complexity.textContent="O(1)";
+  const n=node("X");
+  n.classList.add("insert");
+  visual.appendChild(n);
+}
+
+async function queueDequeue(){
+  clear();
+  [5,6,7].forEach(v=>visual.appendChild(node(v)));
+
+  text.textContent="Front element removed";
+  complexity.textContent="O(1)";
+  visual.children[0].classList.add("remove");
+  await sleep(speed);
+  visual.children[0].remove();
+}
+
+/* ================== LINKED LIST ================== */
+async function listInsert(){
+  clear();
+  [1,2,3].forEach(v=>visual.appendChild(node(v)));
+
+  text.textContent="Traversing using next pointer";
+  complexity.textContent="O(n)";
+  visual.children[1].classList.add("compare");
+  await sleep(speed);
+
+  visual.children[1].classList.remove("compare");
+  text.textContent="Updating pointers and inserting";
+
+  const n=node("X");
+  n.classList.add("insert");
+  visual.insertBefore(n,visual.children[2]);
+}
+
+async function listDelete(){
+  clear();
+  [1,2,3].forEach(v=>visual.appendChild(node(v)));
+
+  text.textContent="Locating node";
+  complexity.textContent="O(n)";
+  visual.children[1].classList.add("active");
+  await sleep(speed);
+
+  visual.children[1].classList.add("remove");
+  await sleep(speed);
+  visual.children[1].remove();
+}
+
+/* ================== CONFIG ================== */
+const structures = {
+  Array:{
+    "Insert":arrayInsert,
+    "Delete":arrayDelete
+  },
+  Stack:{
+    "Push":stackPush,
+    "Pop":stackPop
+  },
+  Queue:{
+    "Enqueue":queueEnqueue,
+    "Dequeue":queueDequeue
+  },
+  "Linked List":{
+    "Insert":listInsert,
+    "Delete":listDelete
+  }
+};
+
+/* ================== UI ================== */
+const ds=document.getElementById("ds");
+const op=document.getElementById("op");
+
+Object.keys(structures).forEach(s=>{
+  const o=document.createElement("option");
+  o.textContent=s;
+  ds.appendChild(o);
+});
+
+function loadOps(){
+  op.innerHTML="";
+  Object.keys(structures[ds.value]).forEach(o=>{
+    const x=document.createElement("option");
+    x.textContent=o;
+    op.appendChild(x);
+  });
+}
+ds.onchange=loadOps;
+loadOps();
+
+async function play(){
+  clear();
+  await structures[ds.value][op.value]();
+}
+
+function reset(){
+  clear();
+  text.textContent="Reset done.";
+  complexity.textContent="—";
+}
+
+document.getElementById("speed").oninput=e=>speed=e.target.value;
+function toggleTheme(){
+  document.documentElement.dataset.theme =
+    document.documentElement.dataset.theme==="dark"?"light":"dark";
+}
+</script>
+</body>
+</html>
