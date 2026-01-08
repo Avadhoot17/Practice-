@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Caption Studio</title>
+
+<style>
+/* ===================== ROOT & THEME ===================== */
+:root{
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --text:#111827;
+  --muted:#6b7280;
+  --accent:linear-gradient(135deg,#6366f1,#22d3ee);
+  --border:#e5e7eb;
+}
+
+[data-theme="dark"]{
+  --bg:#0f172a;
+  --card:#020617;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+  --border:#1e293b;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:var(--bg);
+  color:var(--text);
+  transition:.3s;
+}
+
+/* ===================== LAYOUT ===================== */
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+.title{
+  font-size:1.5rem;
+  font-weight:700;
+}
+.theme-toggle{
+  cursor:pointer;
+  padding:8px 14px;
+  border-radius:20px;
+  background:var(--card);
+  border:1px solid var(--border);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:16px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+  transition:.3s;
+}
+.card:hover{transform:translateY(-2px)}
+
+/* ===================== CONTROLS ===================== */
+label{
+  font-size:.8rem;
+  color:var(--muted);
+}
+select,input{
+  width:100%;
+  padding:10px;
+  margin-top:6px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--text);
+}
+select[multiple]{height:120px}
+
+.actions{
+  display:flex;
+  gap:12px;
+  margin-top:20px;
+  flex-wrap:wrap;
+}
+button{
+  padding:12px 18px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:600;
+}
+.primary{
+  background:var(--accent);
+  color:white;
+}
+.secondary{
+  background:var(--card);
+  color:var(--text);
+  border:1px solid var(--border);
+}
+
+.loading{
+  animation:pulse 1.2s infinite;
+}
+@keyframes pulse{
+  0%{opacity:1}
+  50%{opacity:.5}
+  100%{opacity:1}
+}
+
+/* ===================== OUTPUT ===================== */
+.output{
+  margin-top:24px;
+  display:grid;
+  gap:14px;
+}
+.caption{
+  padding:14px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:var(--card);
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+.caption p{margin:0;flex:1}
+.caption-actions{
+  display:flex;
+  gap:8px;
+}
+.small-btn{
+  font-size:.75rem;
+  padding:6px 10px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--text);
+}
+
+/* ===================== MOBILE ===================== */
+@media(max-width:600px){
+  .header{flex-direction:column;gap:10px}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <div class="header">
+    <div class="title">✨ Caption Studio</div>
+    <div class="theme-toggle" id="themeToggle">Toggle Theme</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <label>Platform</label>
+      <select id="platform" multiple>
+        <option>Instagram</option><option>WhatsApp</option><option>Snapchat</option>
+        <option>Facebook</option><option>LinkedIn</option><option>Twitter (X)</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <label>Content Type</label>
+      <select id="type" multiple>
+        <option>Story</option><option>Status</option><option>Post</option>
+        <option>Reel</option><option>Caption</option><option>Bio</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <label>Location</label>
+      <select id="location" multiple>
+        <option>Home</option><option>Garden</option><option>Cafe</option>
+        <option>Beach</option><option>Mountain</option><option>Road Trip</option>
+        <option>Office</option><option>Gym</option><option>Night Drive</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <label>Mood</label>
+      <select id="mood" multiple>
+        <option>Happy</option><option>Calm</option><option>Romantic</option>
+        <option>Sad</option><option>Motivational</option><option>Savage</option>
+        <option>Aesthetic</option><option>Peaceful</option>
+        <option>Nostalgic</option><option>Funny</option><option>Minimal</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <label>Color Tone</label>
+      <select id="color" multiple>
+        <option>Warm</option><option>Cool</option><option>Pastel</option>
+        <option>Dark</option><option>Black & White</option>
+        <option>Sunset</option><option>Neon</option><option>Earthy</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <label>Caption Length</label>
+      <select id="length">
+        <option value="short">Very Short</option>
+        <option value="s">Short</option>
+        <option value="m" selected>Medium</option>
+        <option value="l">Long</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <label>Emoji Level</label>
+      <select id="emoji">
+        <option>None</option><option>Low</option><option selected>Medium</option><option>High</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <label>Tone</label>
+      <select id="tone">
+        <option>Casual</option><option>Formal</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="primary" id="generate">Generate Captions</button>
+    <button class="secondary" id="clear">Clear</button>
+  </div>
+
+  <div class="output" id="output"></div>
+</div>
+
+<script>
+/* ===================== DATA ===================== */
+const bases=[
+  "moments that feel real",
+  "soft chaos in silence",
+  "this phase feels right",
+  "where time slows down",
+  "living between thoughts",
+  "energy you can't fake",
+  "peace over noise",
+  "small wins matter",
+  "quiet confidence",
+  "unplanned but perfect"
+];
+
+const moods={
+  Happy:["smiling without reason","joy in small things"],
+  Calm:["breathing easier here","slow and steady"],
+  Romantic:["love in the details","hearts speak softly"],
+  Savage:["unbothered energy","no explanations needed"],
+  Motivational:["keep showing up","growth over comfort"],
+  Aesthetic:["beauty in pauses","frames that feel warm"]
+};
+
+const emojis={
+  None:[],
+  Low:["✨","🌿"],
+  Medium:["✨","🌿","🌊","🌙"],
+  High:["✨","🌿","🌊","🌙","🔥","💫"]
+};
+
+let usedCaptions=new Set();
+
+/* ===================== HELPERS ===================== */
+function getSelected(id){
+  return [...document.getElementById(id).selectedOptions].map(o=>o.value);
+}
+
+function random(arr){
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+
+function wordLimit(type){
+  return {short:5,s:10,m:16,l:26}[type]||12;
+}
+
+/* ===================== GENERATOR ===================== */
+function generateCaption(){
+  const moodSel=getSelected("mood");
+  const emojiLevel=document.getElementById("emoji").value;
+  let text=random(bases);
+
+  if(moodSel.length){
+    const m=random(moodSel);
+    if(moods[m]) text+=`, ${random(moods[m])}`;
+  }
+
+  let words=text.split(" ");
+  words=words.slice(0,wordLimit(document.getElementById("length").value));
+  text=words.join(" ");
+
+  if(emojis[emojiLevel].length){
+    text+=" "+random(emojis[emojiLevel]);
+  }
+
+  return text.charAt(0).toUpperCase()+text.slice(1);
+}
+
+/* ===================== UI LOGIC ===================== */
+document.getElementById("generate").onclick=()=>{
+  const out=document.getElementById("output");
+  out.innerHTML="";
+  let count=0;
+
+  while(count<4){
+    let cap=generateCaption();
+    if(usedCaptions.has(cap)) continue;
+    usedCaptions.add(cap);
+
+    const div=document.createElement("div");
+    div.className="caption";
+    div.innerHTML=`
+      <p>${cap}</p>
+      <div class="caption-actions">
+        <button class="small-btn" onclick="navigator.clipboard.writeText('${cap}')">Copy</button>
+        <button class="small-btn" onclick="this.closest('.caption').remove()">Remove</button>
+      </div>`;
+    out.appendChild(div);
+    count++;
+  }
+};
+
+document.getElementById("clear").onclick=()=>{
+  document.getElementById("output").innerHTML="";
+  usedCaptions.clear();
+};
+
+document.getElementById("themeToggle").onclick=()=>{
+  const html=document.documentElement;
+  html.dataset.theme=html.dataset.theme==="dark"?"light":"dark";
+  localStorage.setItem("theme",html.dataset.theme);
+};
+
+document.documentElement.dataset.theme=localStorage.getItem("theme")||"light";
+</script>
+</body>
+</html>
