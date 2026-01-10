@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoodMirror+</title>
+
+<style>
+:root{
+  --bg:#020617;
+  --card:#0f172a;
+  --text:#e5e7eb;
+}
+
+*{box-sizing:border-box;font-family:system-ui}
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#020617,#020617);
+  transition:background 1s;
+  color:var(--text);
+}
+
+.app{
+  width:380px;
+  background:var(--card);
+  padding:22px;
+  border-radius:20px;
+  box-shadow:0 25px 60px rgba(0,0,0,.6);
+}
+
+h1{text-align:center;margin-top:0}
+
+.moods{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin:15px 0;
+}
+
+button{
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  font-size:16px;
+  cursor:pointer;
+  background:#020617;
+  color:white;
+  outline:1px solid #1e293b;
+  transition:.2s;
+}
+
+button:hover{transform:scale(1.05)}
+
+.slider{
+  margin:10px 0;
+  font-size:14px;
+}
+
+input[type=range]{
+  width:100%;
+}
+
+textarea{
+  width:100%;
+  background:#020617;
+  border:none;
+  border-radius:12px;
+  padding:10px;
+  color:white;
+  resize:none;
+  outline:1px solid #1e293b;
+}
+
+.message{
+  margin:15px 0;
+  min-height:40px;
+  opacity:0;
+  transition:.5s;
+}
+
+.message.show{opacity:1}
+
+.timeline{
+  margin-top:15px;
+  font-size:13px;
+  opacity:.8;
+}
+
+.reset{
+  margin-top:10px;
+  background:#1e293b;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <h1>🌈 MoodMirror+</h1>
+  <p style="text-align:center;font-size:14px">Check in with yourself</p>
+
+  <div class="moods">
+    <button onclick="setMood('happy','😊','#22c55e')">😊 Happy</button>
+    <button onclick="setMood('calm','😌','#38bdf8')">😌 Calm</button>
+    <button onclick="setMood('sad','😔','#6366f1')">😔 Sad</button>
+    <button onclick="setMood('stressed','😵','#f59e0b')">😵 Stressed</button>
+  </div>
+
+  <div class="slider">
+    Intensity: <span id="level">3</span>/5
+    <input type="range" min="1" max="5" value="3" id="intensity"
+      oninput="level.textContent=this.value">
+  </div>
+
+  <textarea id="note" rows="2" placeholder="Optional note..."></textarea>
+
+  <div class="message" id="msg"></div>
+
+  <button class="reset" onclick="resetRitual()">🫧 Reset & Breathe</button>
+
+  <div class="timeline" id="timeline"></div>
+</div>
+
+<script>
+let moods=JSON.parse(localStorage.getItem("moodData"))||[];
+
+function setMood(name,emoji,color){
+  const intensity=+intensityEl.value;
+  document.body.style.background=
+    `linear-gradient(135deg,${color},#020617)`;
+
+  const text=getMessage(name,intensity);
+  msg.textContent=text;
+  msg.classList.add("show");
+
+  moods.unshift({
+    name,emoji,intensity,
+    note:note.value,
+    time:new Date().toLocaleTimeString()
+  });
+
+  moods=moods.slice(0,5);
+  localStorage.setItem("moodData",JSON.stringify(moods));
+
+  note.value="";
+  renderTimeline();
+}
+
+function getMessage(m,i){
+  if(i>=4) return `That feeling is strong. Be kind to yourself.`;
+  if(i>=2) return `Thanks for noticing how you feel.`;
+  return `Light moment. Stay present.`;
+}
+
+function resetRitual(){
+  document.body.style.background=
+    "linear-gradient(135deg,#38bdf8,#020617)";
+  msg.textContent="Slow breath in… and out. You’re okay.";
+  msg.classList.add("show");
+}
+
+function renderTimeline(){
+  timeline.innerHTML="<b>Recent check-ins</b><br>";
+  moods.forEach(m=>{
+    timeline.innerHTML+=
+      `${m.emoji} ${m.name} (${m.intensity}/5) • ${m.time}<br>`;
+  });
+}
+
+const intensityEl=document.getElementById("intensity");
+const msg=document.getElementById("msg");
+const timeline=document.getElementById("timeline");
+
+renderTimeline();
+</script>
+</body>
+</html>
