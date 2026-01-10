@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FocusFuel</title>
+
+<style>
+:root{
+  --bg:#0f172a;
+  --card:#020617;
+  --accent:#22c55e;
+  --danger:#ef4444;
+  --text:#e5e7eb;
+}
+
+*{
+  box-sizing:border-box;
+  font-family:system-ui, sans-serif;
+}
+
+body{
+  margin:0;
+  background:linear-gradient(135deg,#020617,#0f172a);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.app{
+  width:420px;
+  background:var(--card);
+  border-radius:16px;
+  padding:24px;
+  box-shadow:0 20px 50px rgba(0,0,0,.5);
+}
+
+h1{
+  margin:0 0 10px;
+  text-align:center;
+}
+
+.stats{
+  display:flex;
+  justify-content:space-between;
+  margin:10px 0 20px;
+  font-size:14px;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  margin-bottom:10px;
+  background:#020617;
+  color:white;
+  outline:1px solid #1e293b;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:var(--accent);
+  color:#022c22;
+  font-weight:600;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+ul{
+  list-style:none;
+  padding:0;
+  margin:15px 0;
+  max-height:150px;
+  overflow:auto;
+}
+
+li{
+  padding:10px;
+  border-radius:8px;
+  background:#020617;
+  margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  outline:1px solid #1e293b;
+}
+
+li.done{
+  opacity:.5;
+  text-decoration:line-through;
+}
+
+.timer{
+  text-align:center;
+  font-size:36px;
+  margin:15px 0;
+}
+
+.warning{
+  color:var(--danger);
+  text-align:center;
+  font-size:14px;
+  min-height:18px;
+}
+
+.fade{
+  animation:fade .4s ease;
+}
+
+@keyframes fade{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+</style>
+</head>
+
+<body>
+<div class="app fade">
+  <h1>⚡ FocusFuel</h1>
+
+  <div class="stats">
+    <div>Focus Score: <b id="score">100</b></div>
+    <div>Distractions: <b id="lost">0</b></div>
+  </div>
+
+  <input id="taskInput" placeholder="Add a task..." />
+  <button onclick="addTask()">Add Task</button>
+
+  <ul id="tasks"></ul>
+
+  <div class="timer" id="timer">25:00</div>
+  <button id="startBtn" onclick="startFocus()">Start Focus Session</button>
+
+  <div class="warning" id="warning"></div>
+</div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let score = +localStorage.getItem("score") || 100;
+let lost = +localStorage.getItem("lost") || 0;
+
+let time = 25 * 60;
+let interval;
+let running = false;
+
+const taskList = document.getElementById("tasks");
+const scoreEl = document.getElementById("score");
+const lostEl = document.getElementById("lost");
+const timerEl = document.getElementById("timer");
+const warningEl = document.getElementById("warning");
+
+function save(){
+  localStorage.setItem("tasks",JSON.stringify(tasks));
+  localStorage.setItem("score",score);
+  localStorage.setItem("lost",lost);
+}
+
+function render(){
+  taskList.innerHTML="";
+  tasks.forEach((t,i)=>{
+    const li=document.createElement("li");
+    li.className=t.done?"done":"";
+    li.innerHTML=`
+      <span>${t.text}</span>
+      <input type="checkbox" ${t.done?"checked":""}
+        onchange="toggle(${i})"/>
+    `;
+    taskList.appendChild(li);
+  });
+  scoreEl.textContent=score;
+  lostEl.textContent=lost;
+}
+
+function addTask(){
+  const input=document.getElementById("taskInput");
+  if(!input.value.trim())return;
+  tasks.push({text:input.value,done:false});
+  input.value="";
+  save();render();
+}
+
+function toggle(i){
+  tasks[i].done=!tasks[i].done;
+  save();render();
+}
+
+function startFocus(){
+  if(running)return;
+  running=true;
+  document.getElementById("startBtn").disabled=true;
+
+  interval=setInterval(()=>{
+    time--;
+    const m=String(Math.floor(time/60)).padStart(2,"0");
+    const s=String(time%60).padStart(2,"0");
+    timerEl.textContent=`${m}:${s}`;
+
+    if(time<=0){
+      clearInterval(interval);
+      running=false;
+      document.getElementById("startBtn").disabled=false;
+      warningEl.textContent="Session complete. Solid focus.";
+    }
+  },1000);
+}
+
+document.addEventListener("visibilitychange",()=>{
+  if(running && document.hidden){
+    lost++;
+    score=Math.max(0,score-5);
+    warningEl.textContent="You lost focus!";
+    save();render();
+    setTimeout(()=>warningEl.textContent="",1500);
+  }
+});
+
+render();
+</script>
+</body>
+</html>
