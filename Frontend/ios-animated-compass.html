@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Compass</title>
+
+<style>
+:root {
+  --ease: cubic-bezier(.25,1,.35,1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: radial-gradient(circle at top, #1a1f3c, #06070d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  color: white;
+}
+
+/* --- CONTAINER --- */
+.app {
+  width: 320px;
+  height: 420px;
+  border-radius: 30px;
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(22px);
+  box-shadow: 0 50px 90px rgba(0,0,0,.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* --- TITLE --- */
+.title {
+  font-size: 18px;
+  opacity: .85;
+  margin-bottom: 20px;
+}
+
+/* --- COMPASS --- */
+.compass {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center,
+      rgba(255,255,255,.12),
+      rgba(255,255,255,.02));
+  box-shadow:
+    inset 0 0 30px rgba(255,255,255,.15),
+    0 30px 60px rgba(0,0,0,.6);
+}
+
+/* --- RING --- */
+.compass::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.2);
+}
+
+/* --- DIRECTIONS --- */
+.dir {
+  position: absolute;
+  font-size: 18px;
+  font-weight: 500;
+  opacity: .9;
+}
+
+.n { top: 12px; left: 50%; transform: translateX(-50%); }
+.s { bottom: 12px; left: 50%; transform: translateX(-50%); }
+.e { right: 14px; top: 50%; transform: translateY(-50%); }
+.w { left: 14px; top: 50%; transform: translateY(-50%); }
+
+/* --- NEEDLE --- */
+.needle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 100px;
+  background: linear-gradient(to top, #ff4d4d, #ff9a9a);
+  border-radius: 4px;
+  transform-origin: bottom center;
+  transform: translate(-50%, -100%) rotate(0deg);
+  box-shadow: 0 0 25px rgba(255,80,80,.8);
+  transition: transform 1s var(--ease);
+}
+
+/* --- CENTER DOT --- */
+.center {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: white;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 20px rgba(255,255,255,.9);
+}
+
+/* --- DEGREE --- */
+.degree {
+  margin-top: 24px;
+  font-size: 22px;
+  letter-spacing: 1px;
+  opacity: .85;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <div class="title">Compass</div>
+
+  <div class="compass">
+    <div class="dir n">N</div>
+    <div class="dir e">E</div>
+    <div class="dir s">S</div>
+    <div class="dir w">W</div>
+
+    <div class="needle" id="needle"></div>
+    <div class="center"></div>
+  </div>
+
+  <div class="degree" id="degree">0°</div>
+</div>
+
+<script>
+let angle = 0;
+const needle = document.getElementById("needle");
+const degree = document.getElementById("degree");
+
+/* --- SMOOTH ROTATION LOOP --- */
+setInterval(() => {
+  angle += 15;
+  if (angle >= 360) angle = 0;
+
+  needle.style.transform =
+    `translate(-50%, -100%) rotate(${angle}deg)`;
+
+  degree.textContent = `${angle}°`;
+}, 1200);
+</script>
+
+</body>
+</html>
