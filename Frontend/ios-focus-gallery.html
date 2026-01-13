@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iOS Focus Gallery</title>
+
+<style>
+:root {
+  --ease: cubic-bezier(.25,1,.35,1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #1c1c28, #050507);
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+/* --- APP --- */
+.app {
+  width: 92vw;
+  max-width: 1100px;
+}
+
+/* --- TITLE --- */
+.title {
+  text-align: center;
+  font-size: 22px;
+  opacity: .85;
+  margin-bottom: 24px;
+}
+
+/* --- GRID --- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  perspective: 1200px;
+}
+
+/* --- CARD --- */
+.card {
+  position: relative;
+  height: 300px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 30px 60px rgba(0,0,0,.5);
+  cursor: pointer;
+  transform: translateZ(0) scale(.92);
+  transition: transform .6s var(--ease), filter .6s var(--ease);
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .8s var(--ease);
+}
+
+/* --- LABEL --- */
+.label {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(14px);
+  font-size: 15px;
+}
+
+/* --- FOCUS STATE --- */
+.card.active {
+  transform: translateZ(120px) scale(1);
+  z-index: 10;
+}
+
+.card.active img {
+  transform: scale(1.05);
+}
+
+/* --- DIM OTHERS --- */
+.grid.dim .card:not(.active) {
+  filter: brightness(.6);
+  transform: scale(.88);
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <div class="title">Focused Moments</div>
+
+  <div class="grid" id="grid">
+    <div class="card active">
+      <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee">
+      <div class="label">Mountain Calm</div>
+    </div>
+
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470">
+      <div class="label">Forest Walk</div>
+    </div>
+
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d">
+      <div class="label">Golden Horizon</div>
+    </div>
+
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba">
+      <div class="label">Silent Lake</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const grid = document.getElementById("grid");
+const cards = document.querySelectorAll(".card");
+
+cards.forEach(card => {
+  card.addEventListener("mouseenter", focus);
+  card.addEventListener("click", focus);
+});
+
+function focus(e) {
+  cards.forEach(c => c.classList.remove("active"));
+  e.currentTarget.classList.add("active");
+  grid.classList.add("dim");
+}
+</script>
+
+</body>
+</html>
