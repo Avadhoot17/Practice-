@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iOS Motion Gallery</title>
+
+<style>
+:root {
+  --ease: cubic-bezier(.22,1,.36,1);
+  --glass: rgba(255,255,255,0.14);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background:
+    radial-gradient(circle at top, #1e1e2e, #050507 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden;
+  color: white;
+}
+
+/* --- FRAME --- */
+.frame {
+  width: 92vw;
+  max-width: 980px;
+  height: 540px;
+  position: relative;
+}
+
+/* --- TRACK --- */
+.track {
+  display: flex;
+  height: 100%;
+  will-change: transform;
+  transition: transform 0.9s var(--ease);
+}
+
+/* --- SLIDE --- */
+.slide {
+  min-width: 100%;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  width: 100%;
+  height: 100%;
+  border-radius: 26px;
+  overflow: hidden;
+  position: relative;
+  background: var(--glass);
+  backdrop-filter: blur(22px);
+  box-shadow:
+    0 40px 80px rgba(0,0,0,.55),
+    inset 0 0 0 1px rgba(255,255,255,.08);
+  transform: scale(.93);
+  transition: transform .9s var(--ease);
+}
+
+.slide.active .card {
+  transform: scale(1);
+}
+
+/* --- IMAGE --- */
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.1);
+  transition: transform 1.2s var(--ease);
+}
+
+.slide.active img {
+  transform: scale(1);
+}
+
+/* --- GRADIENT OVERLAY --- */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom,
+      rgba(0,0,0,.0),
+      rgba(0,0,0,.45));
+}
+
+/* --- CAPTION --- */
+.caption {
+  position: absolute;
+  bottom: 22px;
+  left: 22px;
+  padding: 14px 20px;
+  border-radius: 18px;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(18px);
+  font-size: 16px;
+  letter-spacing: .4px;
+}
+
+/* --- FLOATING CONTROLS --- */
+.control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,.18);
+  backdrop-filter: blur(14px);
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  transition: transform .25s ease, background .25s ease;
+}
+
+.control:hover {
+  transform: translateY(-50%) scale(1.15);
+  background: rgba(255,255,255,.3);
+}
+
+.prev { left: -8px; }
+.next { right: -8px; }
+
+/* --- DOTS --- */
+.dots {
+  position: absolute;
+  bottom: -42px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.35);
+  transition: transform .3s ease, background .3s ease;
+}
+
+.dot.active {
+  background: white;
+  transform: scale(1.8);
+}
+</style>
+</head>
+
+<body>
+
+<div class="frame">
+  <div class="track" id="track">
+
+    <div class="slide active">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee">
+        <div class="caption">Silent Mountains</div>
+      </div>
+    </div>
+
+    <div class="slide">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d">
+        <div class="caption">Endless Horizon</div>
+      </div>
+    </div>
+
+    <div class="slide">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470">
+        <div class="caption">Into the Wild</div>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="control prev">‹</button>
+  <button class="control next">›</button>
+  <div class="dots" id="dots"></div>
+</div>
+
+<script>
+const track = document.getElementById("track");
+const slides = document.querySelectorAll(".slide");
+const dotsWrap = document.getElementById("dots");
+
+let index = 0;
+let startX = 0;
+let currentX = 0;
+let dragging = false;
+
+/* --- DOTS --- */
+slides.forEach((_, i) => {
+  const d = document.createElement("div");
+  d.className = "dot" + (i === 0 ? " active" : "");
+  d.onclick = () => go(i);
+  dotsWrap.appendChild(d);
+});
+const dots = document.querySelectorAll(".dot");
+
+/* --- UPDATE --- */
+function update() {
+  track.style.transition = "transform .9s cubic-bezier(.22,1,.36,1)";
+  track.style.transform = `translateX(-${index * 100}%)`;
+  slides.forEach((s, i) => s.classList.toggle("active", i === index));
+  dots.forEach((d, i) => d.classList.toggle("active", i === index));
+}
+
+function go(i) {
+  index = Math.max(0, Math.min(slides.length - 1, i));
+  update();
+}
+
+/* --- BUTTONS --- */
+document.querySelector(".next").onclick = () => go(index + 1);
+document.querySelector(".prev").onclick = () => go(index - 1);
+
+/* --- DRAG (iOS FEEL) --- */
+track.addEventListener("pointerdown", e => {
+  dragging = true;
+  startX = e.clientX;
+  track.style.transition = "none";
+});
+
+window.addEventListener("pointermove", e => {
+  if (!dragging) return;
+  currentX = e.clientX - startX;
+  track.style.transform =
+    `translateX(calc(-${index * 100}% + ${currentX}px))`;
+});
+
+window.addEventListener("pointerup", () => {
+  if (!dragging) return;
+  dragging = false;
+
+  if (Math.abs(currentX) > 80) {
+    index += currentX < 0 ? 1 : -1;
+  }
+  index = Math.max(0, Math.min(slides.length - 1, index));
+  update();
+  currentX = 0;
+});
+
+/* --- KEYBOARD --- */
+window.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") go(index + 1);
+  if (e.key === "ArrowLeft") go(index - 1);
+});
+</script>
+
+</body>
+</html>
