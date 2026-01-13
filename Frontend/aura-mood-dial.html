@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aura Mood Dial</title>
+
+<style>
+:root {
+  --ease: cubic-bezier(.25,1,.35,1);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: radial-gradient(circle at top, #1b1f2f, #050507);
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: background 1s var(--ease);
+  color: white;
+}
+
+/* --- APP --- */
+.app {
+  width: 360px;
+  height: 520px;
+  border-radius: 32px;
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(24px);
+  box-shadow: 0 60px 100px rgba(0,0,0,.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* --- TITLE --- */
+.title {
+  font-size: 20px;
+  margin-bottom: 18px;
+  opacity: .9;
+}
+
+/* --- DIAL --- */
+.dial-wrap {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin-bottom: 24px;
+}
+
+.dial {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.2);
+  box-shadow: inset 0 0 30px rgba(255,255,255,.1);
+  cursor: grab;
+  transform: rotate(0deg);
+  transition: transform .6s var(--ease);
+}
+
+.marker {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 24px;
+  background: white;
+  border-radius: 4px;
+}
+
+/* --- MOODS --- */
+.mood {
+  position: absolute;
+  width: 60px;
+  text-align: center;
+  font-size: 14px;
+  opacity: .75;
+}
+
+.m1 { top: -18px; left: 50%; transform: translateX(-50%); }
+.m2 { top: 40px; right: -12px; }
+.m3 { bottom: 40px; right: -12px; }
+.m4 { bottom: -18px; left: 50%; transform: translateX(-50%); }
+.m5 { bottom: 40px; left: -12px; }
+.m6 { top: 40px; left: -12px; }
+
+/* --- CURRENT MOOD --- */
+.current {
+  font-size: 26px;
+  letter-spacing: .5px;
+}
+
+/* --- SUBTEXT --- */
+.sub {
+  margin-top: 6px;
+  opacity: .7;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <div class="title">Select Your Mood</div>
+
+  <div class="dial-wrap">
+    <div class="dial" id="dial">
+      <div class="marker"></div>
+    </div>
+
+    <div class="mood m1">Calm</div>
+    <div class="mood m2">Happy</div>
+    <div class="mood m3">Focused</div>
+    <div class="mood m4">Tired</div>
+    <div class="mood m5">Relaxed</div>
+    <div class="mood m6">Inspired</div>
+  </div>
+
+  <div class="current" id="current">Calm</div>
+  <div class="sub" id="sub">Soft and peaceful</div>
+</div>
+
+<script>
+const dial = document.getElementById("dial");
+const current = document.getElementById("current");
+const sub = document.getElementById("sub");
+
+const moods = [
+  { name: "Calm", bg: "#1b2b3a", text: "Soft and peaceful", angle: 0 },
+  { name: "Happy", bg: "#2b3a1b", text: "Light and positive", angle: 60 },
+  { name: "Focused", bg: "#1b3a2b", text: "Sharp and clear", angle: 120 },
+  { name: "Tired", bg: "#3a1b1b", text: "Slow and heavy", angle: 180 },
+  { name: "Relaxed", bg: "#2b1b3a", text: "Loose and easy", angle: 240 },
+  { name: "Inspired", bg: "#3a2b1b", text: "Creative energy", angle: 300 }
+];
+
+let index = 0;
+let dragging = false;
+let startAngle = 0;
+
+/* --- UPDATE --- */
+function applyMood(i) {
+  index = i;
+  dial.style.transform = `rotate(${moods[i].angle}deg)`;
+  document.body.style.background =
+    `radial-gradient(circle at top, ${moods[i].bg}, #050507)`;
+  current.textContent = moods[i].name;
+  sub.textContent = moods[i].text;
+}
+
+applyMood(0);
+
+/* --- DRAG --- */
+dial.addEventListener("pointerdown", e => {
+  dragging = true;
+  startAngle = e.clientX;
+});
+
+window.addEventListener("pointermove", e => {
+  if (!dragging) return;
+  const diff = e.clientX - startAngle;
+  dial.style.transform = `rotate(${moods[index].angle + diff / 2}deg)`;
+});
+
+window.addEventListener("pointerup", e => {
+  if (!dragging) return;
+  dragging = false;
+  index = (index + 1) % moods.length;
+  applyMood(index);
+});
+</script>
+
+</body>
+</html>
