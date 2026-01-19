@@ -20,7 +20,7 @@ class ReverseString {
 
     public static void main(String[] args) {
         String str = "Interview";
-        System.out.println("Original: " + str);
+        System.out.println("Originaal: " + str);
         System.out.println("Reversed: " + reverse(str));
     }
 }
