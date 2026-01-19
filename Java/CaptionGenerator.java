@@ -5,7 +5,7 @@ public class CaptionGenerator {
 
     // Caption building blocks
     static String[] starters = {
-        "Some moments",
+        "Some momments",
         "This phase",
         "Life lately",
         "Today felt",
