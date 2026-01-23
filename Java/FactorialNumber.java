@@ -3,7 +3,7 @@ public class FactorialNumber {
 
     public static void main(String[] args) {
 
-        // Number whose factorial is to be calculated
+        // Number whose factorial is to be calculated by logically
         int number = 5;
 
         // Variable to store factorial result
