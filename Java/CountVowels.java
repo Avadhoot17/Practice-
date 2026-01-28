@@ -29,7 +29,7 @@ class VowelConsonantCount {
     }
 
     public static void main(String[] args) {
-        String text = "Hello World";
+        String text = "Hello World! Hello World!";
         count(text);
     }
 }
