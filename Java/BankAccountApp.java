@@ -13,15 +13,15 @@ public class BankAccount {
     void deposit(double amount) {
         if (amount > 0) {
             balance += amount;
-            System.out.println("Deposited: ₹" + amount);
+            System.out.println("Your Deposited: ₹" + amount);
         } else {
-            System.out.println("Invalid amount");
+            System.out.println("Your Invalid amount");
         }
     }
 
     void withdraw(double amount) {
         if (amount > balance) {
-            System.out.println("Insufficient balance");
+            System.out.println("Insufficient Account balance");
         } else if (amount <= 0) {
             System.out.println("Invalid amount");
         } else {
