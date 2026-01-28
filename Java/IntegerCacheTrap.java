@@ -2,11 +2,11 @@ public class IntegerCacheTrap {
 
     public static void main(String[] args) {
 
-        Integer a = 127;
-        Integer b = 127;
+        Integer a = 126;
+        Integer b = 126;
 
-        Integer c = 128;
-        Integer d = 128;
+        Integer c = 127;
+        Integer d = 127;
 
         System.out.println(a == b);
         System.out.println(c == d);
