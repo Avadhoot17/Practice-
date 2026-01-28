@@ -2,8 +2,8 @@ public class BitwiseCalculator {
 
     public static void main(String[] args) {
 
-        int a = 12;
-        int b = 5;
+        int a = 10;
+        int b = 4;
 
         int r1 = a & b + 2;
         int r2 = a | b << 1;
