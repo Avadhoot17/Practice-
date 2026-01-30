@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Future UI Trick</title>
+<title>Future UI Trick Plus</title>
 
 <style>
 :root {
-  --hue: 220;
+  --hue: 200;
   --scale: 1;
   --rotate: 0deg;
+  --blur: 0px;
+  --glow: 0px;
 }
 
 * {
@@ -18,86 +20,166 @@
 
 body {
   margin: 0;
-  min-height: 200vh;
-  background: hsl(var(--hue), 80%, 8%);
-  color: white;
+  min-height: 300vh;
+  background:
+    radial-gradient(
+      circle at top,
+      hsl(var(--hue), 80%, 20%),
+      hsl(var(--hue), 80%, 5%)
+    );
   display: flex;
   align-items: center;
   justify-content: center;
+  color: white;
 }
 
 .card {
-  width: 320px;
-  height: 200px;
-  border-radius: 20px;
+  width: 340px;
+  height: 220px;
+  border-radius: 24px;
   background: hsl(var(--hue), 80%, 55%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
-  font-weight: bold;
-  transform: 
+  text-align: center;
+  padding: 20px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  transform:
     scale(var(--scale))
     rotate(var(--rotate));
-  transition: transform 0.3s ease, background 0.3s ease;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  filter: blur(var(--blur));
+  box-shadow:
+    0 0 var(--glow) hsl(var(--hue), 90%, 70%),
+    0 30px 60px rgba(0,0,0,0.5);
+  transition: 0.3s ease;
+  cursor: pointer;
+  user-select: none;
 }
 
-.card span {
-  pointer-events: none;
+.hint {
+  position: fixed;
+  bottom: 16px;
+  opacity: 0.6;
+  font-size: 0.8rem;
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
-  <span>Scroll + Hover Magic</span>
+<div class="card" tabindex="0">
+  Touch • Scroll • Hover • Keys
+</div>
+
+<div class="hint">
+  Try: Scroll | Hover | Double Click | Arrow Keys | Stay Idle
 </div>
 
 <script>
+const root = document.documentElement;
 const card = document.querySelector('.card');
 
-/* 🔥 JS Proxy controlling CSS variables */
+/* ⚙️ Reactive state */
 const state = new Proxy(
-  { hue: 220, scale: 1, rotate: 0 },
   {
-    set(target, key, value) {
-      target[key] = value;
-      document.documentElement.style.setProperty(
+    hue: 200,
+    scale: 1,
+    rotate: 0,
+    blur: 0,
+    glow: 0,
+    mode: 'active'
+  },
+  {
+    set(obj, key, value) {
+      obj[key] = value;
+      root.style.setProperty(
         `--${key}`,
-        key === 'rotate' ? value + 'deg' : value
+        typeof value === 'number' && key !== 'rotate'
+          ? value
+          : key === 'rotate'
+          ? value + 'deg'
+          : value
       );
       return true;
     }
   }
 );
 
-/* 🧠 Scroll-based logic */
-window.addEventListener('scroll', () => {
-  const scroll = window.scrollY;
-  state.hue = (220 + scroll / 5) % 360;
-  state.rotate = scroll / 10;
+/* 🌀 Scroll = motion */
+addEventListener('scroll', () => {
+  const s = scrollY;
+  state.rotate = s / 8;
+  state.hue = (200 + s / 6) % 360;
 });
 
-/* 🎯 Hover logic */
-card.addEventListener('mouseenter', () => {
+/* ✋ Hover = focus */
+card.onmouseenter = () => {
   state.scale = 1.15;
-});
+  state.glow = 40;
+};
 
-card.addEventListener('mouseleave', () => {
+card.onmouseleave = () => {
   state.scale = 1;
+  state.glow = 0;
+};
+
+/* 👆 Double click = mode switch */
+card.ondblclick = () => {
+  state.mode = state.mode === 'active' ? 'sleep' : 'active';
+  state.blur = state.mode === 'sleep' ? 2 : 0;
+};
+
+/* ⌨️ Keyboard controls */
+card.onkeydown = e => {
+  if (e.key === 'ArrowLeft') state.rotate -= 10;
+  if (e.key === 'ArrowRight') state.rotate += 10;
+  if (e.key === 'ArrowUp') state.scale += 0.05;
+  if (e.key === 'ArrowDown') state.scale -= 0.05;
+};
+
+/* 🕒 Idle detection */
+let idleTimer;
+const idle = () => {
+  clearTimeout(idleTimer);
+  state.mode = 'active';
+  idleTimer = setTimeout(() => {
+    state.mode = 'idle';
+    state.blur = 1.5;
+    state.glow = 15;
+  }, 4000);
+};
+
+['mousemove','scroll','keydown','click'].forEach(e =>
+  addEventListener(e, idle)
+);
+
+/* 🌙 Time-aware behavior */
+const hour = new Date().getHours();
+if (hour >= 19 || hour <= 6) {
+  state.hue = 260;
+}
+
+/* 🧠 Memory */
+const savedHue = localStorage.getItem('ui-hue');
+if (savedHue) state.hue = savedHue;
+
+window.addEventListener('beforeunload', () => {
+  localStorage.setItem('ui-hue', state.hue);
 });
 
-/* 👀 Visibility-based update */
+/* 👀 Visibility awareness */
 const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      state.hue = Math.floor(Math.random() * 360);
+  entries.forEach(e => {
+    if (!e.isIntersecting) {
+      state.scale = 0.9;
+      state.blur = 2;
+    } else {
+      state.scale = 1;
+      state.blur = 0;
     }
   });
 });
-
 observer.observe(card);
 </script>
 
