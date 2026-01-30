@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>macOS Style Dock Navbar</title>
+
+<style>
+:root {
+  --dock-bg: rgba(30, 30, 30, 0.65);
+  --active: #4fd1ff;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  height: 200vh;
+  background: linear-gradient(180deg, #0f2027, #203a43, #2c5364);
+  font-family: system-ui, sans-serif;
+}
+
+/* Dock */
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 12px 18px;
+  background: var(--dock-bg);
+  backdrop-filter: blur(20px);
+  border-radius: 28px;
+  box-shadow: 0 30px 60px rgba(0,0,0,.5);
+  z-index: 999;
+}
+
+/* Icon container */
+.dock-item {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .25s ease;
+  cursor: pointer;
+}
+
+/* Icon */
+.dock-item img {
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  transition: transform .25s ease;
+}
+
+/* Label */
+.dock-item span {
+  position: absolute;
+  bottom: 70px;
+  background: rgba(0,0,0,.75);
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: .25s;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Active dot */
+.dock-item::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  width: 6px;
+  height: 6px;
+  background: var(--active);
+  border-radius: 50%;
+  opacity: 0;
+  transition: .25s;
+}
+
+/* Hover effects */
+.dock-item:hover img {
+  transform: scale(1.6);
+}
+
+.dock-item:hover span {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Active */
+.dock-item.active::after {
+  opacity: 1;
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  .dock {
+    gap: 10px;
+  }
+  .dock-item {
+    width: 46px;
+    height: 46px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Dock -->
+<nav class="dock" role="navigation" aria-label="macOS Dock">
+  <div class="dock-item active" tabindex="0" data-app="Finder">
+    <img src="https://img.icons8.com/color/96/finder.png">
+    <span>Finder</span>
+  </div>
+  <div class="dock-item" tabindex="0" data-app="Safari">
+    <img src="https://img.icons8.com/color/96/safari.png">
+    <span>Safari</span>
+  </div>
+  <div class="dock-item" tabindex="0" data-app="Mail">
+    <img src="https://img.icons8.com/color/96/mail.png">
+    <span>Mail</span>
+  </div>
+  <div class="dock-item" tabindex="0" data-app="Music">
+    <img src="https://img.icons8.com/color/96/apple-music.png">
+    <span>Music</span>
+  </div>
+  <div class="dock-item" tabindex="0" data-app="Settings">
+    <img src="https://img.icons8.com/color/96/settings.png">
+    <span>Settings</span>
+  </div>
+</nav>
+
+<script>
+const items = document.querySelectorAll('.dock-item');
+
+/* Click logic */
+items.forEach(item => {
+  item.addEventListener('click', () => activate(item));
+  item.addEventListener('keydown', e => {
+    if (e.key === 'Enter') activate(item);
+  });
+});
+
+function activate(selected) {
+  items.forEach(i => i.classList.remove('active'));
+  selected.classList.add('active');
+
+  // fake app action
+  console.log(selected.dataset.app + ' opened');
+}
+
+/* Cursor-based magnification (real dock feel) */
+const dock = document.querySelector('.dock');
+
+dock.addEventListener('mousemove', e => {
+  items.forEach(item => {
+    const rect = item.getBoundingClientRect();
+    const distance = Math.abs(e.clientX - (rect.left + rect.width / 2));
+    const scale = Math.max(1, 1.6 - distance / 180);
+    item.style.transform = `scale(${scale})`;
+  });
+});
+
+dock.addEventListener('mouseleave', () => {
+  items.forEach(item => {
+    item.style.transform = 'scale(1)';
+  });
+});
+</script>
+
+</body>
+</html>
