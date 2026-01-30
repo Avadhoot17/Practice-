@@ -2,27 +2,27 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>macOS Style Dock Navbar</title>
+<title>macOS Dock – Fixed & Expanded</title>
 
 <style>
 :root {
-  --dock-bg: rgba(30, 30, 30, 0.65);
-  --active: #4fd1ff;
+  --dock-bg: rgba(28,28,30,.75);
+  --active: #5ac8fa;
 }
 
 * {
   box-sizing: border-box;
-  user-select: none;
 }
 
 body {
   margin: 0;
-  height: 200vh;
-  background: linear-gradient(180deg, #0f2027, #203a43, #2c5364);
+  min-height: 200vh;
+  background: linear-gradient(180deg,#0b1220,#111827,#020617);
   font-family: system-ui, sans-serif;
+  color: white;
 }
 
-/* Dock */
+/* Dock container */
 .dock {
   position: fixed;
   left: 50%;
@@ -31,45 +31,47 @@ body {
   display: flex;
   align-items: flex-end;
   gap: 14px;
-  padding: 12px 18px;
+  padding: 14px 18px;
   background: var(--dock-bg);
   backdrop-filter: blur(20px);
-  border-radius: 28px;
-  box-shadow: 0 30px 60px rgba(0,0,0,.5);
-  z-index: 999;
+  border-radius: 30px;
+  box-shadow: 0 30px 60px rgba(0,0,0,.55);
+  z-index: 1000;
 }
 
-/* Icon container */
+/* Dock item */
 .dock-item {
   position: relative;
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform .25s ease;
+  transition: transform .2s ease;
   cursor: pointer;
 }
 
 /* Icon */
-.dock-item img {
+.dock-item svg {
   width: 100%;
   height: 100%;
   border-radius: 14px;
-  transition: transform .25s ease;
+  background: linear-gradient(145deg,#3b82f6,#2563eb);
+  padding: 10px;
+  transition: transform .2s ease;
 }
 
 /* Label */
 .dock-item span {
   position: absolute;
-  bottom: 70px;
+  bottom: 76px;
   background: rgba(0,0,0,.75);
   padding: 6px 10px;
-  font-size: 12px;
   border-radius: 8px;
+  font-size: 12px;
   opacity: 0;
-  transform: translateY(8px);
-  transition: .25s;
+  transform: translateY(6px);
+  transition: .2s ease;
   white-space: nowrap;
   pointer-events: none;
 }
@@ -84,12 +86,11 @@ body {
   background: var(--active);
   border-radius: 50%;
   opacity: 0;
-  transition: .25s;
+  transition: .2s;
 }
 
-/* Hover effects */
-.dock-item:hover img {
-  transform: scale(1.6);
+.dock-item.active::after {
+  opacity: 1;
 }
 
 .dock-item:hover span {
@@ -97,85 +98,85 @@ body {
   transform: translateY(0);
 }
 
-/* Active */
-.dock-item.active::after {
-  opacity: 1;
-}
-
-/* Mobile tweaks */
-@media (max-width: 768px) {
-  .dock {
-    gap: 10px;
-  }
-  .dock-item {
-    width: 46px;
-    height: 46px;
-  }
+/* Content mock */
+.app {
+  padding: 80px 20px;
+  font-size: 2rem;
+  text-align: center;
+  opacity: .4;
 }
 </style>
 </head>
 
 <body>
 
-<!-- Dock -->
-<nav class="dock" role="navigation" aria-label="macOS Dock">
-  <div class="dock-item active" tabindex="0" data-app="Finder">
-    <img src="https://img.icons8.com/color/96/finder.png">
+<div class="app" id="appView">Finder</div>
+
+<nav class="dock">
+
+  <div class="dock-item active" data-app="Finder">
+    <svg viewBox="0 0 24 24" fill="white"><path d="M3 3h18v18H3z"/></svg>
     <span>Finder</span>
   </div>
-  <div class="dock-item" tabindex="0" data-app="Safari">
-    <img src="https://img.icons8.com/color/96/safari.png">
+
+  <div class="dock-item" data-app="Safari">
+    <svg viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="10"/></svg>
     <span>Safari</span>
   </div>
-  <div class="dock-item" tabindex="0" data-app="Mail">
-    <img src="https://img.icons8.com/color/96/mail.png">
+
+  <div class="dock-item" data-app="Mail">
+    <svg viewBox="0 0 24 24" fill="white"><path d="M2 6h20v12H2z"/></svg>
     <span>Mail</span>
   </div>
-  <div class="dock-item" tabindex="0" data-app="Music">
-    <img src="https://img.icons8.com/color/96/apple-music.png">
+
+  <div class="dock-item" data-app="Messages">
+    <svg viewBox="0 0 24 24" fill="white"><path d="M4 4h16v12H7l-3 3z"/></svg>
+    <span>Messages</span>
+  </div>
+
+  <div class="dock-item" data-app="Photos">
+    <svg viewBox="0 0 24 24" fill="white"><path d="M12 2l3 6 7 3-7 3-3 6-3-6-7-3 7-3z"/></svg>
+    <span>Photos</span>
+  </div>
+
+  <div class="dock-item" data-app="Music">
+    <svg viewBox="0 0 24 24" fill="white"><path d="M9 3v14a3 3 0 1 0 2 2V7h6V3z"/></svg>
     <span>Music</span>
   </div>
-  <div class="dock-item" tabindex="0" data-app="Settings">
-    <img src="https://img.icons8.com/color/96/settings.png">
+
+  <div class="dock-item" data-app="Settings">
+    <svg viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="3"/><path d="M19 12l2-1-2-1-1-2-1 2-2 1 2 1 1 2z"/></svg>
     <span>Settings</span>
   </div>
+
 </nav>
 
 <script>
 const items = document.querySelectorAll('.dock-item');
+const view = document.getElementById('appView');
+const dock = document.querySelector('.dock');
 
-/* Click logic */
 items.forEach(item => {
-  item.addEventListener('click', () => activate(item));
-  item.addEventListener('keydown', e => {
-    if (e.key === 'Enter') activate(item);
+  item.addEventListener('click', () => {
+    items.forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    view.textContent = item.dataset.app;
   });
 });
 
-function activate(selected) {
-  items.forEach(i => i.classList.remove('active'));
-  selected.classList.add('active');
-
-  // fake app action
-  console.log(selected.dataset.app + ' opened');
-}
-
-/* Cursor-based magnification (real dock feel) */
-const dock = document.querySelector('.dock');
-
+/* Real macOS-style magnification */
 dock.addEventListener('mousemove', e => {
   items.forEach(item => {
-    const rect = item.getBoundingClientRect();
-    const distance = Math.abs(e.clientX - (rect.left + rect.width / 2));
-    const scale = Math.max(1, 1.6 - distance / 180);
+    const r = item.getBoundingClientRect();
+    const center = r.left + r.width / 2;
+    const dist = Math.abs(e.clientX - center);
+    const scale = Math.max(1, 1.6 - dist / 160);
     item.style.transform = `scale(${scale})`;
   });
 });
 
 dock.addEventListener('mouseleave', () => {
-  items.forEach(item => {
-    item.style.transform = 'scale(1)';
-  });
+  items.forEach(item => item.style.transform = 'scale(1)');
 });
 </script>
 
