@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Amazon Clone</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+  margin:0;
+  background:#eaeded;
+  color:#111;
+}
+
+/* ===== NAVBAR ===== */
+.navbar{
+  background:#131921;
+  color:white;
+  padding:10px 16px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.logo{
+  font-size:24px;
+  font-weight:bold;
+}
+.logo span{ color:#ff9900; }
+
+.search{
+  flex:1;
+  display:flex;
+}
+.search input{
+  width:100%;
+  padding:8px;
+  border:none;
+  font-size:14px;
+}
+.search button{
+  background:#febd69;
+  border:none;
+  padding:8px 12px;
+  cursor:pointer;
+}
+
+.cart{
+  cursor:pointer;
+}
+.cart span{
+  color:#ff9900;
+  font-weight:bold;
+}
+
+/* ===== CATEGORY BAR ===== */
+.categories{
+  background:#232f3e;
+  color:white;
+  padding:8px 16px;
+  display:flex;
+  gap:16px;
+  font-size:14px;
+}
+
+/* ===== PRODUCT GRID ===== */
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:16px;
+}
+.card{
+  background:white;
+  padding:16px;
+  border-radius:6px;
+  box-shadow:0 2px 6px rgba(0,0,0,.1);
+  display:flex;
+  flex-direction:column;
+}
+.card img{
+  height:160px;
+  object-fit:contain;
+}
+.card h3{
+  font-size:16px;
+}
+.price{
+  font-size:18px;
+  font-weight:bold;
+}
+.card button{
+  margin-top:auto;
+  background:#f0c14b;
+  border:1px solid #a88734;
+  padding:8px;
+  cursor:pointer;
+}
+.card button:hover{
+  background:#eeb933;
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<div class="navbar">
+  <div class="logo">amazon<span>.in</span></div>
+
+  <div class="search">
+    <input id="search" placeholder="Search Amazon">
+    <button onclick="filterProducts()">🔍</button>
+  </div>
+
+  <div class="cart">
+    Cart (<span id="cartCount">0</span>)
+  </div>
+</div>
+
+<!-- CATEGORY -->
+<div class="categories">
+  <div>All</div>
+  <div>Mobiles</div>
+  <div>Electronics</div>
+  <div>Fashion</div>
+  <div>Home</div>
+  <div>Appliances</div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="container">
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+const products=[
+  {name:'iPhone 14',price:69999},
+  {name:'Samsung Galaxy S23',price:74999},
+  {name:'Boat Headphones',price:1999},
+  {name:'Apple Watch',price:32999},
+  {name:'Dell Laptop',price:58999},
+  {name:'Canon DSLR',price:44999},
+  {name:'Nike Shoes',price:4999},
+  {name:'Kitchen Mixer',price:3999}
+];
+
+let cart=0;
+const grid=document.getElementById('grid');
+
+function render(list){
+  grid.innerHTML='';
+  list.forEach(p=>{
+    grid.innerHTML+=`
+      <div class="card">
+        <img src="https://via.placeholder.com/200x160?text=Product">
+        <h3>${p.name}</h3>
+        <div class="price">₹${p.price}</div>
+        <button onclick="addCart()">Add to Cart</button>
+      </div>`;
+  });
+}
+
+function addCart(){
+  cart++;
+  document.getElementById('cartCount').textContent=cart;
+}
+
+function filterProducts(){
+  const q=document.getElementById('search').value.toLowerCase();
+  const filtered=products.filter(p=>p.name.toLowerCase().includes(q));
+  render(filtered);
+}
+
+render(products);
+</script>
+
+</body>
+</html>
