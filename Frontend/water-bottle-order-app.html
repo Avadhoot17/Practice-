@@ -1,274 +1,1248 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>AquaPure – Water Bottle Delivery</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaPure - Premium Water Delivery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<style>
-:root{
-  --primary:#1e88e5;
-  --secondary:#00bcd4;
-  --bg:#f4faff;
-  --glass:rgba(255,255,255,.7);
-}
+        :root {
+            --primary: #00b4d8;
+            --primary-dark: #0096c7;
+            --secondary: #90e0ef;
+            --accent: #48cae4;
+            --bg-light: #f8f9fa;
+            --text-dark: #212529;
+            --text-gray: #6c757d;
+            --success: #06d6a0;
+            --error: #ef476f;
+            --white: #ffffff;
+            --shadow: 0 4px 24px rgba(0, 180, 216, 0.12);
+            --shadow-lg: 0 8px 40px rgba(0, 180, 216, 0.18);
+        }
 
-*{
-  box-sizing:border-box;
-  font-family:-apple-system,BlinkMacSystemFont,system-ui;
-}
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 25%, #80deea 50%, #4dd0e1 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+            overflow-x: hidden;
+            position: relative;
+        }
 
-body{
-  margin:0;
-  background:linear-gradient(180deg,#e3f2fd,#f4faff);
-  min-height:100vh;
-}
+        /* Animated background waves */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 180, 216, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
 
-/* ===== HEADER ===== */
-header{
-  padding:20px;
-  text-align:center;
-}
-header h1{
-  margin:0;
-  font-size:2rem;
-  color:var(--primary);
-}
-header p{
-  margin-top:6px;
-  opacity:.7;
-}
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
 
-/* ===== APP CONTAINER ===== */
-.app{
-  max-width:420px;
-  margin:auto;
-  padding-bottom:120px;
-}
+        /* Screen system */
+        .screen {
+            display: none;
+            padding: 20px;
+            padding-bottom: 100px;
+            animation: fadeInUp 0.5s ease-out;
+        }
 
-/* ===== CARD ===== */
-.card{
-  background:var(--glass);
-  backdrop-filter:blur(16px);
-  border-radius:18px;
-  padding:18px;
-  margin:16px;
-  box-shadow:0 12px 30px rgba(0,0,0,.08);
-}
+        .screen.active {
+            display: block;
+        }
 
-/* ===== BOTTLES ===== */
-.bottles{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-}
-.bottle{
-  background:white;
-  border-radius:16px;
-  padding:14px;
-  text-align:center;
-  transition:.3s;
-}
-.bottle.active{
-  border:2px solid var(--primary);
-}
-.bottle h3{
-  margin:6px 0;
-}
-.qty{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:12px;
-}
-.qty button{
-  width:32px;
-  height:32px;
-  border:none;
-  border-radius:50%;
-  background:var(--primary);
-  color:white;
-  font-size:1.2rem;
-  cursor:pointer;
-}
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-/* ===== FORM ===== */
-input,select{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border-radius:12px;
-  border:1px solid #ddd;
-  font-size:1rem;
-}
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px 30px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            border-radius: 0 0 30px 30px;
+            margin: -20px -20px 30px;
+            box-shadow: var(--shadow);
+        }
 
-/* ===== BOTTOM BAR ===== */
-.bottom-bar{
-  position:fixed;
-  bottom:0;
-  left:50%;
-  transform:translateX(-50%);
-  width:100%;
-  max-width:420px;
-  background:white;
-  padding:14px 16px;
-  box-shadow:0 -10px 30px rgba(0,0,0,.15);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.bottom-bar button{
-  padding:14px 20px;
-  border:none;
-  border-radius:14px;
-  background:linear-gradient(135deg,var(--primary),var(--secondary));
-  color:white;
-  font-size:1rem;
-  cursor:pointer;
-}
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
 
-/* ===== SUCCESS ===== */
-.success{
-  text-align:center;
-  padding:40px 20px;
-}
-.check{
-  width:90px;
-  height:90px;
-  border-radius:50%;
-  background:linear-gradient(135deg,#4caf50,#2e7d32);
-  margin:auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:3rem;
-  color:white;
-  animation:pop .5s ease;
-}
-@keyframes pop{
-  0%{transform:scale(.6)}
-  100%{transform:scale(1)}
-}
-</style>
+        .tagline {
+            font-size: 14px;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        /* Water bottle animation */
+        .bottle-hero {
+            width: 180px;
+            height: 240px;
+            margin: 40px auto;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .bottle-body {
+            width: 100px;
+            height: 180px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(144, 224, 239, 0.4) 100%);
+            border-radius: 15px;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 
+                inset 0 0 30px rgba(255, 255, 255, 0.5),
+                0 8px 32px rgba(0, 180, 216, 0.3);
+            overflow: hidden;
+        }
+
+        .bottle-cap {
+            width: 60px;
+            height: 30px;
+            background: var(--primary);
+            border-radius: 10px 10px 0 0;
+            margin: 0 auto;
+            box-shadow: 0 4px 16px rgba(0, 150, 199, 0.4);
+        }
+
+        .water-level {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70%;
+            background: linear-gradient(180deg, var(--secondary) 0%, var(--primary) 100%);
+            opacity: 0.6;
+            animation: waterRise 2s ease-out;
+        }
+
+        @keyframes waterRise {
+            from { height: 0%; }
+            to { height: 70%; }
+        }
+
+        .water-wave {
+            position: absolute;
+            top: -10px;
+            left: -50%;
+            width: 200%;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: wave 3s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(-25%) translateY(-5px); }
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(0, 180, 216, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 180, 216, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Ripple effect */
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Bottle cards */
+        .bottle-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .bottle-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            position: relative;
+        }
+
+        .bottle-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .bottle-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(0, 180, 216, 0.05) 0%, rgba(144, 224, 239, 0.1) 100%);
+        }
+
+        .bottle-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 4px 8px rgba(0, 180, 216, 0.2));
+        }
+
+        .bottle-size {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .bottle-price {
+            font-size: 18px;
+            color: var(--text-gray);
+            font-weight: 600;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .bottle-card.selected .quantity-control {
+            opacity: 1;
+            max-height: 50px;
+        }
+
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .qty-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .qty-display {
+            font-size: 18px;
+            font-weight: 700;
+            min-width: 30px;
+            color: var(--primary);
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--error);
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 12px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Time slot selection */
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .time-slot {
+            padding: 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            font-weight: 600;
+        }
+
+        .time-slot:hover {
+            border-color: var(--primary);
+        }
+
+        .time-slot.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Order summary */
+        .summary-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        .summary-value {
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .summary-total {
+            font-size: 24px;
+            color: var(--primary);
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 2px solid var(--primary);
+        }
+
+        /* Payment options */
+        .payment-options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .payment-option {
+            padding: 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .payment-option:hover {
+            border-color: var(--primary);
+        }
+
+        .payment-option.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(0, 180, 216, 0.05) 0%, rgba(144, 224, 239, 0.1) 100%);
+        }
+
+        .payment-icon {
+            font-size: 28px;
+        }
+
+        .payment-name {
+            font-weight: 600;
+            flex: 1;
+        }
+
+        /* Success screen */
+        .success-animation {
+            width: 120px;
+            height: 120px;
+            margin: 40px auto;
+            position: relative;
+        }
+
+        .checkmark {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleUp 0.5s ease-out;
+            box-shadow: 0 8px 32px rgba(6, 214, 160, 0.3);
+        }
+
+        @keyframes scaleUp {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .checkmark::before {
+            content: '✓';
+            font-size: 64px;
+            color: white;
+            font-weight: 700;
+        }
+
+        .success-title {
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--success);
+            margin-bottom: 12px;
+        }
+
+        .success-subtitle {
+            text-align: center;
+            color: var(--text-gray);
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .order-id {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 32px;
+        }
+
+        /* Bottom bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            padding: 16px 20px;
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
+            border-radius: 24px 24px 0 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+
+        .bottom-bar-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .total-label {
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        .total-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            margin: 40px auto;
+            border: 4px solid rgba(0, 180, 216, 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-spinner.show {
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-dark);
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(0, 180, 216, 0.05) 0%, rgba(144, 224, 239, 0.1) 100%);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .app-container {
+                box-shadow: none;
+            }
+
+            .bottle-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Back button */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+        }
+    </style>
 </head>
-
 <body>
+    <div class="app-container">
+        <!-- Home Screen -->
+        <div id="homeScreen" class="screen active">
+            <div class="header">
+                <div class="logo">AquaPure</div>
+                <div class="tagline">Pure water, delivered fresh</div>
+            </div>
+            
+            <div class="bottle-hero">
+                <div class="bottle-cap"></div>
+                <div class="bottle-body">
+                    <div class="water-level">
+                        <div class="water-wave"></div>
+                    </div>
+                </div>
+            </div>
 
-<header>
-  <h1>AquaPure</h1>
-  <p>Pure water delivered to your door</p>
-</header>
+            <div class="info-card">
+                <div class="info-text">
+                    💧 Premium quality water delivered to your doorstep<br>
+                    🚚 Free delivery on orders above ₹500<br>
+                    ⚡ Same-day delivery available
+                </div>
+            </div>
 
-<div class="app" id="app">
-
-  <!-- Bottle Selection -->
-  <div class="card">
-    <h2>Select Bottles</h2>
-    <div class="bottles" id="bottles"></div>
-  </div>
-
-  <!-- Delivery -->
-  <div class="card">
-    <h2>Delivery Details</h2>
-    <input id="name" placeholder="Full Name">
-    <input id="phone" placeholder="Phone Number">
-    <input id="address" placeholder="Delivery Address">
-    <select id="slot">
-      <option value="">Select Time Slot</option>
-      <option>Morning (7–10 AM)</option>
-      <option>Afternoon (12–3 PM)</option>
-      <option>Evening (6–9 PM)</option>
-    </select>
-  </div>
-
-  <!-- Summary -->
-  <div class="card">
-    <h2>Order Summary</h2>
-    <div id="summary"></div>
-  </div>
-
-</div>
-
-<div class="bottom-bar">
-  <div>
-    <strong>Total: ₹<span id="total">0</span></strong>
-  </div>
-  <button onclick="placeOrder()">Place Order</button>
-</div>
-
-<script>
-const bottlesData=[
-  {size:'1L',price:20,qty:0},
-  {size:'5L',price:70,qty:0},
-  {size:'10L',price:120,qty:0},
-  {size:'20L',price:180,qty:0}
-];
-
-const bottlesDiv=document.getElementById('bottles');
-const summaryDiv=document.getElementById('summary');
-const totalSpan=document.getElementById('total');
-const app=document.getElementById('app');
-
-function renderBottles(){
-  bottlesDiv.innerHTML='';
-  bottlesData.forEach((b,i)=>{
-    bottlesDiv.innerHTML+=`
-      <div class="bottle ${b.qty>0?'active':''}">
-        <h3>${b.size}</h3>
-        <p>₹${b.price}</p>
-        <div class="qty">
-          <button onclick="changeQty(${i},-1)">−</button>
-          <strong>${b.qty}</strong>
-          <button onclick="changeQty(${i},1)">+</button>
+            <button class="btn btn-primary" onclick="app.goToScreen('bottleScreen')">
+                Order Now
+            </button>
         </div>
-      </div>`;
-  });
-  updateSummary();
-}
 
-function changeQty(i,val){
-  bottlesData[i].qty=Math.max(0,bottlesData[i].qty+val);
-  renderBottles();
-}
+        <!-- Bottle Selection Screen -->
+        <div id="bottleScreen" class="screen">
+            <button class="back-btn" onclick="app.goToScreen('homeScreen')">←</button>
+            <div class="header">
+                <div class="logo">Select Bottles</div>
+                <div class="tagline">Choose size and quantity</div>
+            </div>
 
-function updateSummary(){
-  let total=0;
-  summaryDiv.innerHTML='';
-  bottlesData.forEach(b=>{
-    if(b.qty>0){
-      const price=b.qty*b.price;
-      total+=price;
-      summaryDiv.innerHTML+=`<p>${b.size} × ${b.qty} = ₹${price}</p>`;
-    }
-  });
-  if(total>0){
-    summaryDiv.innerHTML+=`<p>Delivery: ₹20</p>`;
-    total+=20;
-  }
-  totalSpan.textContent=total;
-}
+            <div class="section-title">Available Sizes</div>
+            <div class="bottle-grid" id="bottleGrid"></div>
 
-function placeOrder(){
-  const name=nameInput.value;
-  if(!name || totalSpan.textContent==0){
-    alert('Please complete your order');
-    return;
-  }
-  localStorage.setItem('lastOrder',JSON.stringify(bottlesData));
-  app.innerHTML=`
-    <div class="success">
-      <div class="check">✓</div>
-      <h2>Order Confirmed</h2>
-      <p>Your water is on the way 🚚</p>
-      <p><strong>Order ID:</strong> AQ${Date.now()}</p>
-    </div>`;
-  document.querySelector('.bottom-bar').style.display='none';
-}
+            <div class="bottom-bar" id="bottleBottomBar">
+                <div class="bottom-bar-content">
+                    <div>
+                        <div class="total-label">Total Amount</div>
+                        <div class="total-amount" id="bottleTotal">₹0</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="app.proceedToDelivery()" id="proceedBtn" disabled>
+                    Continue to Delivery
+                </button>
+            </div>
+        </div>
 
-const nameInput=document.getElementById('name');
+        <!-- Delivery Details Screen -->
+        <div id="deliveryScreen" class="screen">
+            <button class="back-btn" onclick="app.goToScreen('bottleScreen')">←</button>
+            <div class="header">
+                <div class="logo">Delivery Details</div>
+                <div class="tagline">Where should we deliver?</div>
+            </div>
 
-renderBottles();
-</script>
+            <form id="deliveryForm">
+                <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" class="form-input" id="customerName" placeholder="Enter your name" required>
+                    <div class="error-message" id="nameError">Please enter your name</div>
+                </div>
 
+                <div class="form-group">
+                    <label class="form-label">Phone Number *</label>
+                    <input type="tel" class="form-input" id="customerPhone" placeholder="10-digit mobile number" required>
+                    <div class="error-message" id="phoneError">Please enter a valid 10-digit phone number</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Delivery Address *</label>
+                    <input type="text" class="form-input" id="customerAddress" placeholder="House no, Street, Area" required>
+                    <div class="error-message" id="addressError">Please enter delivery address</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Pincode *</label>
+                    <input type="text" class="form-input" id="customerPincode" placeholder="6-digit pincode" required>
+                    <div class="error-message" id="pincodeError">Please enter a valid 6-digit pincode</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Delivery Time Slot *</label>
+                    <div class="time-slots" id="timeSlots"></div>
+                    <div class="error-message" id="slotError">Please select a time slot</div>
+                </div>
+            </form>
+
+            <div class="bottom-bar">
+                <button class="btn btn-primary" onclick="app.proceedToSummary()">
+                    Review Order
+                </button>
+            </div>
+        </div>
+
+        <!-- Order Summary Screen -->
+        <div id="summaryScreen" class="screen">
+            <button class="back-btn" onclick="app.goToScreen('deliveryScreen')">←</button>
+            <div class="header">
+                <div class="logo">Order Summary</div>
+                <div class="tagline">Review your order</div>
+            </div>
+
+            <div class="section-title">Delivery To</div>
+            <div class="summary-card">
+                <div class="summary-item">
+                    <div class="summary-label">Name</div>
+                    <div class="summary-value" id="summaryName"></div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Phone</div>
+                    <div class="summary-value" id="summaryPhone"></div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Address</div>
+                    <div class="summary-value" id="summaryAddress"></div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Time Slot</div>
+                    <div class="summary-value" id="summarySlot"></div>
+                </div>
+            </div>
+
+            <div class="section-title">Order Items</div>
+            <div class="summary-card" id="orderItems"></div>
+
+            <div class="section-title">Price Breakdown</div>
+            <div class="summary-card">
+                <div class="summary-item">
+                    <div class="summary-label">Subtotal</div>
+                    <div class="summary-value" id="summarySubtotal"></div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Delivery Charge</div>
+                    <div class="summary-value" id="summaryDelivery"></div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">GST (5%)</div>
+                    <div class="summary-value" id="summaryTax"></div>
+                </div>
+                <div class="summary-item summary-total">
+                    <div class="summary-label">Total</div>
+                    <div class="summary-value" id="summaryTotal"></div>
+                </div>
+            </div>
+
+            <div class="bottom-bar">
+                <button class="btn btn-primary" onclick="app.goToScreen('paymentScreen')">
+                    Proceed to Payment
+                </button>
+            </div>
+        </div>
+
+        <!-- Payment Screen -->
+        <div id="paymentScreen" class="screen">
+            <button class="back-btn" onclick="app.goToScreen('summaryScreen')">←</button>
+            <div class="header">
+                <div class="logo">Payment</div>
+                <div class="tagline">Choose payment method</div>
+            </div>
+
+            <div class="section-title">Payment Options</div>
+            <div class="payment-options" id="paymentOptions"></div>
+
+            <div class="loading-spinner" id="paymentLoader"></div>
+
+            <div class="bottom-bar">
+                <div class="bottom-bar-content">
+                    <div>
+                        <div class="total-label">Amount to Pay</div>
+                        <div class="total-amount" id="paymentTotal"></div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="app.processPayment()" id="payBtn" disabled>
+                    Complete Order
+                </button>
+            </div>
+        </div>
+
+        <!-- Success Screen -->
+        <div id="successScreen" class="screen">
+            <div class="header">
+                <div class="logo">Order Confirmed!</div>
+                <div class="tagline">Thank you for your order</div>
+            </div>
+
+            <div class="success-animation">
+                <div class="checkmark"></div>
+            </div>
+
+            <div class="success-title">Order Placed Successfully</div>
+            <div class="success-subtitle">Your order ID is</div>
+            <div class="order-id" id="orderId"></div>
+
+            <div class="info-card">
+                <div class="info-text">
+                    📦 <strong>Estimated Delivery:</strong> <span id="deliveryTime"></span><br>
+                    📱 Track your order in real-time<br>
+                    💧 Fresh water on its way!
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="app.trackOrder()" style="margin-bottom: 12px;">
+                Track Order
+            </button>
+            <button class="btn btn-secondary" onclick="app.orderAgain()">
+                Order Again
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // App state management
+        const app = {
+            currentScreen: 'homeScreen',
+            bottles: [
+                { id: 1, size: '1L', price: 20, icon: '💧', quantity: 0 },
+                { id: 2, size: '5L', price: 80, icon: '💦', quantity: 0 },
+                { id: 3, size: '10L', price: 150, icon: '🌊', quantity: 0 },
+                { id: 4, size: '20L', price: 280, icon: '🚰', quantity: 0 }
+            ],
+            timeSlots: [
+                '9:00 AM - 12:00 PM',
+                '12:00 PM - 3:00 PM',
+                '3:00 PM - 6:00 PM',
+                '6:00 PM - 9:00 PM'
+            ],
+            paymentMethods: [
+                { id: 'cod', name: 'Cash on Delivery', icon: '💵' },
+                { id: 'upi', name: 'UPI Payment', icon: '📱' },
+                { id: 'card', name: 'Credit/Debit Card', icon: '💳' }
+            ],
+            selectedSlot: null,
+            selectedPayment: null,
+            deliveryCharge: 40,
+            freeDeliveryThreshold: 500,
+
+            // Initialize app
+            init() {
+                this.renderBottles();
+                this.renderTimeSlots();
+                this.renderPaymentOptions();
+                this.loadLastOrder();
+            },
+
+            // Screen navigation
+            goToScreen(screenId) {
+                // Hide all screens
+                document.querySelectorAll('.screen').forEach(screen => {
+                    screen.classList.remove('active');
+                });
+                
+                // Show target screen
+                document.getElementById(screenId).classList.add('active');
+                this.currentScreen = screenId;
+
+                // Scroll to top
+                window.scrollTo(0, 0);
+            },
+
+            // Render bottle cards
+            renderBottles() {
+                const grid = document.getElementById('bottleGrid');
+                grid.innerHTML = this.bottles.map(bottle => `
+                    <div class="bottle-card" id="bottle-${bottle.id}" onclick="app.toggleBottle(${bottle.id})">
+                        <div class="bottle-icon">${bottle.icon}</div>
+                        <div class="bottle-size">${bottle.size}</div>
+                        <div class="bottle-price">₹${bottle.price}</div>
+                        <div class="quantity-control">
+                            <button class="qty-btn" onclick="event.stopPropagation(); app.updateQuantity(${bottle.id}, -1)">−</button>
+                            <div class="qty-display" id="qty-${bottle.id}">0</div>
+                            <button class="qty-btn" onclick="event.stopPropagation(); app.updateQuantity(${bottle.id}, 1)">+</button>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            // Toggle bottle selection
+            toggleBottle(id) {
+                const bottle = this.bottles.find(b => b.id === id);
+                const card = document.getElementById(`bottle-${id}`);
+                
+                if (bottle.quantity === 0) {
+                    this.updateQuantity(id, 1);
+                }
+            },
+
+            // Update quantity
+            updateQuantity(id, change) {
+                const bottle = this.bottles.find(b => b.id === id);
+                const newQty = Math.max(0, bottle.quantity + change);
+                
+                bottle.quantity = newQty;
+                document.getElementById(`qty-${id}`).textContent = newQty;
+                
+                const card = document.getElementById(`bottle-${id}`);
+                if (newQty > 0) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+                
+                this.updateTotal();
+            },
+
+            // Calculate and update total
+            updateTotal() {
+                const subtotal = this.bottles.reduce((sum, bottle) => {
+                    return sum + (bottle.price * bottle.quantity);
+                }, 0);
+                
+                document.getElementById('bottleTotal').textContent = `₹${subtotal}`;
+                
+                const proceedBtn = document.getElementById('proceedBtn');
+                proceedBtn.disabled = subtotal === 0;
+            },
+
+            // Proceed to delivery
+            proceedToDelivery() {
+                const hasItems = this.bottles.some(b => b.quantity > 0);
+                if (!hasItems) return;
+                
+                this.goToScreen('deliveryScreen');
+            },
+
+            // Render time slots
+            renderTimeSlots() {
+                const container = document.getElementById('timeSlots');
+                container.innerHTML = this.timeSlots.map((slot, index) => `
+                    <div class="time-slot" id="slot-${index}" onclick="app.selectSlot(${index})">
+                        ${slot}
+                    </div>
+                `).join('');
+            },
+
+            // Select time slot
+            selectSlot(index) {
+                document.querySelectorAll('.time-slot').forEach(slot => {
+                    slot.classList.remove('selected');
+                });
+                document.getElementById(`slot-${index}`).classList.add('selected');
+                this.selectedSlot = this.timeSlots[index];
+                document.getElementById('slotError').classList.remove('show');
+            },
+
+            // Validate form
+            validateForm() {
+                let isValid = true;
+                
+                const name = document.getElementById('customerName');
+                const phone = document.getElementById('customerPhone');
+                const address = document.getElementById('customerAddress');
+                const pincode = document.getElementById('customerPincode');
+                
+                // Name validation
+                if (!name.value.trim()) {
+                    name.classList.add('error');
+                    document.getElementById('nameError').classList.add('show');
+                    isValid = false;
+                } else {
+                    name.classList.remove('error');
+                    document.getElementById('nameError').classList.remove('show');
+                }
+                
+                // Phone validation
+                const phoneRegex = /^[6-9]\d{9}$/;
+                if (!phoneRegex.test(phone.value)) {
+                    phone.classList.add('error');
+                    document.getElementById('phoneError').classList.add('show');
+                    isValid = false;
+                } else {
+                    phone.classList.remove('error');
+                    document.getElementById('phoneError').classList.remove('show');
+                }
+                
+                // Address validation
+                if (!address.value.trim()) {
+                    address.classList.add('error');
+                    document.getElementById('addressError').classList.add('show');
+                    isValid = false;
+                } else {
+                    address.classList.remove('error');
+                    document.getElementById('addressError').classList.remove('show');
+                }
+                
+                // Pincode validation
+                const pincodeRegex = /^\d{6}$/;
+                if (!pincodeRegex.test(pincode.value)) {
+                    pincode.classList.add('error');
+                    document.getElementById('pincodeError').classList.add('show');
+                    isValid = false;
+                } else {
+                    pincode.classList.remove('error');
+                    document.getElementById('pincodeError').classList.remove('show');
+                }
+                
+                // Time slot validation
+                if (!this.selectedSlot) {
+                    document.getElementById('slotError').classList.add('show');
+                    isValid = false;
+                } else {
+                    document.getElementById('slotError').classList.remove('show');
+                }
+                
+                return isValid;
+            },
+
+            // Proceed to summary
+            proceedToSummary() {
+                if (!this.validateForm()) return;
+                
+                this.renderSummary();
+                this.goToScreen('summaryScreen');
+            },
+
+            // Render order summary
+            renderSummary() {
+                // Customer details
+                document.getElementById('summaryName').textContent = document.getElementById('customerName').value;
+                document.getElementById('summaryPhone').textContent = document.getElementById('customerPhone').value;
+                document.getElementById('summaryAddress').textContent = 
+                    `${document.getElementById('customerAddress').value}, ${document.getElementById('customerPincode').value}`;
+                document.getElementById('summarySlot').textContent = this.selectedSlot;
+                
+                // Order items
+                const orderItems = document.getElementById('orderItems');
+                orderItems.innerHTML = this.bottles
+                    .filter(b => b.quantity > 0)
+                    .map(bottle => `
+                        <div class="summary-item">
+                            <div class="summary-label">${bottle.icon} ${bottle.size} × ${bottle.quantity}</div>
+                            <div class="summary-value">₹${bottle.price * bottle.quantity}</div>
+                        </div>
+                    `).join('');
+                
+                // Price calculation
+                const subtotal = this.bottles.reduce((sum, b) => sum + (b.price * b.quantity), 0);
+                const deliveryCharge = subtotal >= this.freeDeliveryThreshold ? 0 : this.deliveryCharge;
+                const tax = Math.round((subtotal + deliveryCharge) * 0.05);
+                const total = subtotal + deliveryCharge + tax;
+                
+                document.getElementById('summarySubtotal').textContent = `₹${subtotal}`;
+                document.getElementById('summaryDelivery').textContent = deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`;
+                document.getElementById('summaryTax').textContent = `₹${tax}`;
+                document.getElementById('summaryTotal').textContent = `₹${total}`;
+                document.getElementById('paymentTotal').textContent = `₹${total}`;
+            },
+
+            // Render payment options
+            renderPaymentOptions() {
+                const container = document.getElementById('paymentOptions');
+                container.innerHTML = this.paymentMethods.map(method => `
+                    <div class="payment-option" id="payment-${method.id}" onclick="app.selectPayment('${method.id}')">
+                        <div class="payment-icon">${method.icon}</div>
+                        <div class="payment-name">${method.name}</div>
+                    </div>
+                `).join('');
+            },
+
+            // Select payment method
+            selectPayment(id) {
+                document.querySelectorAll('.payment-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                document.getElementById(`payment-${id}`).classList.add('selected');
+                this.selectedPayment = id;
+                document.getElementById('payBtn').disabled = false;
+            },
+
+            // Process payment
+            processPayment() {
+                if (!this.selectedPayment) return;
+                
+                const loader = document.getElementById('paymentLoader');
+                const payBtn = document.getElementById('payBtn');
+                
+                payBtn.disabled = true;
+                loader.classList.add('show');
+                
+                // Simulate payment processing
+                setTimeout(() => {
+                    loader.classList.remove('show');
+                    this.showSuccess();
+                }, 2000);
+            },
+
+            // Show success screen
+            showSuccess() {
+                const orderId = 'AQP' + Date.now().toString().slice(-8);
+                document.getElementById('orderId').textContent = orderId;
+                
+                // Calculate delivery time
+                const deliveryDate = new Date();
+                deliveryDate.setHours(deliveryDate.getHours() + 3);
+                const timeString = deliveryDate.toLocaleString('en-IN', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true 
+                });
+                const dateString = deliveryDate.toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'short'
+                });
+                document.getElementById('deliveryTime').textContent = `${dateString}, ${timeString}`;
+                
+                // Save order to localStorage
+                this.saveOrder();
+                
+                this.goToScreen('successScreen');
+            },
+
+            // Track order (mock)
+            trackOrder() {
+                alert('🚚 Your order is being prepared!\n\nDelivery partner will be assigned soon.\n\nYou will receive SMS updates.');
+            },
+
+            // Order again
+            orderAgain() {
+                // Reset quantities
+                this.bottles.forEach(bottle => {
+                    bottle.quantity = 0;
+                });
+                this.selectedSlot = null;
+                this.selectedPayment = null;
+                
+                // Clear form
+                document.getElementById('deliveryForm').reset();
+                
+                this.goToScreen('homeScreen');
+            },
+
+            // Save order to localStorage
+            saveOrder() {
+                const orderData = {
+                    bottles: this.bottles.filter(b => b.quantity > 0),
+                    customer: {
+                        name: document.getElementById('customerName').value,
+                        phone: document.getElementById('customerPhone').value,
+                        address: document.getElementById('customerAddress').value,
+                        pincode: document.getElementById('customerPincode').value
+                    },
+                    slot: this.selectedSlot,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('lastOrder', JSON.stringify(orderData));
+            },
+
+            // Load last order from localStorage
+            loadLastOrder() {
+                const lastOrder = localStorage.getItem('lastOrder');
+                if (lastOrder) {
+                    const data = JSON.parse(lastOrder);
+                    // Pre-fill customer details if available
+                    if (data.customer) {
+                        document.getElementById('customerName').value = data.customer.name || '';
+                        document.getElementById('customerPhone').value = data.customer.phone || '';
+                        document.getElementById('customerAddress').value = data.customer.address || '';
+                        document.getElementById('customerPincode').value = data.customer.pincode || '';
+                    }
+                }
+            }
+        };
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
 </body>
 </html>
