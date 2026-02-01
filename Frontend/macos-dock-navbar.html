@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>iOS Original Dock</title>
+<title>iOS Dock – Original Clone</title>
 
 <style>
 :root {
-  --dock-bg: rgba(255,255,255,0.75);
-  --active: #007aff;
+  --dock-bg: rgba(255,255,255,0.78);
+  --dot: #007aff;
 }
 
 * {
@@ -17,12 +17,12 @@
 
 body {
   margin: 0;
-  min-height: 200vh;
-  background: linear-gradient(180deg,#e9eef5,#cfd8e3);
+  height: 200vh;
+  background: linear-gradient(180deg,#eef2f7,#dbe3ee);
   font-family: -apple-system, BlinkMacSystemFont, system-ui;
 }
 
-/* iOS Dock */
+/* ===== iOS DOCK ===== */
 .dock {
   position: fixed;
   left: 50%;
@@ -30,16 +30,17 @@ body {
   transform: translateX(-50%);
   display: flex;
   gap: 18px;
-  padding: 12px 22px;
+  padding: 14px 22px;
   background: var(--dock-bg);
-  backdrop-filter: blur(22px);
-  border-radius: 36px;
+  backdrop-filter: blur(26px);
+  border-radius: 38px;
   box-shadow:
-    0 10px 30px rgba(0,0,0,.15),
-    inset 0 1px 0 rgba(255,255,255,.6);
+    0 12px 30px rgba(0,0,0,.15),
+    inset 0 1px 0 rgba(255,255,255,.65);
+  z-index: 1000;
 }
 
-/* Dock Item */
+/* ===== DOCK ITEM ===== */
 .dock-item {
   position: relative;
   width: 60px;
@@ -47,7 +48,7 @@ body {
   cursor: pointer;
 }
 
-/* iOS Squircle Icon */
+/* ===== iOS SQUIRCLE ===== */
 .icon {
   width: 100%;
   height: 100%;
@@ -55,25 +56,25 @@ body {
   display: grid;
   place-items: center;
   box-shadow:
-    inset 0 1px 1px rgba(255,255,255,.6),
-    inset 0 -2px 4px rgba(0,0,0,.15);
-  transition: transform .15s ease;
+    inset 0 1px 1px rgba(255,255,255,.7),
+    inset 0 -3px 6px rgba(0,0,0,.18);
+  transition: transform .12s ease;
 }
 
-/* App-specific gradients */
+/* ===== APP COLORS (iOS system palette) ===== */
 .phone   { background: linear-gradient(180deg,#34c759,#1aa74a); }
 .safari  { background: radial-gradient(circle at top,#9ee7ff,#007aff); }
 .mail    { background: linear-gradient(180deg,#4facfe,#007aff); }
 .music   { background: linear-gradient(180deg,#ff375f,#ff2d55); }
 
-/* Glyphs */
+/* ===== GLYPHS (iOS scale & weight) ===== */
 .icon svg {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   fill: white;
 }
 
-/* Active dot */
+/* ===== ACTIVE DOT ===== */
 .dock-item::after {
   content: '';
   position: absolute;
@@ -82,7 +83,7 @@ body {
   transform: translateX(-50%);
   width: 6px;
   height: 6px;
-  background: var(--active);
+  background: var(--dot);
   border-radius: 50%;
   opacity: 0;
 }
@@ -91,17 +92,17 @@ body {
   opacity: 1;
 }
 
-/* Tap animation */
+/* ===== iOS PRESS FEEDBACK ===== */
 .dock-item:active .icon {
   transform: scale(.92);
 }
 
-/* App view mock */
+/* ===== APP VIEW (mock) ===== */
 .view {
   padding-top: 90px;
   text-align: center;
-  font-size: 2rem;
-  opacity: .5;
+  font-size: 2.1rem;
+  opacity: .45;
 }
 </style>
 </head>
@@ -112,14 +113,16 @@ body {
 
 <nav class="dock">
 
+  <!-- Phone -->
   <div class="dock-item active" data-app="Phone">
     <div class="icon phone">
       <svg viewBox="0 0 24 24">
-        <path d="M6 2h12v20H6z"/>
+        <path d="M7 2h10v20H7z"/>
       </svg>
     </div>
   </div>
 
+  <!-- Safari -->
   <div class="dock-item" data-app="Safari">
     <div class="icon safari">
       <svg viewBox="0 0 24 24">
@@ -128,6 +131,7 @@ body {
     </div>
   </div>
 
+  <!-- Mail -->
   <div class="dock-item" data-app="Mail">
     <div class="icon mail">
       <svg viewBox="0 0 24 24">
@@ -136,6 +140,7 @@ body {
     </div>
   </div>
 
+  <!-- Music -->
   <div class="dock-item" data-app="Music">
     <div class="icon music">
       <svg viewBox="0 0 24 24">
