@@ -2,164 +2,179 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>iOS Dock – Original Clone</title>
+<title>macOS Style Dock Navbar</title>
 
 <style>
 :root {
-  --dock-bg: rgba(255,255,255,0.78);
-  --dot: #007aff;
+  --dock-bg: rgba(30, 30, 30, 0.65);
+  --active: #4fd1ff;
 }
 
 * {
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 body {
   margin: 0;
   height: 200vh;
-  background: linear-gradient(180deg,#eef2f7,#dbe3ee);
-  font-family: -apple-system, BlinkMacSystemFont, system-ui;
+  background: linear-gradient(180deg, #0f2027, #203a43, #2c5364);
+  font-family: system-ui, sans-serif;
 }
 
-/* ===== iOS DOCK ===== */
+/* Dock */
 .dock {
   position: fixed;
   left: 50%;
-  bottom: 14px;
+  bottom: 18px;
   transform: translateX(-50%);
   display: flex;
-  gap: 18px;
-  padding: 14px 22px;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 12px 18px;
   background: var(--dock-bg);
-  backdrop-filter: blur(26px);
-  border-radius: 38px;
-  box-shadow:
-    0 12px 30px rgba(0,0,0,.15),
-    inset 0 1px 0 rgba(255,255,255,.65);
-  z-index: 1000;
+  backdrop-filter: blur(20px);
+  border-radius: 28px;
+  box-shadow: 0 30px 60px rgba(0,0,0,.5);
+  z-index: 999;
 }
 
-/* ===== DOCK ITEM ===== */
+/* Icon container */
 .dock-item {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .25s ease;
   cursor: pointer;
 }
 
-/* ===== iOS SQUIRCLE ===== */
-.icon {
+/* Icon */
+.dock-item img {
   width: 100%;
   height: 100%;
-  border-radius: 18px;
-  display: grid;
-  place-items: center;
-  box-shadow:
-    inset 0 1px 1px rgba(255,255,255,.7),
-    inset 0 -3px 6px rgba(0,0,0,.18);
-  transition: transform .12s ease;
+  border-radius: 14px;
+  transition: transform .25s ease;
 }
 
-/* ===== APP COLORS (iOS system palette) ===== */
-.phone   { background: linear-gradient(180deg,#34c759,#1aa74a); }
-.safari  { background: radial-gradient(circle at top,#9ee7ff,#007aff); }
-.mail    { background: linear-gradient(180deg,#4facfe,#007aff); }
-.music   { background: linear-gradient(180deg,#ff375f,#ff2d55); }
-
-/* ===== GLYPHS (iOS scale & weight) ===== */
-.icon svg {
-  width: 28px;
-  height: 28px;
-  fill: white;
+/* Label */
+.dock-item span {
+  position: absolute;
+  bottom: 70px;
+  background: rgba(0,0,0,.75);
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: .25s;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
-/* ===== ACTIVE DOT ===== */
+/* Active dot */
 .dock-item::after {
   content: '';
   position: absolute;
   bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
   width: 6px;
   height: 6px;
-  background: var(--dot);
+  background: var(--active);
   border-radius: 50%;
   opacity: 0;
+  transition: .25s;
 }
 
+/* Hover effects */
+.dock-item:hover img {
+  transform: scale(1.6);
+}
+
+.dock-item:hover span {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Active */
 .dock-item.active::after {
   opacity: 1;
 }
 
-/* ===== iOS PRESS FEEDBACK ===== */
-.dock-item:active .icon {
-  transform: scale(.92);
-}
-
-/* ===== APP VIEW (mock) ===== */
-.view {
-  padding-top: 90px;
-  text-align: center;
-  font-size: 2.1rem;
-  opacity: .45;
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  .dock {
+    gap: 10px;
+  }
+  .dock-item {
+    width: 46px;
+    height: 46px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="view" id="view">Phone</div>
-
-<nav class="dock">
-
-  <!-- Phone -->
-  <div class="dock-item active" data-app="Phone">
-    <div class="icon phone">
-      <svg viewBox="0 0 24 24">
-        <path d="M7 2h10v20H7z"/>
-      </svg>
-    </div>
+<!-- Dock -->
+<nav class="dock" role="navigation" aria-label="macOS Dock">
+  <div class="dock-item active" tabindex="0" data-app="Finder">
+    <img src="https://img.icons8.com/color/96/finder.png">
+    <span>Finder</span>
   </div>
-
-  <!-- Safari -->
-  <div class="dock-item" data-app="Safari">
-    <div class="icon safari">
-      <svg viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="9"/>
-      </svg>
-    </div>
+  <div class="dock-item" tabindex="0" data-app="Safari">
+    <img src="https://img.icons8.com/color/96/safari.png">
+    <span>Safari</span>
   </div>
-
-  <!-- Mail -->
-  <div class="dock-item" data-app="Mail">
-    <div class="icon mail">
-      <svg viewBox="0 0 24 24">
-        <path d="M2 6h20v12H2z"/>
-      </svg>
-    </div>
+  <div class="dock-item" tabindex="0" data-app="Mail">
+    <img src="https://img.icons8.com/color/96/mail.png">
+    <span>Mail</span>
   </div>
-
-  <!-- Music -->
-  <div class="dock-item" data-app="Music">
-    <div class="icon music">
-      <svg viewBox="0 0 24 24">
-        <path d="M9 3v14a3 3 0 1 0 2 2V7h6V3z"/>
-      </svg>
-    </div>
+  <div class="dock-item" tabindex="0" data-app="Music">
+    <img src="https://img.icons8.com/color/96/apple-music.png">
+    <span>Music</span>
   </div>
-
+  <div class="dock-item" tabindex="0" data-app="Settings">
+    <img src="https://img.icons8.com/color/96/settings.png">
+    <span>Settings</span>
+  </div>
 </nav>
 
 <script>
 const items = document.querySelectorAll('.dock-item');
-const view = document.getElementById('view');
 
+/* Click logic */
 items.forEach(item => {
-  item.addEventListener('click', () => {
-    items.forEach(i => i.classList.remove('active'));
-    item.classList.add('active');
-    view.textContent = item.dataset.app;
+  item.addEventListener('click', () => activate(item));
+  item.addEventListener('keydown', e => {
+    if (e.key === 'Enter') activate(item);
+  });
+});
+
+function activate(selected) {
+  items.forEach(i => i.classList.remove('active'));
+  selected.classList.add('active');
+
+  // fake app action
+  console.log(selected.dataset.app + ' opened');
+}
+
+/* Cursor-based magnification (real dock feel) */
+const dock = document.querySelector('.dock');
+
+dock.addEventListener('mousemove', e => {
+  items.forEach(item => {
+    const rect = item.getBoundingClientRect();
+    const distance = Math.abs(e.clientX - (rect.left + rect.width / 2));
+    const scale = Math.max(1, 1.6 - distance / 180);
+    item.style.transform = `scale(${scale})`;
+  });
+});
+
+dock.addEventListener('mouseleave', () => {
+  items.forEach(item => {
+    item.style.transform = 'scale(1)';
   });
 });
 </script>
