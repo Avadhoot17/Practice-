@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AquaPure – Water Bottle Delivery</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --primary:#1e88e5;
+  --secondary:#00bcd4;
+  --bg:#f4faff;
+  --glass:rgba(255,255,255,.7);
+}
+
+*{
+  box-sizing:border-box;
+  font-family:-apple-system,BlinkMacSystemFont,system-ui;
+}
+
+body{
+  margin:0;
+  background:linear-gradient(180deg,#e3f2fd,#f4faff);
+  min-height:100vh;
+}
+
+/* ===== HEADER ===== */
+header{
+  padding:20px;
+  text-align:center;
+}
+header h1{
+  margin:0;
+  font-size:2rem;
+  color:var(--primary);
+}
+header p{
+  margin-top:6px;
+  opacity:.7;
+}
+
+/* ===== APP CONTAINER ===== */
+.app{
+  max-width:420px;
+  margin:auto;
+  padding-bottom:120px;
+}
+
+/* ===== CARD ===== */
+.card{
+  background:var(--glass);
+  backdrop-filter:blur(16px);
+  border-radius:18px;
+  padding:18px;
+  margin:16px;
+  box-shadow:0 12px 30px rgba(0,0,0,.08);
+}
+
+/* ===== BOTTLES ===== */
+.bottles{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+.bottle{
+  background:white;
+  border-radius:16px;
+  padding:14px;
+  text-align:center;
+  transition:.3s;
+}
+.bottle.active{
+  border:2px solid var(--primary);
+}
+.bottle h3{
+  margin:6px 0;
+}
+.qty{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+}
+.qty button{
+  width:32px;
+  height:32px;
+  border:none;
+  border-radius:50%;
+  background:var(--primary);
+  color:white;
+  font-size:1.2rem;
+  cursor:pointer;
+}
+
+/* ===== FORM ===== */
+input,select{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  font-size:1rem;
+}
+
+/* ===== BOTTOM BAR ===== */
+.bottom-bar{
+  position:fixed;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:420px;
+  background:white;
+  padding:14px 16px;
+  box-shadow:0 -10px 30px rgba(0,0,0,.15);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.bottom-bar button{
+  padding:14px 20px;
+  border:none;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  color:white;
+  font-size:1rem;
+  cursor:pointer;
+}
+
+/* ===== SUCCESS ===== */
+.success{
+  text-align:center;
+  padding:40px 20px;
+}
+.check{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#4caf50,#2e7d32);
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:3rem;
+  color:white;
+  animation:pop .5s ease;
+}
+@keyframes pop{
+  0%{transform:scale(.6)}
+  100%{transform:scale(1)}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>AquaPure</h1>
+  <p>Pure water delivered to your door</p>
+</header>
+
+<div class="app" id="app">
+
+  <!-- Bottle Selection -->
+  <div class="card">
+    <h2>Select Bottles</h2>
+    <div class="bottles" id="bottles"></div>
+  </div>
+
+  <!-- Delivery -->
+  <div class="card">
+    <h2>Delivery Details</h2>
+    <input id="name" placeholder="Full Name">
+    <input id="phone" placeholder="Phone Number">
+    <input id="address" placeholder="Delivery Address">
+    <select id="slot">
+      <option value="">Select Time Slot</option>
+      <option>Morning (7–10 AM)</option>
+      <option>Afternoon (12–3 PM)</option>
+      <option>Evening (6–9 PM)</option>
+    </select>
+  </div>
+
+  <!-- Summary -->
+  <div class="card">
+    <h2>Order Summary</h2>
+    <div id="summary"></div>
+  </div>
+
+</div>
+
+<div class="bottom-bar">
+  <div>
+    <strong>Total: ₹<span id="total">0</span></strong>
+  </div>
+  <button onclick="placeOrder()">Place Order</button>
+</div>
+
+<script>
+const bottlesData=[
+  {size:'1L',price:20,qty:0},
+  {size:'5L',price:70,qty:0},
+  {size:'10L',price:120,qty:0},
+  {size:'20L',price:180,qty:0}
+];
+
+const bottlesDiv=document.getElementById('bottles');
+const summaryDiv=document.getElementById('summary');
+const totalSpan=document.getElementById('total');
+const app=document.getElementById('app');
+
+function renderBottles(){
+  bottlesDiv.innerHTML='';
+  bottlesData.forEach((b,i)=>{
+    bottlesDiv.innerHTML+=`
+      <div class="bottle ${b.qty>0?'active':''}">
+        <h3>${b.size}</h3>
+        <p>₹${b.price}</p>
+        <div class="qty">
+          <button onclick="changeQty(${i},-1)">−</button>
+          <strong>${b.qty}</strong>
+          <button onclick="changeQty(${i},1)">+</button>
+        </div>
+      </div>`;
+  });
+  updateSummary();
+}
+
+function changeQty(i,val){
+  bottlesData[i].qty=Math.max(0,bottlesData[i].qty+val);
+  renderBottles();
+}
+
+function updateSummary(){
+  let total=0;
+  summaryDiv.innerHTML='';
+  bottlesData.forEach(b=>{
+    if(b.qty>0){
+      const price=b.qty*b.price;
+      total+=price;
+      summaryDiv.innerHTML+=`<p>${b.size} × ${b.qty} = ₹${price}</p>`;
+    }
+  });
+  if(total>0){
+    summaryDiv.innerHTML+=`<p>Delivery: ₹20</p>`;
+    total+=20;
+  }
+  totalSpan.textContent=total;
+}
+
+function placeOrder(){
+  const name=nameInput.value;
+  if(!name || totalSpan.textContent==0){
+    alert('Please complete your order');
+    return;
+  }
+  localStorage.setItem('lastOrder',JSON.stringify(bottlesData));
+  app.innerHTML=`
+    <div class="success">
+      <div class="check">✓</div>
+      <h2>Order Confirmed</h2>
+      <p>Your water is on the way 🚚</p>
+      <p><strong>Order ID:</strong> AQ${Date.now()}</p>
+    </div>`;
+  document.querySelector('.bottom-bar').style.display='none';
+}
+
+const nameInput=document.getElementById('name');
+
+renderBottles();
+</script>
+
+</body>
+</html>
