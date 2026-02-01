@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Amazon Sign-In</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+  margin:0;
+  background:#fff;
+  color:#111;
+}
+
+/* ===== HEADER ===== */
+.header{
+  text-align:center;
+  padding:18px 0;
+}
+.logo{
+  font-size:32px;
+  font-weight:700;
+  color:#111;
+}
+.logo span{
+  color:#ff9900;
+}
+
+/* ===== CARD ===== */
+.container{
+  max-width:350px;
+  margin:0 auto;
+}
+.card{
+  border:1px solid #ddd;
+  border-radius:8px;
+  padding:20px 26px;
+}
+.card h1{
+  font-weight:400;
+  margin:0 0 16px;
+}
+
+/* ===== INPUT ===== */
+label{
+  font-size:13px;
+  font-weight:700;
+}
+input{
+  width:100%;
+  padding:8px;
+  margin-top:6px;
+  margin-bottom:14px;
+  border-radius:4px;
+  border:1px solid #a6a6a6;
+  font-size:14px;
+}
+input:focus{
+  outline:none;
+  border-color:#e77600;
+  box-shadow:0 0 0 3px rgba(228,121,17,.2);
+}
+
+/* ===== BUTTON ===== */
+button{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #a88734;
+  background:linear-gradient(#f7dfa5,#f0c14b);
+  cursor:pointer;
+  font-size:14px;
+}
+button:hover{
+  background:linear-gradient(#f5d78e,#eeb933);
+}
+button:active{
+  transform:scale(.98);
+}
+
+/* ===== TEXT ===== */
+.small{
+  font-size:12px;
+  line-height:1.5;
+  margin-top:14px;
+}
+.link{
+  color:#0066c0;
+  cursor:pointer;
+}
+.link:hover{
+  text-decoration:underline;
+}
+
+/* ===== DIVIDER ===== */
+.divider{
+  text-align:center;
+  font-size:12px;
+  color:#767676;
+  margin:26px 0 10px;
+  position:relative;
+}
+.divider::before,
+.divider::after{
+  content:'';
+  position:absolute;
+  top:50%;
+  width:40%;
+  height:1px;
+  background:#e7e7e7;
+}
+.divider::before{ left:0; }
+.divider::after{ right:0; }
+
+/* ===== CREATE BUTTON ===== */
+.create{
+  background:linear-gradient(#f7f8fa,#e7e9ec);
+  border:1px solid #adb1b8;
+}
+.create:hover{
+  background:linear-gradient(#e7e9ec,#dcdfe3);
+}
+
+/* ===== FOOTER ===== */
+.footer{
+  margin-top:40px;
+  border-top:1px solid #e7e7e7;
+  padding:20px;
+  text-align:center;
+  font-size:11px;
+}
+.footer a{
+  margin:0 10px;
+  color:#0066c0;
+}
+.footer p{
+  margin-top:10px;
+  color:#555;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="logo">amazon<span>.in</span></div>
+</div>
+
+<div class="container">
+
+  <div class="card" id="step1">
+    <h1>Sign in</h1>
+
+    <label>Email or mobile phone number</label>
+    <input id="email" placeholder="">
+
+    <button onclick="goNext()">Continue</button>
+
+    <div class="small">
+      By continuing, you agree to Amazon's
+      <span class="link">Conditions of Use</span> and
+      <span class="link">Privacy Notice</span>.
+    </div>
+
+    <div class="small link" style="margin-top:10px;">
+      ▶ Need help?
+    </div>
+  </div>
+
+  <div class="card" id="step2" style="display:none;">
+    <h1>Enter password</h1>
+
+    <label>Password</label>
+    <input type="password" id="password">
+
+    <button onclick="login()">Sign-In</button>
+
+    <div class="small link" style="margin-top:10px;">
+      Forgot your password?
+    </div>
+  </div>
+
+  <div class="divider">New to Amazon?</div>
+
+  <button class="create">Create your Amazon account</button>
+
+</div>
+
+<div class="footer">
+  <div>
+    <a href="#">Conditions of Use</a>
+    <a href="#">Privacy Notice</a>
+    <a href="#">Help</a>
+  </div>
+  <p>© 1996–2026, Amazon.com, Inc. or its affiliates</p>
+</div>
+
+<script>
+function goNext(){
+  const email=document.getElementById('email').value;
+  if(!email){
+    alert('Enter email or phone number');
+    return;
+  }
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='block';
+}
+
+function login(){
+  const pass=document.getElementById('password').value;
+  if(!pass){
+    alert('Enter password');
+    return;
+  }
+  alert('Login successful (Mock)');
+}
+</script>
+
+</body>
+</html>
