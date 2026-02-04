@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Next‑Level Java Code Editor</title>
+<title>Universal Code Editor Pro</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Consolas,monospace}
@@ -18,59 +18,60 @@ body{
   padding:20px;
 }
 
-.editor-app{
+.app{
   width:100%;
   max-width:1200px;
-  height:90vh;
+  height:92vh;
   background:#020617;
   border-radius:16px;
   display:grid;
-  grid-template-rows:50px 1fr 160px;
+  grid-template-rows:52px 1fr 170px;
   overflow:hidden;
-  box-shadow:0 20px 50px rgba(0,0,0,.4);
+  box-shadow:0 25px 60px rgba(0,0,0,.45);
 }
 
-/* Top bar */
 .topbar{
-  background:#020617;
-  border-bottom:1px solid #1e293b;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 16px;
+  padding:0 14px;
+  border-bottom:1px solid #1e293b;
+  background:#020617;
 }
 
 .title{font-size:14px;color:#38bdf8}
 
-.actions button{
+.controls{display:flex;gap:6px;align-items:center}
+
+select,button{
+  background:#020617;
+  color:#e2e8f0;
+  border:1px solid #334155;
+  padding:6px 10px;
+  border-radius:8px;
+  font-size:12px;
+}
+
+button{
   background:#38bdf8;
   color:#020617;
   border:none;
-  padding:6px 12px;
-  border-radius:8px;
   cursor:pointer;
-  margin-left:6px;
-  font-size:12px;
   transition:.2s;
 }
+button:hover{transform:translateY(-1px)}
 
-.actions button:hover{transform:translateY(-1px)}
-
-/* Editor */
 .editor{
   display:grid;
   grid-template-columns:60px 1fr;
-  height:100%;
 }
 
 .lines{
-  background:#020617;
-  border-right:1px solid #1e293b;
   padding:10px 6px;
-  font-size:12px;
-  color:#64748b;
   text-align:right;
-  overflow:hidden;
+  color:#64748b;
+  font-size:12px;
+  border-right:1px solid #1e293b;
 }
 
 textarea{
@@ -86,52 +87,45 @@ textarea{
   resize:none;
 }
 
-/* Output console */
 .console{
-  background:#000000;
+  background:#000;
   border-top:1px solid #1e293b;
   padding:10px;
   font-size:12px;
   color:#22c55e;
   overflow:auto;
 }
-
-.keyword{color:#c084fc}
-.string{color:#34d399}
-.comment{color:#64748b}
-
 </style>
 </head>
 
 <body>
 
-<div class="editor-app">
+<div class="app">
 
-<!-- TOP BAR -->
 <div class="topbar">
-  <div class="title">Java Playground Editor</div>
-  <div class="actions">
+  <div class="title">Universal Playground Editor Pro</div>
+
+  <div class="controls">
+    <select id="language">
+      <option value="javascript">JavaScript</option>
+      <option value="python">Python</option>
+      <option value="java">Java</option>
+      <option value="c">C</option>
+      <option value="cpp">C++</option>
+    </select>
+
     <button onclick="runCode()">Run</button>
-    <button onclick="formatCode()">Format</button>
     <button onclick="clearCode()">Clear</button>
     <button onclick="downloadCode()">Download</button>
   </div>
 </div>
 
-<!-- CODE AREA -->
 <div class="editor">
   <div class="lines" id="lines"></div>
-  <textarea id="code" spellcheck="false">public class Main {
-
-    public static void main(String[] args) {
-        System.out.println("Hello, Java World!");
-    }
-
-}</textarea>
+  <textarea id="code" spellcheck="false">console.log("Hello World");</textarea>
 </div>
 
-<!-- OUTPUT -->
-<div class="console" id="console">Console output will appear here...</div>
+<div class="console" id="console">Output will appear here...</div>
 
 </div>
 
@@ -139,6 +133,7 @@ textarea{
 const codeArea=document.getElementById('code');
 const lines=document.getElementById('lines');
 const consoleBox=document.getElementById('console');
+const langSelect=document.getElementById('language');
 
 function updateLines(){
   const count=codeArea.value.split('\n').length;
@@ -148,45 +143,57 @@ function updateLines(){
 codeArea.addEventListener('input',updateLines);
 updateLines();
 
-function runCode(){
+async function runCode(){
   const code=codeArea.value;
+  const lang=langSelect.value;
 
-  const match=code.match(/System\.out\.println\((.*?)\)/g);
+  try{
+    if(lang==='javascript'){
+      // Support import by running inside dynamic module
+      const blob=new Blob([code],{type:'text/javascript'});
+      const url=URL.createObjectURL(blob);
 
-  if(!match){
-    consoleBox.textContent='Program executed. (Simulation mode — only println supported)';
-    return;
+      consoleBox.textContent='Running JavaScript module...';
+
+      const module=await import(url);
+
+      if(module?.default!==undefined)
+        consoleBox.textContent=String(module.default);
+      else
+        consoleBox.textContent='JavaScript executed successfully.';
+    }
+
+    else if(lang==='python'){
+      consoleBox.textContent='Python needs backend or Pyodide. (Simulation mode)';
+    }
+
+    else if(lang==='java'){
+      const match=code.match(/System\.out\.println\((.*?)\)/g);
+      if(!match){consoleBox.textContent='Java executed. (println simulation only)';return;}
+      consoleBox.textContent=match.map(l=>l.match(/\((.*?)\)/)[1].replaceAll('"','')).join('\n');
+    }
+
+    else if(lang==='c'||lang==='cpp'){
+      consoleBox.textContent='C/C++ require real compiler backend. (Simulation)';
+    }
   }
-
-  const output=match.map(line=>{
-    const text=line.match(/\((.*?)\)/)[1];
-    return text.replaceAll('"','');
-  }).join('\n');
-
-  consoleBox.textContent=output;
+  catch(err){
+    consoleBox.textContent='Error: '+err.message;
+  }
 }
 
 function clearCode(){
   codeArea.value='';
-  consoleBox.textContent='Console cleared.';
-  updateLines();
-}
-
-function formatCode(){
-  let formatted=codeArea.value
-    .replace(/\{/g,'{\n')
-    .replace(/;/g,';\n')
-    .replace(/\}/g,'\n}');
-
-  codeArea.value=formatted;
+  consoleBox.textContent='Cleared.';
   updateLines();
 }
 
 function downloadCode(){
+  const ext={javascript:'js',python:'py',java:'java',c:'c',cpp:'cpp'}[langSelect.value];
   const blob=new Blob([codeArea.value],{type:'text/plain'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
-  a.download='Main.java';
+  a.download='code.'+ext;
   a.click();
 }
 </script>
