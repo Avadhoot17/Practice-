@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Learning DB Table Builder</title>
+  <title>Easy DB Table Builder</title>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
 
     body {
       min-height: 100vh;
-      background: linear-gradient(135deg, #eef2ff, #fdf2f8);
+      background: linear-gradient(135deg, #eef2ff, #f8fafc);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -18,120 +19,119 @@
 
     .app {
       width: 100%;
-      max-width: 1200px;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+      max-width: 1100px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.08);
       overflow: hidden;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      animation: fadeIn 0.6s ease;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .panel { padding: 26px; }
 
-    .panel { padding: 24px; }
-
-    h1 { font-size: 22px; margin-bottom: 16px; }
-    h2 { font-size: 16px; margin: 18px 0 10px; color: #444; }
+    h1 { font-size: 22px; margin-bottom: 18px; }
+    h2 { font-size: 15px; margin: 18px 0 8px; color: #444; }
 
     input, button {
-      padding: 10px 12px;
+      padding: 11px 12px;
       border-radius: 10px;
-      border: 1px solid #ddd;
-      outline: none;
+      border: 1px solid #e5e7eb;
       font-size: 14px;
+      transition: 0.15s ease;
     }
 
-    input:focus { border-color: #6366f1; }
+    input:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+    }
 
     button {
       cursor: pointer;
       background: #6366f1;
       color: white;
       border: none;
-      transition: 0.2s ease;
+      font-weight: 500;
     }
 
-    button:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(99,102,241,0.25); }
+    button:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(99,102,241,0.25); }
 
     .row { display: flex; gap: 8px; margin-bottom: 10px; }
+
+    .hint { font-size: 12px; color: #6b7280; margin-top: 4px; }
 
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
+      border-radius: 12px;
+      overflow: hidden;
     }
 
     th, td {
-      border: 1px solid #eee;
-      padding: 8px;
+      border: 1px solid #f1f5f9;
+      padding: 10px;
       text-align: center;
       font-size: 14px;
     }
 
-    th { background: #f5f7ff; }
+    th { background: #f1f5ff; font-weight: 600; }
+
+    td.delete, th.delete { cursor: pointer; color: #ef4444; font-weight: 600; }
 
     .json {
       margin-top: 16px;
       background: #0f172a;
       color: #e2e8f0;
-      padding: 12px;
+      padding: 14px;
       border-radius: 12px;
       font-size: 12px;
       overflow-x: auto;
     }
 
-    .tooltip {
-      font-size: 12px;
-      color: #666;
-      margin-top: 4px;
-    }
-
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
 
     @media (max-width: 900px) {
       .app { grid-template-columns: 1fr; }
     }
   </style>
 </head>
+
 <body>
   <div class="app">
 
-    <!-- Left Panel -->
+    <!-- LEFT SIDE -->
     <div class="panel">
-      <h1>DB Table Builder</h1>
+      <h1>Simple Database Builder</h1>
 
-      <h2>Table Name</h2>
-      <input id="tableName" placeholder="Enter table name" />
-      <div class="tooltip">A table stores structured data in rows and columns.</div>
+      <h2>1. Table Name</h2>
+      <input id="tableName" placeholder="Example: Students" />
+      <div class="hint">A table stores related data in rows and columns.</div>
 
-      <h2>Add Column</h2>
+      <h2>2. Add Column</h2>
       <div class="row">
-        <input id="columnInput" placeholder="Column name" />
+        <input id="columnInput" placeholder="Example: Name" />
         <button onclick="addColumn()">Add</button>
       </div>
-      <div class="tooltip">Columns define the type of data stored.</div>
+      <div class="hint">Columns describe what type of data you store.</div>
 
-      <h2>Add Row Data</h2>
+      <h2>3. Add Row Data</h2>
       <div id="rowInputs"></div>
-      <button onclick="addRow()">Add Row</button>
-      <div class="tooltip">Rows contain the actual records.</div>
+      <button onclick="addRow()">Insert Row</button>
+      <div class="hint">Rows are individual records inside the table.</div>
 
       <div class="actions">
-        <button onclick="resetTable()">Reset Table</button>
+        <button onclick="resetTable()">Reset Everything</button>
       </div>
     </div>
 
-    <!-- Right Panel -->
+    <!-- RIGHT SIDE -->
     <div class="panel">
-      <h1 id="previewTitle">Preview</h1>
+      <h1 id="previewTitle">Live Preview</h1>
       <table id="previewTable"></table>
 
-      <h2>JSON Structure</h2>
+      <h2>Real JSON Data</h2>
       <pre class="json" id="jsonPreview">{}</pre>
     </div>
 
@@ -214,8 +214,7 @@
     }
 
     function updatePreview() {
-      previewTitle.textContent = tableNameInput.value || "Preview";
-
+      previewTitle.textContent = tableNameInput.value || "Live Preview";
       previewTable.innerHTML = "";
 
       if (!columns.length) {
@@ -223,17 +222,20 @@
         return;
       }
 
-      const thead = document.createElement("tr");
+      const header = document.createElement("tr");
 
       columns.forEach((col, i) => {
         const th = document.createElement("th");
-        th.textContent = col + " ✕";
-        th.style.cursor = "pointer";
+        th.textContent = col;
         th.onclick = () => deleteColumn(i);
-        thead.appendChild(th);
+        header.appendChild(th);
       });
 
-      previewTable.appendChild(thead);
+      const delHead = document.createElement("th");
+      delHead.textContent = "Delete";
+      header.appendChild(delHead);
+
+      previewTable.appendChild(header);
 
       rows.forEach((row, rowIndex) => {
         const tr = document.createElement("tr");
@@ -246,19 +248,14 @@
 
         const del = document.createElement("td");
         del.textContent = "✕";
-        del.style.cursor = "pointer";
+        del.className = "delete";
         del.onclick = () => deleteRow(rowIndex);
         tr.appendChild(del);
 
         previewTable.appendChild(tr);
       });
 
-      const jsonData = {
-        table: tableNameInput.value || null,
-        columns,
-        rows
-      };
-
+      const jsonData = { table: tableNameInput.value || null, columns, rows };
       jsonPreview.textContent = JSON.stringify(jsonData, null, 2);
     }
   </script>
