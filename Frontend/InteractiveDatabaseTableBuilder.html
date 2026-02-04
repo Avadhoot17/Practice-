@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Easy DB Table Builder</title>
+  <title>Perfect DB Table Builder</title>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
@@ -19,16 +19,16 @@
 
     .app {
       width: 100%;
-      max-width: 1100px;
+      max-width: 1150px;
       background: #ffffff;
       border-radius: 18px;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.08);
+      box-shadow: 0 20px 45px rgba(0,0,0,0.08);
       overflow: hidden;
       display: grid;
       grid-template-columns: 1fr 1fr;
     }
 
-    .panel { padding: 26px; }
+    .panel { padding: 28px; }
 
     h1 { font-size: 22px; margin-bottom: 18px; }
     h2 { font-size: 15px; margin: 18px 0 8px; color: #444; }
@@ -64,7 +64,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-top: 12px;
       border-radius: 12px;
       overflow: hidden;
     }
@@ -78,7 +78,7 @@
 
     th { background: #f1f5ff; font-weight: 600; }
 
-    td.delete, th.delete { cursor: pointer; color: #ef4444; font-weight: 600; }
+    td.delete { cursor: pointer; color: #ef4444; font-weight: 600; }
 
     .json {
       margin-top: 16px;
@@ -103,26 +103,28 @@
 
     <!-- LEFT SIDE -->
     <div class="panel">
-      <h1>Simple Database Builder</h1>
+      <h1>Database Builder</h1>
 
       <h2>1. Table Name</h2>
       <input id="tableName" placeholder="Example: Students" />
-      <div class="hint">A table stores related data in rows and columns.</div>
+      <div class="hint">Tables organize structured data.</div>
 
       <h2>2. Add Column</h2>
       <div class="row">
         <input id="columnInput" placeholder="Example: Name" />
         <button onclick="addColumn()">Add</button>
       </div>
-      <div class="hint">Columns describe what type of data you store.</div>
 
-      <h2>3. Add Row Data</h2>
+      <h2>3. Row Details</h2>
       <div id="rowInputs"></div>
-      <button onclick="addRow()">Insert Row</button>
-      <div class="hint">Rows are individual records inside the table.</div>
+
+      <div class="row">
+        <input type="date" id="dateInput" />
+        <button onclick="addRow()">Add Row</button>
+      </div>
 
       <div class="actions">
-        <button onclick="resetTable()">Reset Everything</button>
+        <button onclick="resetTable()">Reset</button>
       </div>
     </div>
 
@@ -131,7 +133,7 @@
       <h1 id="previewTitle">Live Preview</h1>
       <table id="previewTable"></table>
 
-      <h2>Real JSON Data</h2>
+      <h2>JSON Output</h2>
       <pre class="json" id="jsonPreview">{}</pre>
     </div>
 
@@ -147,6 +149,7 @@
     const jsonPreview = document.getElementById("jsonPreview");
     const previewTitle = document.getElementById("previewTitle");
     const tableNameInput = document.getElementById("tableName");
+    const dateInput = document.getElementById("dateInput");
 
     tableNameInput.addEventListener("input", updatePreview);
 
@@ -183,6 +186,9 @@
         input.value = "";
       });
 
+      row.date = dateInput.value || null;
+      dateInput.value = "";
+
       rows.push(row);
       updatePreview();
     }
@@ -192,23 +198,11 @@
       updatePreview();
     }
 
-    function deleteColumn(index) {
-      const colName = columns[index];
-      columns.splice(index, 1);
-
-      rows = rows.map(r => {
-        delete r[colName];
-        return r;
-      });
-
-      renderRowInputs();
-      updatePreview();
-    }
-
     function resetTable() {
       columns = [];
       rows = [];
       tableNameInput.value = "";
+      dateInput.value = "";
       renderRowInputs();
       updatePreview();
     }
@@ -217,19 +211,22 @@
       previewTitle.textContent = tableNameInput.value || "Live Preview";
       previewTable.innerHTML = "";
 
-      if (!columns.length) {
+      if (!columns.length && rows.length === 0) {
         jsonPreview.textContent = "{}";
         return;
       }
 
       const header = document.createElement("tr");
 
-      columns.forEach((col, i) => {
+      columns.forEach(col => {
         const th = document.createElement("th");
         th.textContent = col;
-        th.onclick = () => deleteColumn(i);
         header.appendChild(th);
       });
+
+      const dateHead = document.createElement("th");
+      dateHead.textContent = "Date";
+      header.appendChild(dateHead);
 
       const delHead = document.createElement("th");
       delHead.textContent = "Delete";
@@ -245,6 +242,10 @@
           td.textContent = row[col] || "";
           tr.appendChild(td);
         });
+
+        const dateTd = document.createElement("td");
+        dateTd.textContent = row.date || "";
+        tr.appendChild(dateTd);
 
         const del = document.createElement("td");
         del.textContent = "✕";
