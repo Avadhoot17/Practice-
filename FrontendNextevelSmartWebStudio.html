@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Web Studio</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,Segoe UI,Arial}
+
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#020617,#0f172a);
+  color:#e2e8f0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.app{
+  width:100%;
+  max-width:1300px;
+  height:92vh;
+  display:grid;
+  grid-template-columns:260px 1fr 360px;
+  background:#020617;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 30px 70px rgba(0,0,0,.5);
+}
+
+.panel{
+  border-right:1px solid #1e293b;
+  display:flex;
+  flex-direction:column;
+}
+
+.panel:last-child{border-right:none;border-left:1px solid #1e293b}
+
+.header{
+  padding:14px;
+  font-size:14px;
+  border-bottom:1px solid #1e293b;
+  color:#38bdf8;
+}
+
+.files{flex:1;overflow:auto;padding:10px}
+.file{
+  padding:8px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:13px;
+}
+.file:hover{background:#0f172a}
+.active{background:#1e293b}
+
+.editor{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+}
+
+textarea{
+  flex:1;
+  background:#020617;
+  color:#e2e8f0;
+  border:none;
+  outline:none;
+  padding:14px;
+  font-family:Consolas,monospace;
+  font-size:13px;
+  resize:none;
+}
+
+.runbar{
+  border-top:1px solid #1e293b;
+  padding:10px;
+  display:flex;
+  gap:8px;
+}
+
+button{
+  background:#38bdf8;
+  border:none;
+  color:#020617;
+  padding:8px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:12px;
+}
+button:hover{transform:translateY(-1px)}
+
+.preview iframe{
+  width:100%;
+  height:100%;
+  border:none;
+  background:white;
+}
+
+.console{
+  flex:1;
+  background:#000;
+  color:#22c55e;
+  font-family:Consolas,monospace;
+  font-size:12px;
+  padding:10px;
+  overflow:auto;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- FILE PANEL -->
+<div class="panel">
+  <div class="header">Project Files</div>
+  <div class="files" id="fileList"></div>
+</div>
+
+<!-- EDITOR PANEL -->
+<div class="panel editor">
+  <div class="header" id="editorTitle">index.html</div>
+  <textarea id="code"></textarea>
+  <div class="runbar">
+    <button onclick="runProject()">Run Project</button>
+    <button onclick="saveProject()">Save</button>
+    <button onclick="newFile()">New File</button>
+  </div>
+</div>
+
+<!-- PREVIEW PANEL -->
+<div class="panel">
+  <div class="header">Live Preview</div>
+  <iframe id="preview"></iframe>
+  <div class="header">Console</div>
+  <div class="console" id="console">Ready.</div>
+</div>
+
+</div>
+
+<script>
+let files={
+  "index.html":"<h1>Hello Smart Studio</h1>",
+  "style.css":"body{font-family:sans-serif}",
+  "script.js":"console.log('Studio Ready');"
+};
+
+let current="index.html";
+
+const fileList=document.getElementById('fileList');
+const codeArea=document.getElementById('code');
+const title=document.getElementById('editorTitle');
+const preview=document.getElementById('preview');
+const consoleBox=document.getElementById('console');
+
+function renderFiles(){
+  fileList.innerHTML='';
+  Object.keys(files).forEach(name=>{
+    const div=document.createElement('div');
+    div.className='file'+(name===current?' active':'');
+    div.textContent=name;
+    div.onclick=()=>openFile(name);
+    fileList.appendChild(div);
+  });
+}
+
+function openFile(name){
+  saveCurrent();
+  current=name;
+  title.textContent=name;
+  codeArea.value=files[name];
+  renderFiles();
+}
+
+function saveCurrent(){
+  files[current]=codeArea.value;
+}
+
+function saveProject(){
+  saveCurrent();
+  consoleBox.textContent='Project saved locally in memory.';
+}
+
+function newFile(){
+  const name=prompt('Enter file name');
+  if(!name)return;
+  files[name]='';
+  openFile(name);
+}
+
+function runProject(){
+  saveCurrent();
+
+  const html=files['index.html']||'';
+  const css="<style>"+(files['style.css']||'')+"</style>";
+  const js="<script>try{"+(files['script.js']||'')+"}catch(e){parent.postMessage(e.message,'*')}<\/script>";
+
+  const doc=html+css+js;
+  preview.srcdoc=doc;
+  consoleBox.textContent='Project running...';
+}
+
+window.addEventListener('message',e=>{
+  consoleBox.textContent='Error: '+e.data;
+});
+
+openFile(current);
+</script>
+
+</body>
+</html>
