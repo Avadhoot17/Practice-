@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>3D Navbar</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Segoe UI, sans-serif;
+}
+
+body{
+  height:200vh;
+  background:linear-gradient(120deg,#0f2027,#203a43,#2c5364);
+  color:white;
+}
+
+/* NAVBAR */
+nav{
+  position:fixed;
+  top:0;
+  width:100%;
+  padding:18px 40px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  backdrop-filter:blur(12px);
+  background:rgba(255,255,255,0.05);
+  box-shadow:0 8px 30px rgba(0,0,0,0.3);
+  z-index:1000;
+}
+
+/* LOGO */
+.logo{
+  font-size:24px;
+  font-weight:bold;
+  letter-spacing:1px;
+  transform:perspective(400px) rotateX(10deg);
+  transition:0.4s;
+}
+
+.logo:hover{
+  transform:perspective(400px) rotateX(0deg) scale(1.1);
+  text-shadow:0 0 15px #00eaff;
+}
+
+/* MENU */
+ul{
+  list-style:none;
+  display:flex;
+  gap:25px;
+}
+
+li{
+  position:relative;
+  transform-style:preserve-3d;
+}
+
+a{
+  text-decoration:none;
+  color:white;
+  font-size:16px;
+  padding:10px 18px;
+  display:block;
+  border-radius:10px;
+  background:rgba(255,255,255,0.05);
+  transition:0.4s;
+  transform:translateZ(0);
+}
+
+/* 3D HOVER EFFECT */
+li:hover a{
+  transform:translateZ(20px) rotateX(8deg) rotateY(-8deg);
+  box-shadow:
+    0 10px 20px rgba(0,0,0,0.4),
+    inset 0 0 10px rgba(255,255,255,0.1),
+    0 0 15px #00eaff;
+}
+
+/* ACTIVE LINK */
+a.active{
+  background:#00eaff;
+  color:#003;
+  box-shadow:0 0 20px #00eaff;
+}
+
+/* MOBILE */
+.menu-btn{
+  display:none;
+  font-size:26px;
+  cursor:pointer;
+}
+
+/* MOBILE NAV */
+@media(max-width:768px){
+  ul{
+    position:absolute;
+    top:70px;
+    right:0;
+    width:220px;
+    flex-direction:column;
+    background:rgba(0,0,0,0.85);
+    padding:20px;
+    transform:translateX(100%);
+    transition:0.4s;
+    border-radius:0 0 0 20px;
+  }
+
+  ul.show{
+    transform:translateX(0);
+  }
+
+  .menu-btn{
+    display:block;
+  }
+}
+
+/* DEMO CONTENT */
+section{
+  margin-top:120px;
+  text-align:center;
+  font-size:40px;
+  opacity:0.8;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <div class="logo">3D-NAV</div>
+
+  <div class="menu-btn" id="menuBtn">☰</div>
+
+  <ul id="navLinks">
+    <li><a class="active" href="#">Home</a></li>
+    <li><a href="#">About</a></li>
+    <li><a href="#">Services</a></li>
+    <li><a href="#">Projects</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+</nav>
+
+<section>Scroll Down ↓</section>
+
+<script>
+const menuBtn = document.getElementById("menuBtn");
+const navLinks = document.getElementById("navLinks");
+const links = document.querySelectorAll("nav a");
+
+/* MOBILE TOGGLE */
+menuBtn.onclick = () => {
+  navLinks.classList.toggle("show");
+};
+
+/* ACTIVE LINK SWITCH */
+links.forEach(link=>{
+  link.addEventListener("click",()=>{
+    links.forEach(l=>l.classList.remove("active"));
+    link.classList.add("active");
+  });
+});
+
+/* SCROLL SHADOW DEPTH */
+window.addEventListener("scroll",()=>{
+  const nav = document.querySelector("nav");
+  if(window.scrollY > 40){
+    nav.style.boxShadow = "0 12px 40px rgba(0,0,0,0.6)";
+  }else{
+    nav.style.boxShadow = "0 8px 30px rgba(0,0,0,0.3)";
+  }
+});
+</script>
+
+</body>
+</html>
