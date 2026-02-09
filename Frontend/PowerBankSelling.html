@@ -6,194 +6,93 @@
 <title>Voltix PowerBank Store</title>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Segoe UI, sans-serif;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,sans-serif;}
 
 body{
   background:#060912;
-  color:white;
-  overflow-x:hidden;
+  color:#fff;
 }
 
-/* ===== NAVBAR ===== */
+/* NAVBAR */
 nav{
-  position:fixed;
-  top:0;
-  width:100%;
-  padding:18px 40px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:rgba(0,0,0,0.55);
-  backdrop-filter:blur(12px);
+  position:fixed;top:0;width:100%;
+  padding:16px 30px;
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(10px);
   z-index:1000;
 }
 
-.logo{
-  font-size:22px;
-  font-weight:700;
-  color:#00eaff;
-  text-shadow:0 0 12px #00eaff;
-}
+.logo{color:#00eaff;font-weight:700;font-size:22px;}
 
-.icons{
-  display:flex;
-  gap:18px;
-  align-items:center;
-  cursor:pointer;
-}
+.icons span{cursor:pointer;margin-left:18px;font-size:18px;}
 
 .cart-count{
-  background:#00eaff;
-  color:#000;
-  font-size:12px;
-  padding:2px 7px;
-  border-radius:10px;
+  background:#00eaff;color:#000;
+  font-size:12px;padding:2px 6px;border-radius:8px;margin-left:4px;
 }
 
-/* ===== HERO ===== */
+/* HERO */
 .hero{
-  height:85vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+  height:80vh;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
   text-align:center;
-  background:radial-gradient(circle at center,#0f1a33,#02040a);
-  animation:fadeIn 1.2s ease;
+  background:radial-gradient(circle,#0f1a33,#02040a);
 }
 
-.hero h1{
-  font-size:52px;
-  margin-bottom:10px;
-  text-shadow:0 0 25px #00eaff;
-}
-
-.hero p{
-  opacity:.7;
-  margin-bottom:25px;
-}
+.hero h1{font-size:50px;text-shadow:0 0 20px #00eaff;}
+.hero p{opacity:.7;margin:12px 0 20px;}
 
 .btn{
-  padding:12px 28px;
-  border:none;
-  border-radius:30px;
-  background:#00eaff;
-  color:#000;
-  font-weight:600;
-  cursor:pointer;
-  transition:.3s;
+  padding:12px 26px;border:none;border-radius:25px;
+  background:#00eaff;color:#000;font-weight:600;cursor:pointer;
+  transition:.25s;
 }
+.btn:hover{transform:scale(1.05);box-shadow:0 0 20px #00eaff;}
 
-.btn:hover{
-  transform:scale(1.08);
-  box-shadow:0 0 25px #00eaff;
-}
-
-/* ===== PRODUCTS GRID ===== */
+/* PRODUCTS */
 .products{
-  padding:90px 40px;
+  padding:80px 30px;
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:32px;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:28px;
 }
 
-/* ===== CARD ===== */
 .card{
-  background:#0d1426;
-  border-radius:20px;
-  padding:22px;
-  text-align:center;
-  position:relative;
-  overflow:hidden;
-  transform:translateY(30px);
-  opacity:0;
-  animation:cardReveal .8s ease forwards;
+  background:#0d1426;border-radius:18px;padding:18px;text-align:center;
+  transition:.3s;position:relative;
+}
+.card:hover{transform:translateY(-8px);box-shadow:0 0 20px #00eaff33;}
+
+.card img{height:170px;object-fit:contain;margin-bottom:10px;width:100%;}
+.price{color:#00eaff;margin:10px 0;font-size:18px;}
+
+/* CART PANEL */
+.cart{
+  position:fixed;right:-360px;top:0;width:340px;height:100%;
+  background:#0b1224;padding:20px;
+  transition:.4s;z-index:1200;overflow-y:auto;
+}
+.cart.show{right:0;}
+
+.cart h2{margin-bottom:12px;}
+
+.cart-item{
+  display:flex;justify-content:space-between;align-items:center;
+  margin:10px 0;padding-bottom:8px;border-bottom:1px solid #222;
+  font-size:14px;
 }
 
-/* stagger animation */
-.card:nth-child(2){animation-delay:.1s}
-.card:nth-child(3){animation-delay:.2s}
-.card:nth-child(4){animation-delay:.3s}
-.card:nth-child(5){animation-delay:.4s}
-.card:nth-child(6){animation-delay:.5s}
-
-/* glow gradient */
-.card::before{
-  content:"";
-  position:absolute;
-  inset:-2px;
-  background:linear-gradient(120deg,#00eaff33,transparent,#00eaff33);
-  opacity:0;
-  transition:.4s;
+.qty button{
+  background:#00eaff;border:none;padding:2px 6px;margin:0 4px;cursor:pointer;
 }
 
-.card:hover::before{opacity:1;}
-
-.card:hover{
-  transform:translateY(-12px) scale(1.04);
-  box-shadow:0 0 30px #00eaff33;
+.total{
+  margin-top:15px;font-weight:700;color:#00eaff;
 }
 
-/* image */
-.card img{
-  width:100%;
-  height:180px;
-  object-fit:contain;
-  margin-bottom:12px;
-}
-
-/* text */
-.price{
-  color:#00eaff;
-  font-size:20px;
-  margin:10px 0;
-}
-
-/* add button pulse */
-.add{
-  margin-top:8px;
-}
-
-.add:active{
-  transform:scale(.9);
-}
-
-/* ===== PROFILE PANEL ===== */
-.profile{
-  position:fixed;
-  top:0;
-  right:-320px;
-  width:300px;
-  height:100vh;
-  background:#0b1224;
-  padding:22px;
-  transition:.45s;
-  z-index:1200;
-}
-
-.profile.show{ right:0; }
-
-/* ===== FOOTER ===== */
-footer{
-  text-align:center;
-  padding:35px;
-  opacity:.6;
-}
-
-/* ===== ANIMATIONS ===== */
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(20px)}
-  to{opacity:1; transform:translateY(0)}
-}
-
-@keyframes cardReveal{
-  to{opacity:1; transform:translateY(0)}
-}
+/* FOOTER */
+footer{text-align:center;padding:30px;opacity:.6;}
 </style>
 </head>
 
@@ -203,67 +102,114 @@ footer{
   <div class="logo">Voltix</div>
   <div class="icons">
     🛒 <span class="cart-count" id="count">0</span>
-    <span id="profileBtn">👤</span>
+    <span id="cartBtn">Open Cart</span>
   </div>
 </nav>
 
 <section class="hero">
-  <h1>Next-Gen Power Banks</h1>
-  <p>Ultra-fast charging with futuristic design.</p>
-  <button class="btn">Explore Products</button>
+  <h1>Fast Charging PowerBanks</h1>
+  <p>Premium energy. Anywhere.</p>
+  <button class="btn" onclick="scrollToProducts()">Shop Now</button>
 </section>
 
 <section class="products" id="products"></section>
 
-<div class="profile" id="profile">
-  <h2>User Dashboard</h2>
-  <p>Name: Guest</p>
-  <p>Orders: 0</p>
-  <p>Status: Basic Member</p>
+<!-- CART -->
+<div class="cart" id="cart">
+  <h2>Your Cart</h2>
+  <div id="cartItems"></div>
+  <div class="total" id="total">Total: ₹0</div>
 </div>
 
 <footer>© 2026 Voltix Energy</footer>
 
 <script>
-const items = [
-  ["Voltix Mini 10K","₹999","https://images.unsplash.com/photo-1585386959984-a4155224a1ad"],
-  ["Voltix Slim 12K","₹1099","https://images.unsplash.com/photo-1598327105666-5b89351aff97"],
-  ["Voltix Pro 20K","₹1499","https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5"],
-  ["Voltix Turbo 22K","₹1699","https://images.unsplash.com/photo-1615529182904-14819c35db37"],
-  ["Voltix Max 30K","₹1999","https://images.unsplash.com/photo-1580910051074-3eb694886505"],
-  ["Voltix Ultra 40K","₹2499","https://images.unsplash.com/photo-1606813909355-3b2e7d7c4c2d"]
+/* DATA */
+const products = [
+  {name:"Voltix Mini 10K",price:999,img:"https://images.unsplash.com/photo-1585386959984-a4155224a1ad"},
+  {name:"Voltix Slim 12K",price:1099,img:"https://images.unsplash.com/photo-1598327105666-5b89351aff97"},
+  {name:"Voltix Pro 20K",price:1499,img:"https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5"},
+  {name:"Voltix Max 30K",price:1999,img:"https://images.unsplash.com/photo-1615529182904-14819c35db37"},
+  {name:"Voltix Ultra 40K",price:2499,img:"https://images.unsplash.com/photo-1580910051074-3eb694886505"}
 ];
 
+/* STATE */
+let cart = [];
+
+/* DOM */
 const container = document.getElementById("products");
-const count = document.getElementById("count");
-const profile = document.getElementById("profile");
+const cartBox = document.getElementById("cart");
+const cartItems = document.getElementById("cartItems");
+const totalEl = document.getElementById("total");
+const countEl = document.getElementById("count");
 
-let cart = 0;
-
-/* create cards */
-items.forEach(p=>{
+/* CREATE PRODUCT UI */
+products.forEach((p,i)=>{
   const card = document.createElement("div");
   card.className="card";
-
   card.innerHTML = `
-    <img src="${p[2]}" alt="">
-    <h3>${p[0]}</h3>
-    <div class="price">${p[1]}</div>
-    <button class="btn add">Add to Cart</button>
+    <img src="${p.img}">
+    <h3>${p.name}</h3>
+    <div class="price">₹${p.price}</div>
+    <button class="btn">Add to Cart</button>
   `;
-
-  card.querySelector("button").onclick = ()=>{
-    cart++;
-    count.textContent = cart;
-  };
-
+  card.querySelector("button").onclick = ()=>addToCart(i);
   container.appendChild(card);
 });
 
-/* profile toggle */
-document.getElementById("profileBtn").onclick = ()=>{
-  profile.classList.toggle("show");
+/* ADD TO CART */
+function addToCart(index){
+  const item = cart.find(c=>c.index===index);
+  if(item){ item.qty++; }
+  else{ cart.push({index,qty:1}); }
+  updateCart();
+}
+
+/* UPDATE CART UI */
+function updateCart(){
+  cartItems.innerHTML="";
+  let total=0, count=0;
+
+  cart.forEach(c=>{
+    const p = products[c.index];
+    total += p.price * c.qty;
+    count += c.qty;
+
+    const div = document.createElement("div");
+    div.className="cart-item";
+    div.innerHTML = `
+      <span>${p.name}</span>
+      <div class="qty">
+        <button onclick="changeQty(${c.index},-1)">-</button>
+        ${c.qty}
+        <button onclick="changeQty(${c.index},1)">+</button>
+      </div>
+    `;
+    cartItems.appendChild(div);
+  });
+
+  totalEl.textContent = "Total: ₹" + total;
+  countEl.textContent = count;
+}
+
+/* CHANGE QTY */
+function changeQty(index,delta){
+  const item = cart.find(c=>c.index===index);
+  if(!item) return;
+  item.qty += delta;
+  if(item.qty <= 0) cart = cart.filter(c=>c.index!==index);
+  updateCart();
+}
+
+/* CART TOGGLE */
+document.getElementById("cartBtn").onclick = ()=>{
+  cartBox.classList.toggle("show");
 };
+
+/* SCROLL */
+function scrollToProducts(){
+  document.getElementById("products").scrollIntoView({behavior:"smooth"});
+}
 </script>
 
 </body>
