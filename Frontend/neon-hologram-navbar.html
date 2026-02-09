@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neon Hologram Navbar</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Segoe UI, sans-serif;
+}
+
+body{
+  height:200vh;
+  background:radial-gradient(circle at top,#0f2027,#090a1a 60%);
+  color:white;
+  overflow-x:hidden;
+}
+
+/* ===== FLOATING NAV ===== */
+nav{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%) perspective(800px);
+  width:90%;
+  padding:16px 30px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(16px);
+  border-radius:20px;
+  box-shadow:0 0 25px rgba(0,255,255,0.15);
+  transition:transform .2s ease;
+  z-index:1000;
+}
+
+/* LOGO */
+.logo{
+  font-size:22px;
+  font-weight:600;
+  letter-spacing:1px;
+  color:#00f7ff;
+  text-shadow:0 0 12px #00f7ff;
+}
+
+/* MENU */
+ul{
+  list-style:none;
+  display:flex;
+  gap:30px;
+}
+
+a{
+  text-decoration:none;
+  color:white;
+  font-size:15px;
+  position:relative;
+  padding:6px 0;
+  transition:.3s;
+}
+
+/* NEON UNDERLINE TRAIL */
+a::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:-6px;
+  width:0%;
+  height:2px;
+  background:linear-gradient(90deg,#00f7ff,#ff00ff);
+  box-shadow:0 0 10px #00f7ff,0 0 20px #ff00ff;
+  transition:.4s;
+}
+
+a:hover::after{
+  width:100%;
+}
+
+a:hover{
+  color:#00f7ff;
+  text-shadow:0 0 10px #00f7ff;
+}
+
+/* ===== MOBILE ===== */
+.menu-btn{
+  display:none;
+  font-size:26px;
+  cursor:pointer;
+}
+
+@media(max-width:768px){
+  ul{
+    position:fixed;
+    top:0;
+    right:-100%;
+    width:240px;
+    height:100vh;
+    background:#050510;
+    flex-direction:column;
+    align-items:center;
+    padding-top:90px;
+    gap:25px;
+    transition:.4s;
+  }
+
+  ul.show{
+    right:0;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+}
+
+/* ===== MOUSE LIGHT ===== */
+.mouse-light{
+  position:fixed;
+  width:300px;
+  height:300px;
+  background:radial-gradient(circle,#00f7ff55,transparent 60%);
+  pointer-events:none;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  z-index:0;
+}
+
+/* DEMO TEXT */
+section{
+  margin-top:160px;
+  text-align:center;
+  font-size:40px;
+  opacity:.85;
+}
+</style>
+</head>
+
+<body>
+
+<div class="mouse-light" id="light"></div>
+
+<nav id="nav">
+  <div class="logo">NEON-AI</div>
+
+  <div class="menu-btn" id="menuBtn">☰</div>
+
+  <ul id="navLinks">
+    <li><a href="#">Home</a></li>
+    <li><a href="#">About</a></li>
+    <li><a href="#">Services</a></li>
+    <li><a href="#">Projects</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+</nav>
+
+<section>Futuristic Neon Navbar</section>
+
+<!-- CLICK SOUND -->
+<audio id="clickSound">
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_401d9c.mp3?filename=click-124467.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const nav = document.getElementById("nav");
+const light = document.getElementById("light");
+const menuBtn = document.getElementById("menuBtn");
+const navLinks = document.getElementById("navLinks");
+const clickSound = document.getElementById("clickSound");
+
+/* ===== MOBILE MENU ===== */
+menuBtn.onclick = () => navLinks.classList.toggle("show");
+
+/* ===== CLICK SOUND ===== */
+document.querySelectorAll("a, .menu-btn").forEach(el=>{
+  el.addEventListener("click",()=>{
+    clickSound.currentTime = 0;
+    clickSound.play();
+  });
+});
+
+/* ===== MOUSE FOLLOW LIGHT ===== */
+window.addEventListener("mousemove",e=>{
+  light.style.left = e.clientX + "px";
+  light.style.top = e.clientY + "px";
+
+  /* 3D NAV TILT */
+  const x = (window.innerWidth / 2 - e.clientX) / 40;
+  const y = (window.innerHeight / 2 - e.clientY) / 40;
+  nav.style.transform =
+    `translateX(-50%) perspective(800px) rotateY(${x}deg) rotateX(${y}deg)`;
+});
+
+/* RESET TILT WHEN LEAVE */
+window.addEventListener("mouseleave",()=>{
+  nav.style.transform = "translateX(-50%) perspective(800px) rotateX(0) rotateY(0)";
+});
+</script>
+
+</body>
+</html>
