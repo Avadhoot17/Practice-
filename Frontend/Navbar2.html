@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Pro Navbar</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Segoe UI, sans-serif;
+}
+
+body{
+  height:250vh;
+  background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+  color:white;
+  scroll-behavior:smooth;
+}
+
+/* ===== NAVBAR ===== */
+nav{
+  position:fixed;
+  top:15px;
+  left:50%;
+  transform:translateX(-50%);
+  width:90%;
+  padding:14px 28px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(255,255,255,0.06);
+  backdrop-filter:blur(14px);
+  border-radius:18px;
+  box-shadow:0 10px 35px rgba(0,0,0,0.4);
+  z-index:1000;
+  transition:.4s;
+}
+
+/* SCROLL EFFECT */
+nav.scrolled{
+  top:0;
+  width:100%;
+  border-radius:0;
+  background:rgba(0,0,0,0.8);
+}
+
+/* LOGO */
+.logo{
+  font-size:22px;
+  font-weight:600;
+  letter-spacing:1px;
+  cursor:pointer;
+}
+
+/* MENU */
+ul{
+  list-style:none;
+  display:flex;
+  gap:28px;
+  position:relative;
+}
+
+a{
+  text-decoration:none;
+  color:white;
+  font-size:15px;
+  padding:8px 0;
+  position:relative;
+}
+
+/* UNDERLINE TRACKER */
+ul::after{
+  content:"";
+  position:absolute;
+  bottom:-6px;
+  height:3px;
+  width:0;
+  background:#00f5ff;
+  transition:.4s;
+  left:0;
+  border-radius:3px;
+}
+
+/* HOVER */
+li:hover ~ ::after{}
+
+/* ACTIVE STYLE */
+a.active{
+  color:#00f5ff;
+}
+
+/* ===== MOBILE ===== */
+.menu-btn{
+  display:none;
+  font-size:26px;
+  cursor:pointer;
+}
+
+@media(max-width:768px){
+  ul{
+    position:fixed;
+    top:0;
+    right:-100%;
+    height:100vh;
+    width:240px;
+    background:#111;
+    flex-direction:column;
+    padding-top:80px;
+    gap:22px;
+    align-items:center;
+    transition:.4s;
+  }
+
+  ul.show{
+    right:0;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+}
+
+/* ===== PROGRESS BAR ===== */
+.progress{
+  position:fixed;
+  top:0;
+  left:0;
+  height:3px;
+  width:0%;
+  background:#00f5ff;
+  z-index:2000;
+}
+
+/* DEMO SECTIONS */
+section{
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:40px;
+  opacity:.85;
+}
+</style>
+</head>
+
+<body>
+
+<div class="progress" id="progress"></div>
+
+<nav id="navbar">
+  <div class="logo">NAV-PRO</div>
+  <div class="menu-btn" id="menuBtn">☰</div>
+
+  <ul id="navLinks">
+    <li><a href="#home" class="active">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<section id="home">Home</section>
+<section id="about">About</section>
+<section id="services">Services</section>
+<section id="projects">Projects</section>
+<section id="contact">Contact</section>
+
+<script>
+const menuBtn = document.getElementById("menuBtn");
+const navLinks = document.getElementById("navLinks");
+const links = document.querySelectorAll("nav a");
+const navbar = document.getElementById("navbar");
+const progress = document.getElementById("progress");
+
+/* MOBILE MENU */
+menuBtn.onclick = () => navLinks.classList.toggle("show");
+
+/* ACTIVE LINK ON CLICK */
+links.forEach(link=>{
+  link.addEventListener("click",()=>{
+    navLinks.classList.remove("show");
+    links.forEach(l=>l.classList.remove("active"));
+    link.classList.add("active");
+  });
+});
+
+/* SCROLL NAV EFFECT + PROGRESS */
+window.addEventListener("scroll",()=>{
+
+  /* NAV STYLE */
+  if(window.scrollY > 40){
+    navbar.classList.add("scrolled");
+  }else{
+    navbar.classList.remove("scrolled");
+  }
+
+  /* PROGRESS BAR */
+  const scrollTop = window.scrollY;
+  const docHeight = document.body.scrollHeight - window.innerHeight;
+  const percent = (scrollTop / docHeight) * 100;
+  progress.style.width = percent + "%";
+});
+</script>
+
+</body>
+</html>
