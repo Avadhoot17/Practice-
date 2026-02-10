@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Task Dashboard</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  background: linear-gradient(135deg, #0f172a, #020617);
+  color: white;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  width: 240px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-right: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar h2 {
+  text-align: center;
+  color: #38bdf8;
+}
+
+.nav-item {
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.nav-item:hover {
+  background: rgba(56,189,248,0.2);
+}
+
+/* ---------- Main ---------- */
+.main {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+/* ---------- Glass Card ---------- */
+.card {
+  background: rgba(255,255,255,0.05);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* ---------- Task Input ---------- */
+.task-input {
+  display: flex;
+  gap: 10px;
+}
+
+.task-input input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+}
+
+button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  background: #38bdf8;
+  color: black;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+/* ---------- Task List ---------- */
+.task {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  animation: fadeIn 0.4s ease;
+}
+
+.task.done {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* ---------- Progress ---------- */
+.progress-bar {
+  height: 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.1);
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  width: 0%;
+  background: #22c55e;
+  transition: width 0.4s ease;
+}
+
+/* ---------- Animation ---------- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <h2>Dashboard</h2>
+  <div class="nav-item">Home</div>
+  <div class="nav-item">Tasks</div>
+  <div class="nav-item">Analytics</div>
+  <div class="nav-item">Settings</div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Add Task -->
+  <div class="card">
+    <h3>Add New Task</h3>
+    <div class="task-input">
+      <input type="text" id="taskText" placeholder="Enter task...">
+      <button onclick="addTask()">Add</button>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="card">
+    <h3>Progress</h3>
+    <div class="progress-bar">
+      <div class="progress" id="progress"></div>
+    </div>
+  </div>
+
+  <!-- Task List -->
+  <div class="card">
+    <h3>Your Tasks</h3>
+    <div id="taskList"></div>
+  </div>
+
+</div>
+
+<script>
+let tasks = [];
+
+function renderTasks() {
+  const list = document.getElementById("taskList");
+  list.innerHTML = "";
+
+  let completed = 0;
+
+  tasks.forEach((task, index) => {
+    const div = document.createElement("div");
+    div.className = "task" + (task.done ? " done" : "");
+
+    div.innerHTML = `
+      <span onclick="toggleTask(${index})">${task.text}</span>
+      <button onclick="deleteTask(${index})">✕</button>
+    `;
+
+    if (task.done) completed++;
+    list.appendChild(div);
+  });
+
+  updateProgress(completed);
+}
+
+function addTask() {
+  const input = document.getElementById("taskText");
+  if (!input.value.trim()) return;
+
+  tasks.push({ text: input.value, done: false });
+  input.value = "";
+  renderTasks();
+}
+
+function toggleTask(index) {
+  tasks[index].done = !tasks[index].done;
+  renderTasks();
+}
+
+function deleteTask(index) {
+  tasks.splice(index, 1);
+  renderTasks();
+}
+
+function updateProgress(completed) {
+  const percent = tasks.length ? (completed / tasks.length) * 100 : 0;
+  document.getElementById("progress").style.width = percent + "%";
+}
+</script>
+
+</body>
+</html>
