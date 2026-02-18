@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Privacy Logic – Mini Game</title>
+
+<style>
+:root{
+  --bg:#eef2f7;
+  --card:rgba(255,255,255,0.55);
+  --text:#1a1a1a;
+  --accent:#4f7cff;
+}
+
+body.dark{
+  --bg:#0f172a;
+  --card:rgba(30,41,59,0.6);
+  --text:#f1f5f9;
+  --accent:#38bdf8;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.3s;
+}
+
+/* glass card */
+.container{
+  width:95%;
+  max-width:650px;
+  padding:20px;
+  border-radius:20px;
+  background:var(--card);
+  backdrop-filter:blur(14px);
+  box-shadow:0 10px 30px rgba(0,0,0,.15);
+  text-align:center;
+}
+
+h1{margin-bottom:8px}
+.progress{
+  height:10px;
+  background:#ccc3;
+  border-radius:10px;
+  overflow:hidden;
+  margin:12px 0 18px;
+}
+.bar{
+  height:100%;
+  width:0%;
+  background:var(--accent);
+  transition:.4s;
+}
+
+/* urinals grid */
+.grid{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  flex-wrap:wrap;
+  margin:20px 0;
+}
+
+.spot{
+  width:70px;
+  height:90px;
+  border-radius:14px;
+  background:#ffffffcc;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  cursor:pointer;
+  transition:.25s;
+  box-shadow:inset 0 -4px 0 #0001;
+}
+
+.spot:hover{transform:translateY(-4px)}
+
+.occupied{
+  background:#ef4444aa;
+  cursor:not-allowed;
+}
+
+.correct{
+  background:#22c55eaa;
+}
+
+.wrong{
+  animation:shake .35s;
+  background:#f97316aa;
+}
+
+@keyframes shake{
+  25%{transform:translateX(-4px)}
+  50%{transform:translateX(4px)}
+  75%{transform:translateX(-4px)}
+}
+
+/* buttons */
+.controls{
+  display:flex;
+  justify-content:space-between;
+  margin-top:10px;
+}
+
+button{
+  border:none;
+  padding:8px 14px;
+  border-radius:10px;
+  background:var(--accent);
+  color:white;
+  cursor:pointer;
+}
+
+.hidden{display:none}
+.summary{margin-top:16px;font-size:18px}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Privacy Logic</h1>
+  <p id="levelText">Level 1</p>
+
+  <div class="progress"><div class="bar" id="bar"></div></div>
+
+  <div class="grid" id="grid"></div>
+
+  <p id="message"></p>
+
+  <div class="controls">
+    <button onclick="toggleDark()">Dark Mode</button>
+    <button onclick="restartGame()">Restart</button>
+  </div>
+
+  <div class="summary hidden" id="summary"></div>
+</div>
+
+<script>
+const levels = [
+  {spots:3, occupied:[0], correct:2, hint:"Leave space if possible."},
+  {spots:4, occupied:[1], correct:3, hint:"Max distance wins."},
+  {spots:5, occupied:[2], correct:0, hint:"Edges feel safer."},
+  {spots:5, occupied:[0,4], correct:2, hint:"Middle becomes safe now."},
+  {spots:6, occupied:[1,3], correct:5, hint:"Find the loneliest corner."},
+  {spots:6, occupied:[2], correct:5, hint:"Distance beats symmetry."},
+  {spots:7, occupied:[1,5], correct:3, hint:"Balanced privacy."},
+  {spots:8, occupied:[0,7], correct:3, hint:"Center gap logic."},
+  {spots:9, occupied:[4], correct:0, hint:"Extreme edge again."},
+  {spots:10, occupied:[2,7], correct:5, hint:"Perfect spacing master."}
+];
+
+let level = 0;
+let score = 0;
+
+const grid = document.getElementById("grid");
+const msg = document.getElementById("message");
+const bar = document.getElementById("bar");
+const levelText = document.getElementById("levelText");
+const summary = document.getElementById("summary");
+
+function loadLevel(){
+  const data = levels[level];
+  grid.innerHTML = "";
+  msg.textContent = "";
+  levelText.textContent = `Level ${level+1}`;
+
+  bar.style.width = `${(level/levels.length)*100}%`;
+
+  for(let i=0;i<data.spots;i++){
+    const div = document.createElement("div");
+    div.className = "spot";
+    div.textContent = "🚻";
+
+    if(data.occupied.includes(i)){
+      div.classList.add("occupied");
+    }else{
+      div.onclick = () => choose(i, div);
+    }
+
+    grid.appendChild(div);
+  }
+}
+
+function choose(i, el){
+  const data = levels[level];
+
+  if(i === data.correct){
+    el.classList.add("correct");
+    score++;
+
+    setTimeout(()=>{
+      level++;
+      if(level >= levels.length) finish();
+      else loadLevel();
+    }, 600);
+
+  }else{
+    el.classList.add("wrong");
+    msg.textContent = data.hint;
+  }
+}
+
+function finish(){
+  grid.innerHTML = "";
+  bar.style.width = "100%";
+
+  let title =
+    score === 10 ? "🏆 Perfect Spacing Legend" :
+    score >= 7 ? "😎 Privacy Master" :
+    score >= 4 ? "🙂 Decent Instincts" :
+    "😂 Chaos Chooser";
+
+  summary.classList.remove("hidden");
+  summary.innerHTML = `${title}<br>Score: ${score}/10`;
+}
+
+function restartGame(){
+  level = 0;
+  score = 0;
+  summary.classList.add("hidden");
+  loadLevel();
+}
+
+function toggleDark(){
+  document.body.classList.toggle("dark");
+}
+
+loadLevel();
+</script>
+
+</body>
+</html>
