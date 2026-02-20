@@ -6,51 +6,74 @@ public class BasicSwingApp {
 
     public static void main(String[] args) {
 
+        // Run GUI on Event Dispatch Thread (Best Practice)
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                createUI();
+            }
+        });
+    }
+
+    private static void createUI() {
+
         // Create Frame
-        JFrame frame = new JFrame("Basic Swing Application");
-        frame.setSize(400, 250);
+        JFrame frame = new JFrame("Basic Swing GUI Application");
+        frame.setSize(450, 300);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null); // Center on screen
+        frame.setLocationRelativeTo(null); // Center screen
 
-        // Create Panel
+        // Main Panel
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(3, 1, 10, 10));
+        panel.setLayout(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
-        // Create Components
-        JLabel label = new JLabel("Enter Your Name:", SwingConstants.CENTER);
+        // Title Label
+        JLabel titleLabel = new JLabel("Welcome to Swing Application", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        titleLabel.setForeground(new Color(30, 144, 255));
+
+        // Input Panel
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridLayout(2, 1, 5, 5));
+
         JTextField textField = new JTextField();
-        JButton button = new JButton("Submit");
+        textField.setFont(new Font("Arial", Font.PLAIN, 14));
 
-        // Add Action Listener to Button
+        JButton button = new JButton("Submit");
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setBackground(new Color(60, 179, 113));
+        button.setForeground(Color.WHITE);
+
+        inputPanel.add(textField);
+        inputPanel.add(button);
+
+        // Add Action Listener
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String name = textField.getText();
 
-                if(name.isEmpty()) {
+                String name = textField.getText().trim();
+
+                if (name.isEmpty()) {
                     JOptionPane.showMessageDialog(frame,
                             "Please enter your name!",
-                            "Warning",
+                            "Input Required",
                             JOptionPane.WARNING_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(frame,
-                            "Hello, " + name + "!",
+                            "Hello, " + name + " 👋",
                             "Welcome",
                             JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         });
 
-        // Add Components to Panel
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
-        panel.add(label);
-        panel.add(textField);
-        panel.add(button);
+        // Add Components
+        panel.add(titleLabel, BorderLayout.NORTH);
+        panel.add(inputPanel, BorderLayout.CENTER);
 
-        // Add Panel to Frame
         frame.add(panel);
-
-        // Make Frame Visible
         frame.setVisible(true);
     }
 }
