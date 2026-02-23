@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProFlow Plumbing</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+scroll-behavior:smooth;
+}
+
+body{
+background:#f4f7fa;
+color:#222;
+}
+
+/* NAVBAR */
+
+header{
+position:fixed;
+width:100%;
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(10px);
+padding:15px 8%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+z-index:1000;
+transition:.3s;
+}
+
+header.scrolled{
+background:#0d1b2a;
+}
+
+.logo{
+color:#fff;
+font-size:22px;
+font-weight:700;
+}
+
+nav ul{
+display:flex;
+gap:25px;
+list-style:none;
+}
+
+nav ul li a{
+color:#fff;
+text-decoration:none;
+font-weight:500;
+transition:.3s;
+}
+
+nav ul li a:hover{
+color:#00b4d8;
+}
+
+.menu-toggle{
+display:none;
+font-size:28px;
+color:#fff;
+cursor:pointer;
+}
+
+/* HERO */
+
+.hero{
+height:100vh;
+position:relative;
+overflow:hidden;
+}
+
+.hero video{
+position:absolute;
+width:100%;
+height:100%;
+object-fit:cover;
+z-index:-1;
+}
+
+.hero-content{
+height:100%;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+color:#fff;
+padding:0 20px;
+background:rgba(0,0,0,0.5);
+}
+
+.hero h1{
+font-size:48px;
+margin-bottom:20px;
+}
+
+.hero p{
+max-width:600px;
+margin-bottom:25px;
+}
+
+.btn{
+padding:12px 28px;
+background:#00b4d8;
+color:#fff;
+border:none;
+cursor:pointer;
+border-radius:30px;
+font-weight:600;
+transition:.3s;
+}
+
+.btn:hover{
+background:#0077b6;
+}
+
+/* SECTIONS */
+
+section{
+padding:80px 8%;
+}
+
+.section-title{
+text-align:center;
+margin-bottom:50px;
+font-size:32px;
+font-weight:700;
+color:#0d1b2a;
+}
+
+/* SERVICES */
+
+.services{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:30px;
+}
+
+.service-card{
+background:#fff;
+padding:30px;
+border-radius:12px;
+box-shadow:0 10px 20px rgba(0,0,0,0.08);
+text-align:center;
+transition:.3s;
+}
+
+.service-card:hover{
+transform:translateY(-10px);
+}
+
+.service-card img{
+width:80px;
+margin-bottom:15px;
+}
+
+/* GALLERY */
+
+.slider{
+position:relative;
+overflow:hidden;
+border-radius:12px;
+}
+
+.slides{
+display:flex;
+transition:transform .5s ease;
+}
+
+.slides img{
+width:100%;
+flex-shrink:0;
+}
+
+/* TESTIMONIALS */
+
+.testimonials{
+background:#0d1b2a;
+color:#fff;
+text-align:center;
+}
+
+.testimonial{
+display:none;
+}
+
+.testimonial.active{
+display:block;
+}
+
+.testimonial p{
+max-width:600px;
+margin:0 auto 15px;
+}
+
+/* PRICING */
+
+.pricing{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:30px;
+}
+
+.price-card{
+background:#fff;
+padding:30px;
+border-radius:12px;
+box-shadow:0 10px 20px rgba(0,0,0,0.08);
+text-align:center;
+}
+
+.price-card h3{
+margin-bottom:10px;
+}
+
+.price{
+font-size:28px;
+margin:15px 0;
+color:#0077b6;
+}
+
+/* CONTACT */
+
+.contact form{
+display:grid;
+gap:15px;
+max-width:500px;
+margin:0 auto;
+}
+
+input,textarea{
+padding:12px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+footer{
+background:#0d1b2a;
+color:#fff;
+text-align:center;
+padding:20px;
+}
+
+/* WHATSAPP */
+
+.whatsapp{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#25D366;
+color:#fff;
+padding:15px;
+border-radius:50%;
+font-size:22px;
+text-decoration:none;
+}
+
+/* MODAL */
+
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#fff;
+padding:30px;
+border-radius:10px;
+width:90%;
+max-width:400px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:768px){
+
+nav ul{
+position:absolute;
+top:70px;
+right:0;
+background:#0d1b2a;
+flex-direction:column;
+width:200px;
+padding:20px;
+display:none;
+}
+
+nav ul.active{
+display:flex;
+}
+
+.menu-toggle{
+display:block;
+}
+
+.hero h1{
+font-size:32px;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<header id="header">
+<div class="logo">ProFlow Plumbing</div>
+<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+<nav>
+<ul id="menu">
+<li><a href="#home">Home</a></li>
+<li><a href="#services">Services</a></li>
+<li><a href="#gallery">Gallery</a></li>
+<li><a href="#pricing">Pricing</a></li>
+<li><a href="#contact">Contact</a></li>
+</ul>
+</nav>
+</header>
+
+<section class="hero" id="home">
+<video autoplay muted loop>
+<source src="https://www.w3schools.com/howto/rain.mp4" type="video/mp4">
+</video>
+<div class="hero-content">
+<h1>Fast & Reliable Plumbing Services</h1>
+<p>Emergency repairs, installations, maintenance — available 24/7 for your home and office.</p>
+<button class="btn" onclick="openModal()">Book Service</button>
+</div>
+</section>
+
+<section id="services">
+<h2 class="section-title">Our Services</h2>
+<div class="services">
+<div class="service-card">
+<img src="https://img.icons8.com/color/96/plumbing.png">
+<h3>Leak Repair</h3>
+<p>Quick detection and repair of pipe leaks.</p>
+</div>
+<div class="service-card">
+<img src="https://img.icons8.com/color/96/wrench.png">
+<h3>Pipe Installation</h3>
+<p>Professional pipe fitting and installation.</p>
+</div>
+<div class="service-card">
+<img src="https://img.icons8.com/color/96/toilet.png">
+<h3>Bathroom Setup</h3>
+<p>Complete bathroom renovation solutions.</p>
+</div>
+</div>
+</section>
+
+<section id="gallery">
+<h2 class="section-title">Our Work</h2>
+<div class="slider">
+<div class="slides" id="slides">
+<img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952">
+<img src="https://images.unsplash.com/photo-1598514982675-7f8a9b4f9f94">
+<img src="https://images.unsplash.com/photo-1581091215367-59ab6b0d28e7">
+</div>
+</div>
+</section>
+
+<section class="testimonials">
+<h2 class="section-title" style="color:#fff;">Testimonials</h2>
+<div class="testimonial active">
+<p>Excellent service. Very professional and fast.</p>
+<strong>- Rahul</strong>
+</div>
+<div class="testimonial">
+<p>Fixed my leaking pipe within 30 minutes.</p>
+<strong>- Sneha</strong>
+</div>
+</section>
+
+<section id="pricing">
+<h2 class="section-title">Pricing Plans</h2>
+<div class="pricing">
+<div class="price-card">
+<h3>Basic</h3>
+<div class="price">₹499</div>
+<p>Inspection + Minor Repair</p>
+</div>
+<div class="price-card">
+<h3>Standard</h3>
+<div class="price">₹999</div>
+<p>Installation + Warranty</p>
+</div>
+<div class="price-card">
+<h3>Premium</h3>
+<div class="price">₹1999</div>
+<p>Full Bathroom Setup</p>
+</div>
+</div>
+</section>
+
+<section id="contact" class="contact">
+<h2 class="section-title">Contact Us</h2>
+<form onsubmit="submitForm(event)">
+<input type="text" placeholder="Your Name" required>
+<input type="email" placeholder="Your Email" required>
+<textarea rows="4" placeholder="Your Message" required></textarea>
+<button class="btn">Send Message</button>
+</form>
+</section>
+
+<footer>
+© 2026 ProFlow Plumbing | All Rights Reserved
+</footer>
+
+<a href="https://wa.me/919999999999" class="whatsapp">💬</a>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h3>Book a Service</h3>
+<input type="text" placeholder="Your Name">
+<input type="tel" placeholder="Phone Number">
+<button class="btn" onclick="closeModal()">Submit</button>
+</div>
+</div>
+
+<script>
+
+function toggleMenu(){
+document.getElementById("menu").classList.toggle("active");
+}
+
+window.addEventListener("scroll",function(){
+document.getElementById("header").classList.toggle("scrolled",window.scrollY>50);
+});
+
+/* GALLERY AUTO SLIDE */
+
+let slideIndex=0;
+const slides=document.getElementById("slides");
+
+setInterval(()=>{
+slideIndex++;
+if(slideIndex>2) slideIndex=0;
+slides.style.transform="translateX(-"+slideIndex*100+"%)";
+},3000);
+
+/* TESTIMONIAL ROTATE */
+
+let tIndex=0;
+const testimonials=document.querySelectorAll(".testimonial");
+
+setInterval(()=>{
+testimonials[tIndex].classList.remove("active");
+tIndex=(tIndex+1)%testimonials.length;
+testimonials[tIndex].classList.add("active");
+},4000);
+
+/* CONTACT FORM */
+
+function submitForm(e){
+e.preventDefault();
+alert("Thank you! We will contact you soon.");
+}
+
+/* MODAL */
+
+function openModal(){
+document.getElementById("modal").style.display="flex";
+}
+
+function closeModal(){
+document.getElementById("modal").style.display="none";
+}
+
+</script>
+
+</body>
+</html>
