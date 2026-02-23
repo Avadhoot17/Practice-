@@ -3,242 +3,220 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AquaFix Plumbing</title>
+<title>HydroPro Plumbing Services</title>
 
-<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
 
 :root{
---primary:#0A84FF;
---bg:#f2f2f7;
---card:#ffffffcc;
---blur:blur(20px);
+--primary:#0C4A6E;
+--accent:#F97316;
+--light:#F8FAFC;
+--dark:#0F172A;
 }
 
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+font-family:'Inter',sans-serif;
 scroll-behavior:smooth;
 }
 
 body{
-background:var(--bg);
-color:#111;
+background:#fff;
+color:#1e293b;
 }
 
-/* NAVBAR */
+/* HEADER */
 
 header{
 position:fixed;
+top:0;
 width:100%;
-padding:15px 8%;
+background:#ffffff;
+box-shadow:0 2px 15px rgba(0,0,0,0.05);
 display:flex;
 justify-content:space-between;
 align-items:center;
-backdrop-filter:var(--blur);
-background:rgba(255,255,255,0.6);
+padding:18px 8%;
 z-index:1000;
-transition:.3s;
 }
 
 .logo{
 font-weight:700;
-font-size:20px;
+font-size:22px;
 color:var(--primary);
 }
 
 nav ul{
 display:flex;
-gap:25px;
+gap:30px;
 list-style:none;
 }
 
 nav a{
 text-decoration:none;
-color:#333;
+color:#334155;
 font-weight:500;
 }
 
-.menu-toggle{
-display:none;
-font-size:26px;
-cursor:pointer;
+.cta-call{
+background:var(--accent);
+color:#fff;
+padding:10px 18px;
+border-radius:6px;
+font-weight:600;
 }
 
 /* HERO */
 
 .hero{
 height:100vh;
+background:url('https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
 display:flex;
-justify-content:center;
 align-items:center;
-text-align:center;
-padding:0 20px;
-background:linear-gradient(135deg,#0A84FF,#5AC8FA);
 color:#fff;
+position:relative;
+}
+
+.hero::after{
+content:"";
+position:absolute;
+inset:0;
+background:rgba(0,0,0,0.6);
+}
+
+.hero-content{
+position:relative;
+padding:0 8%;
+max-width:700px;
 }
 
 .hero h1{
-font-size:42px;
-margin-bottom:15px;
+font-size:48px;
+margin-bottom:20px;
 }
 
 .hero p{
-max-width:500px;
 margin-bottom:25px;
 }
 
-.btn{
-padding:12px 28px;
+.btn-primary{
+background:var(--accent);
+padding:14px 28px;
+color:#fff;
 border:none;
-border-radius:50px;
-background:#fff;
-color:var(--primary);
+border-radius:6px;
 font-weight:600;
 cursor:pointer;
-transition:.3s;
-}
-
-.btn:hover{
-transform:scale(1.05);
-}
-
-/* SECTION */
-
-section{
-padding:80px 8%;
-}
-
-.section-title{
-font-size:30px;
-margin-bottom:40px;
-text-align:center;
 }
 
 /* SERVICES */
 
+section{
+padding:90px 8%;
+}
+
+.section-title{
+text-align:center;
+font-size:32px;
+margin-bottom:50px;
+color:var(--dark);
+}
+
 .services{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:25px;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:35px;
 }
 
-.card{
-background:var(--card);
-backdrop-filter:var(--blur);
-padding:30px;
-border-radius:25px;
-box-shadow:0 10px 30px rgba(0,0,0,0.08);
-transition:.4s;
+.service-card{
+background:#fff;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 5px 25px rgba(0,0,0,0.05);
+transition:.3s;
 }
 
-.card:hover{
+.service-card:hover{
 transform:translateY(-10px);
 }
 
-.card img{
+.service-card img{
 width:100%;
-border-radius:15px;
-margin-bottom:15px;
-height:180px;
+height:220px;
 object-fit:cover;
+}
+
+.service-card-content{
+padding:25px;
+}
+
+/* WHY CHOOSE */
+
+.why{
+background:var(--light);
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:30px;
+text-align:center;
+}
+
+.why-box{
+padding:30px;
 }
 
 /* GALLERY */
 
-.slider{
-position:relative;
-overflow:hidden;
-border-radius:25px;
+.gallery{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
 }
 
-.slides{
-display:flex;
-transition:transform .6s ease-in-out;
-}
-
-.slides img{
+.gallery img{
 width:100%;
-flex-shrink:0;
-height:400px;
+height:250px;
 object-fit:cover;
-}
-
-/* TESTIMONIAL */
-
-.testimonials{
-text-align:center;
-}
-
-.testimonial{
-display:none;
-font-size:18px;
-max-width:600px;
-margin:auto;
-}
-
-.testimonial.active{
-display:block;
+border-radius:8px;
 }
 
 /* CONTACT */
 
-form{
-max-width:500px;
-margin:auto;
+.contact{
+background:var(--primary);
+color:#fff;
+text-align:center;
+padding:70px 8%;
+}
+
+.contact form{
+max-width:600px;
+margin:30px auto 0;
 display:grid;
 gap:15px;
 }
 
 input,textarea{
-padding:15px;
-border-radius:15px;
+padding:14px;
+border-radius:6px;
 border:none;
-background:#fff;
-box-shadow:0 5px 15px rgba(0,0,0,0.05);
 }
 
 footer{
+background:#0f172a;
+color:#fff;
 text-align:center;
-padding:20px;
-color:#777;
+padding:25px;
 }
 
 /* MOBILE */
 
 @media(max-width:768px){
-
-nav ul{
-display:none;
-flex-direction:column;
-position:absolute;
-right:20px;
-top:70px;
-background:#fff;
-padding:20px;
-border-radius:15px;
-box-shadow:0 10px 30px rgba(0,0,0,0.1);
-}
-
-nav ul.active{
-display:flex;
-}
-
-.menu-toggle{
-display:block;
-}
-
-.hero h1{
-font-size:30px;
-}
-
-.slides img{
-height:250px;
-}
-
+.hero h1{font-size:32px;}
+nav ul{display:none;}
 }
 
 </style>
@@ -246,22 +224,22 @@ height:250px;
 <body>
 
 <header>
-<div class="logo">AquaFix</div>
-<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+<div class="logo">HydroPro</div>
 <nav>
-<ul id="menu">
+<ul>
 <li><a href="#services">Services</a></li>
-<li><a href="#gallery">Gallery</a></li>
+<li><a href="#gallery">Work</a></li>
 <li><a href="#contact">Contact</a></li>
+<li><a href="tel:+919999999999" class="cta-call">Emergency Call</a></li>
 </ul>
 </nav>
 </header>
 
 <section class="hero">
-<div>
-<h1>Premium Plumbing Solutions</h1>
-<p>Fast repairs. Clean installations. 24/7 emergency service.</p>
-<button class="btn" onclick="scrollToContact()">Book Now</button>
+<div class="hero-content">
+<h1>Professional Plumbing Services You Can Trust</h1>
+<p>24/7 emergency plumbing, pipe repair, leak detection and full bathroom installation services.</p>
+<button class="btn-primary" onclick="document.getElementById('contact').scrollIntoView()">Book Service</button>
 </div>
 </section>
 
@@ -269,99 +247,78 @@ height:250px;
 <h2 class="section-title">Our Services</h2>
 <div class="services">
 
-<div class="card">
-<img src="https://picsum.photos/500/300?random=1">
-<h3>Leak Repair</h3>
-<p>Advanced leak detection and fast repair.</p>
+<div class="service-card">
+<img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80">
+<div class="service-card-content">
+<h3>Leak Detection & Repair</h3>
+<p>Advanced leak detection technology for fast repair.</p>
+</div>
 </div>
 
-<div class="card">
-<img src="https://picsum.photos/500/300?random=2">
+<div class="service-card">
+<img src="https://images.unsplash.com/photo-1600566752355-35792bedcfea?auto=format&fit=crop&w=800&q=80">
+<div class="service-card-content">
 <h3>Pipe Installation</h3>
-<p>Professional water line installation.</p>
+<p>Reliable water line and drainage installation services.</p>
+</div>
 </div>
 
-<div class="card">
-<img src="https://picsum.photos/500/300?random=3">
+<div class="service-card">
+<img src="https://images.unsplash.com/photo-1581090700227-1e8bdf1dfc84?auto=format&fit=crop&w=800&q=80">
+<div class="service-card-content">
 <h3>Bathroom Renovation</h3>
-<p>Modern and clean bathroom solutions.</p>
+<p>Complete modern bathroom solutions and upgrades.</p>
+</div>
 </div>
 
+</div>
+</section>
+
+<section class="why">
+<div class="why-box">
+<h3>Licensed & Insured</h3>
+<p>Certified professionals with guaranteed workmanship.</p>
+</div>
+<div class="why-box">
+<h3>24/7 Emergency</h3>
+<p>We respond quickly to urgent plumbing issues.</p>
+</div>
+<div class="why-box">
+<h3>Affordable Pricing</h3>
+<p>Transparent pricing with no hidden charges.</p>
 </div>
 </section>
 
 <section id="gallery">
-<h2 class="section-title">Our Work</h2>
-<div class="slider">
-<div class="slides" id="slides">
-<img src="https://picsum.photos/1200/600?random=4">
-<img src="https://picsum.photos/1200/600?random=5">
-<img src="https://picsum.photos/1200/600?random=6">
-</div>
+<h2 class="section-title">Recent Projects</h2>
+<div class="gallery">
+<img src="https://images.unsplash.com/photo-1598514982675-7f8a9b4f9f94?auto=format&fit=crop&w=800&q=80">
+<img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80">
+<img src="https://images.unsplash.com/photo-1581090700227-1e8bdf1dfc84?auto=format&fit=crop&w=800&q=80">
 </div>
 </section>
 
-<section class="testimonials">
-<h2 class="section-title">What Clients Say</h2>
-<div class="testimonial active">“Extremely professional and fast service.”</div>
-<div class="testimonial">“Best plumbing team in the city.”</div>
-<div class="testimonial">“Affordable and reliable.”</div>
-</section>
-
-<section id="contact">
-<h2 class="section-title">Contact Us</h2>
+<section id="contact" class="contact">
+<h2>Book Plumbing Service</h2>
+<p>Fill out the form and our team will contact you shortly.</p>
 <form onsubmit="submitForm(event)">
 <input type="text" placeholder="Full Name" required>
-<input type="email" placeholder="Email Address" required>
-<textarea rows="4" placeholder="Your Message" required></textarea>
-<button class="btn">Send Message</button>
+<input type="tel" placeholder="Phone Number" required>
+<textarea rows="4" placeholder="Describe your issue" required></textarea>
+<button class="btn-primary">Submit Request</button>
 </form>
 </section>
 
 <footer>
-© 2026 AquaFix Plumbing
+© 2026 HydroPro Plumbing Services. All rights reserved.
 </footer>
 
 <script>
-
-function toggleMenu(){
-document.getElementById("menu").classList.toggle("active");
-}
-
-function scrollToContact(){
-document.getElementById("contact").scrollIntoView({behavior:"smooth"});
-}
-
-/* GALLERY AUTO SLIDE */
-
-const slides=document.getElementById("slides");
-const totalSlides=slides.children.length;
-let index=0;
-
-setInterval(()=>{
-index=(index+1)%totalSlides;
-slides.style.transform="translateX(-"+index*100+"%)";
-},3500);
-
-/* TESTIMONIAL ROTATION */
-
-const testimonials=document.querySelectorAll(".testimonial");
-let tIndex=0;
-
-setInterval(()=>{
-testimonials[tIndex].classList.remove("active");
-tIndex=(tIndex+1)%testimonials.length;
-testimonials[tIndex].classList.add("active");
-},4000);
-
-/* FORM */
-
 function submitForm(e){
 e.preventDefault();
-alert("Thank you. Our team will contact you shortly.");
+alert("Your request has been submitted successfully.");
 e.target.reset();
 }
-
 </script>
 
 </body>
