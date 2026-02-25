@@ -3,7 +3,7 @@
 int main() {
     int size;
 
-    printf("Enter size of square: ");
+    printf("Please Enter size of square: ");
     scanf("%d", &size);
 
     for (int i = 1; i <= size; i++) {
