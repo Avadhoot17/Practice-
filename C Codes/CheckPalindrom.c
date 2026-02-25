@@ -9,9 +9,9 @@ int main() {
     }
 
     if (temp == rev)
-        printf("Palindrome");
+        printf("It's a Palindrome");
     else
-        printf("Not Palindrome");
+        printf("It's Not a Palindrome");
 
     return 0;
 }
