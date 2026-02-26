@@ -3,103 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pro Task Dashboard</title>
+<title>Advanced Task Dashboard</title>
 
 <style>
+:root{
+  --bg1:#0f172a;
+  --bg2:#020617;
+  --card:rgba(255,255,255,.06);
+  --accent:#38bdf8;
+  --text:#fff;
+}
+
+.light{
+  --bg1:#f1f5f9;
+  --bg2:#e2e8f0;
+  --card:#ffffff;
+  --accent:#2563eb;
+  --text:#000;
+}
+
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,sans-serif}
 
 body{
-  height:100vh;display:flex;
-  background:linear-gradient(135deg,#0f172a,#020617);
-  color:#fff;
+  height:100vh;
+  display:flex;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
+  color:var(--text);
+  transition:.3s;
 }
 
 /* Sidebar */
 .sidebar{
-  width:230px;padding:20px;
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(12px);
-  border-right:1px solid rgba(255,255,255,0.1);
+  width:230px;
+  padding:20px;
+  background:var(--card);
+  backdrop-filter:blur(10px);
+  border-right:1px solid rgba(255,255,255,.1);
 }
-.sidebar h2{color:#38bdf8;text-align:center;margin-bottom:20px}
-.nav{padding:10px;border-radius:8px;cursor:pointer}
-.nav:hover{background:rgba(56,189,248,.2)}
+.sidebar h2{color:var(--accent);text-align:center;margin-bottom:20px}
+.theme-toggle{
+  margin-top:20px;
+  padding:8px;
+  border-radius:8px;
+  cursor:pointer;
+  background:var(--accent);
+  text-align:center;
+  font-weight:600;
+}
 
 /* Main */
 .main{flex:1;padding:25px;overflow:auto}
 
-/* Cards */
+/* Card */
 .card{
-  background:rgba(255,255,255,0.05);
-  border-radius:16px;padding:18px;margin-bottom:18px;
+  background:var(--card);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:20px;
   backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,.08);
+  transition:.3s;
 }
 
-/* Input */
-.task-input{display:flex;gap:10px}
-input{
-  flex:1;padding:12px;border:none;border-radius:10px;outline:none
+/* Inputs */
+.task-input{display:flex;gap:10px;flex-wrap:wrap}
+input,select{
+  padding:10px;border:none;border-radius:8px;outline:none
 }
 button{
-  padding:12px 16px;border:none;border-radius:10px;
-  background:#38bdf8;font-weight:600;cursor:pointer
+  padding:10px 15px;
+  border:none;border-radius:8px;
+  background:var(--accent);
+  font-weight:600;cursor:pointer;
 }
 button:hover{transform:scale(1.05)}
 
-/* Filters */
-.filters{display:flex;gap:10px;margin-top:10px}
-.filter{cursor:pointer;padding:6px 12px;border-radius:8px}
-.filter.active{background:#38bdf8;color:#000}
+.search{margin-top:10px;width:100%}
 
 /* Tasks */
 .task{
-  display:flex;justify-content:space-between;
-  background:rgba(255,255,255,0.06);
-  padding:10px;border-radius:10px;margin-top:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(255,255,255,.08);
+  padding:12px;
+  border-radius:10px;
+  margin-top:10px;
   cursor:grab;
+  transition:.2s;
 }
+.task:hover{transform:translateX(5px)}
 .task.done{opacity:.5;text-decoration:line-through}
 
-/* Progress */
-.bar{height:10px;background:rgba(255,255,255,.1);border-radius:10px;margin-top:10px}
-.progress{height:100%;width:0;background:#22c55e;border-radius:10px;transition:.4s}
+.priority{
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:6px;
+  margin-right:6px;
+  color:#000;
+}
+.low{background:#22c55e}
+.medium{background:#facc15}
+.high{background:#ef4444;color:#fff}
+
+/* Progress Circle */
+.progress-wrapper{
+  display:flex;align-items:center;gap:20px;
+}
+svg{transform:rotate(-90deg)}
+circle{
+  fill:none;
+  stroke-width:8;
+}
+.bg{stroke:rgba(255,255,255,.1)}
+.fg{
+  stroke:var(--accent);
+  stroke-dasharray:440;
+  stroke-dashoffset:440;
+  transition:.4s;
+}
+.stats{font-size:14px}
 </style>
 </head>
 
 <body>
 
 <div class="sidebar">
-  <h2>Tasks</h2>
-  <div class="nav">Dashboard</div>
-  <div class="nav">Analytics</div>
-  <div class="nav">Settings</div>
+  <h2>Pro Tasks</h2>
+  <div class="theme-toggle" id="themeBtn">Toggle Theme</div>
 </div>
 
 <div class="main">
 
-  <!-- Add -->
+  <!-- Add Task -->
   <div class="card">
     <h3>Add Task</h3>
     <div class="task-input">
-      <input id="taskInput" placeholder="Write a task...">
+      <input id="taskInput" placeholder="Task...">
+      <select id="priority">
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+      <input type="date" id="due">
       <button id="addBtn">Add</button>
     </div>
-
-    <div class="filters">
-      <div class="filter active" data-type="all">All</div>
-      <div class="filter" data-type="active">Active</div>
-      <div class="filter" data-type="done">Done</div>
-    </div>
+    <input class="search" id="search" placeholder="Search task...">
   </div>
 
   <!-- Progress -->
-  <div class="card">
-    <h3>Progress</h3>
-    <div class="bar"><div class="progress" id="progress"></div></div>
+  <div class="card progress-wrapper">
+    <svg width="160" height="160">
+      <circle cx="80" cy="80" r="70" class="bg"></circle>
+      <circle cx="80" cy="80" r="70" class="fg" id="circle"></circle>
+    </svg>
+    <div class="stats" id="stats"></div>
   </div>
 
-  <!-- List -->
+  <!-- Task List -->
   <div class="card">
     <h3>Your Tasks</h3>
     <div id="taskList"></div>
@@ -108,55 +168,66 @@ button:hover{transform:scale(1.05)}
 </div>
 
 <script>
-let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-let filter = "all";
+let tasks = JSON.parse(localStorage.getItem("tasksPro")||"[]");
+let searchQuery="";
 
-const input = document.getElementById("taskInput");
-const list = document.getElementById("taskList");
-const progress = document.getElementById("progress");
+const list=document.getElementById("taskList");
+const circle=document.getElementById("circle");
+const stats=document.getElementById("stats");
 
 /* Save */
 function save(){
-  localStorage.setItem("tasks", JSON.stringify(tasks));
+  localStorage.setItem("tasksPro",JSON.stringify(tasks));
 }
 
 /* Render */
 function render(){
-  list.innerHTML = "";
+  list.innerHTML="";
+  let filtered=tasks.filter(t=>t.text.toLowerCase().includes(searchQuery));
 
-  let shown = tasks.filter(t =>
-    filter==="all" || (filter==="active" && !t.done) || (filter==="done" && t.done)
-  );
+  let done=tasks.filter(t=>t.done).length;
+  let percent=tasks.length?done/tasks.length:0;
+  circle.style.strokeDashoffset=440-(440*percent);
+  stats.innerHTML=`${done} / ${tasks.length} Completed`;
 
-  let completed = tasks.filter(t=>t.done).length;
-  progress.style.width = tasks.length ? (completed/tasks.length)*100 + "%" : "0%";
-
-  shown.forEach((t,i)=>{
-    const div = document.createElement("div");
+  filtered.forEach((t,index)=>{
+    const div=document.createElement("div");
     div.className="task"+(t.done?" done":"");
     div.draggable=true;
 
-    div.innerHTML = `
-      <span>${t.text}</span>
+    div.innerHTML=`
       <div>
+        <span class="priority ${t.priority}">${t.priority}</span>
+        ${t.text} <small>(${t.due||"No date"})</small>
+      </div>
+      <div>
+        <button data-act="edit">✎</button>
         <button data-act="toggle">✓</button>
         <button data-act="del">✕</button>
       </div>
     `;
 
-    /* actions */
-    div.onclick = e=>{
-      if(e.target.dataset.act==="toggle"){
-        t.done=!t.done; save(); render();
+    div.onclick=e=>{
+      if(e.target.dataset.act==="toggle"){t.done=!t.done}
+      if(e.target.dataset.act==="del"){tasks.splice(tasks.indexOf(t),1)}
+      if(e.target.dataset.act==="edit"){
+        let newText=prompt("Edit task:",t.text);
+        if(newText) t.text=newText;
       }
-      if(e.target.dataset.act==="del"){
-        tasks.splice(tasks.indexOf(t),1); save(); render();
-      }
+      save();render();
     };
 
-    /* drag */
-    div.ondragstart = ()=> div.classList.add("drag");
-    div.ondragend   = ()=> div.classList.remove("drag");
+    /* Drag reorder */
+    div.ondragstart=()=>div.classList.add("drag");
+    div.ondragend=()=>{
+      div.classList.remove("drag");
+      let items=[...list.children];
+      tasks=items.map(el=>{
+        let text=el.innerText.split("\n")[0].trim();
+        return tasks.find(t=>text.includes(t.text));
+      });
+      save();
+    };
 
     list.appendChild(div);
   });
@@ -164,26 +235,25 @@ function render(){
 
 /* Add */
 function add(){
-  if(!input.value.trim()) return;
-  tasks.push({text:input.value,done:false});
-  input.value="";
-  save(); render();
+  let text=document.getElementById("taskInput").value;
+  let priority=document.getElementById("priority").value;
+  let due=document.getElementById("due").value;
+  if(!text.trim())return;
+  tasks.push({text,priority,due,done:false});
+  document.getElementById("taskInput").value="";
+  save();render();
 }
 
 /* Events */
-document.getElementById("addBtn").onclick = add;
-input.addEventListener("keypress",e=>{ if(e.key==="Enter") add(); });
+document.getElementById("addBtn").onclick=add;
+document.getElementById("search").oninput=e=>{
+  searchQuery=e.target.value.toLowerCase();
+  render();
+};
+document.getElementById("themeBtn").onclick=()=>{
+  document.body.classList.toggle("light");
+};
 
-document.querySelectorAll(".filter").forEach(f=>{
-  f.onclick=()=>{
-    document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));
-    f.classList.add("active");
-    filter=f.dataset.type;
-    render();
-  };
-});
-
-/* Initial */
 render();
 </script>
 
