@@ -3,113 +3,129 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Royal Pune Grand Hotel</title>
+<title>Royal Grand Hotel Pune</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Poppins',sans-serif;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
 
 body{
-background:#0f172a;
-color:#fff;
+background:linear-gradient(135deg,#0f172a,#1e293b);
+color:white;
 overflow-x:hidden;
 }
 
-header{
-height:90vh;
-background:url('https://images.unsplash.com/photo-1555992336-03a23c7b20ee') center/cover no-repeat;
+/* HERO */
+
+.hero{
+height:100vh;
+background:url('https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=2070') center/cover no-repeat;
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
 text-align:center;
+position:relative;
 }
 
-header h1{
-font-size:60px;
+.hero::after{
+content:"";
+position:absolute;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.65);
+}
+
+.hero-content{
+position:relative;
+z-index:2;
+}
+
+.hero h1{
+font-family:'Playfair Display',serif;
+font-size:70px;
 background:linear-gradient(45deg,#facc15,#f97316);
 -webkit-background-clip:text;
 color:transparent;
 }
 
-header p{
+.hero p{
 margin-top:15px;
-font-size:20px;
-color:#eee;
+font-size:22px;
+color:#ddd;
 }
 
-.search-box{
-margin-top:30px;
-}
+/* FILTER SECTION */
 
-.search-box input{
-padding:12px 20px;
-width:300px;
-border:none;
-border-radius:30px;
-outline:none;
-font-size:16px;
-}
-
-nav{
-background:#111827;
+.controls{
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(10px);
+padding:20px;
 display:flex;
-justify-content:center;
-gap:20px;
-padding:15px;
 flex-wrap:wrap;
+justify-content:center;
+gap:15px;
+position:sticky;
+top:0;
+z-index:10;
 }
 
-nav button{
-background:#1f2937;
-color:white;
-border:none;
+.controls button{
 padding:10px 20px;
-border-radius:25px;
+border-radius:30px;
+border:none;
+background:#1e293b;
+color:white;
 cursor:pointer;
 transition:0.3s;
 }
 
-nav button:hover{
+.controls button.active,
+.controls button:hover{
 background:#f97316;
 }
 
+.controls input{
+padding:10px 15px;
+border-radius:30px;
+border:none;
+outline:none;
+}
+
+/* MENU GRID */
+
 .section-title{
 text-align:center;
-margin:50px 0 20px;
-font-size:32px;
+font-size:35px;
+margin:40px 0;
 color:#facc15;
 }
 
-.menu-container{
+.menu{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-gap:25px;
-padding:0 40px 60px;
+gap:30px;
+padding:0 50px 80px;
 }
 
 .card{
-background:#1e293b;
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(12px);
 border-radius:20px;
 overflow:hidden;
 transition:0.4s;
-box-shadow:0 10px 20px rgba(0,0,0,0.5);
+box-shadow:0 10px 30px rgba(0,0,0,0.6);
 }
 
 .card:hover{
-transform:translateY(-10px);
+transform:translateY(-10px) scale(1.02);
 }
 
 .card img{
 width:100%;
-height:200px;
+height:220px;
 object-fit:cover;
 }
 
@@ -119,32 +135,46 @@ padding:15px;
 
 .card-content h3{
 margin-bottom:8px;
+font-size:20px;
 }
 
+.badges{
+display:flex;
+gap:10px;
+margin-bottom:8px;
+}
+
+.badge{
+padding:4px 10px;
+font-size:12px;
+border-radius:20px;
+}
+
+.veg{background:#16a34a;}
+.nonveg{background:#dc2626;}
+.country{background:#2563eb;}
+
 .price{
+font-size:18px;
+font-weight:600;
 color:#f97316;
-font-weight:bold;
 margin-top:5px;
 }
 
-.country{
-font-size:14px;
-color:#94a3b8;
-}
+/* FOOTER */
 
 footer{
 background:#111827;
 text-align:center;
 padding:20px;
+font-size:14px;
 }
 
+/* RESPONSIVE */
+
 @media(max-width:768px){
-header h1{
-font-size:40px;
-}
-.search-box input{
-width:220px;
-}
+.hero h1{font-size:40px;}
+.menu{padding:20px;}
 }
 
 </style>
@@ -152,32 +182,36 @@ width:220px;
 
 <body>
 
-<header>
-<h1>Royal Pune Grand</h1>
-<p>Premium Multi-Cuisine Experience</p>
-<div class="search-box">
+<section class="hero">
+<div class="hero-content">
+<h1>Royal Grand Pune</h1>
+<p>Luxury Multi-Cuisine Dining Experience</p>
+</div>
+</section>
+
+<div class="controls">
+<button onclick="filterMenu('all')" class="active">All</button>
+<button onclick="filterMenu('breakfast')">Breakfast</button>
+<button onclick="filterMenu('lunch')">Lunch</button>
+<button onclick="filterMenu('dinner')">Dinner</button>
 <input type="text" id="search" placeholder="Search dish...">
 </div>
-</header>
 
-<nav>
-<button onclick="filterCategory('all')">All</button>
-<button onclick="filterCategory('breakfast')">Breakfast</button>
-<button onclick="filterCategory('lunch')">Lunch</button>
-<button onclick="filterCategory('dinner')">Dinner</button>
-</nav>
+<h2 class="section-title">Explore Our Menu</h2>
 
-<h2 class="section-title">Our Special Menu</h2>
+<div class="menu" id="menu">
 
-<div class="menu-container" id="menu">
+<!-- BREAKFAST -->
 
-<!-- Breakfast -->
 <div class="card breakfast">
-<img src="https://images.unsplash.com/photo-1551782450-a2132b4ba21d">
+<img src="https://images.unsplash.com/photo-1604908176997-4312ad6b6e48">
 <div class="card-content">
 <h3>Masala Dosa</h3>
-<div class="country">Indian</div>
-<div class="price">₹120</div>
+<div class="badges">
+<span class="badge veg">Veg</span>
+<span class="badge country">India</span>
+</div>
+<div class="price">₹140</div>
 </div>
 </div>
 
@@ -185,55 +219,75 @@ width:220px;
 <img src="https://images.unsplash.com/photo-1504754524776-8f4f37790ca0">
 <div class="card-content">
 <h3>American Pancakes</h3>
-<div class="country">USA</div>
-<div class="price">₹220</div>
+<div class="badges">
+<span class="badge veg">Veg</span>
+<span class="badge country">USA</span>
+</div>
+<div class="price">₹240</div>
 </div>
 </div>
 
 <div class="card breakfast">
-<img src="https://images.unsplash.com/photo-1604908177522-472e3f8f9c56">
+<img src="https://images.unsplash.com/photo-1585238342024-78d387f4a707">
 <div class="card-content">
-<h3>French Croissant</h3>
-<div class="country">France</div>
-<div class="price">₹180</div>
+<h3>English Breakfast</h3>
+<div class="badges">
+<span class="badge nonveg">Non-Veg</span>
+<span class="badge country">UK</span>
+</div>
+<div class="price">₹320</div>
 </div>
 </div>
 
-<!-- Lunch -->
+<!-- LUNCH -->
+
 <div class="card lunch">
-<img src="https://images.unsplash.com/photo-1604908176997-4312ad6b6e48">
+<img src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092">
 <div class="card-content">
 <h3>Butter Chicken</h3>
-<div class="country">Indian</div>
-<div class="price">₹320</div>
+<div class="badges">
+<span class="badge nonveg">Non-Veg</span>
+<span class="badge country">India</span>
+</div>
+<div class="price">₹360</div>
 </div>
 </div>
 
 <div class="card lunch">
 <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c">
 <div class="card-content">
-<h3>Veg Sushi Platter</h3>
-<div class="country">Japan</div>
-<div class="price">₹450</div>
+<h3>Sushi Platter</h3>
+<div class="badges">
+<span class="badge nonveg">Non-Veg</span>
+<span class="badge country">Japan</span>
+</div>
+<div class="price">₹480</div>
 </div>
 </div>
 
 <div class="card lunch">
-<img src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092">
+<img src="https://images.unsplash.com/photo-1525755662778-989d0524087e">
 <div class="card-content">
-<h3>Italian Pasta Alfredo</h3>
-<div class="country">Italy</div>
-<div class="price">₹350</div>
+<h3>Italian Margherita Pizza</h3>
+<div class="badges">
+<span class="badge veg">Veg</span>
+<span class="badge country">Italy</span>
+</div>
+<div class="price">₹390</div>
 </div>
 </div>
 
-<!-- Dinner -->
+<!-- DINNER -->
+
 <div class="card dinner">
-<img src="https://images.unsplash.com/photo-1543353071-10c8ba85a904">
+<img src="https://images.unsplash.com/photo-1544025162-d76694265947">
 <div class="card-content">
-<h3>Paneer Tikka</h3>
-<div class="country">Indian</div>
-<div class="price">₹280</div>
+<h3>Hakka Noodles</h3>
+<div class="badges">
+<span class="badge veg">Veg</span>
+<span class="badge country">China</span>
+</div>
+<div class="price">₹260</div>
 </div>
 </div>
 
@@ -241,30 +295,42 @@ width:220px;
 <img src="https://images.unsplash.com/photo-1550547660-d9450f859349">
 <div class="card-content">
 <h3>Mexican Tacos</h3>
-<div class="country">Mexico</div>
-<div class="price">₹300</div>
+<div class="badges">
+<span class="badge nonveg">Non-Veg</span>
+<span class="badge country">Mexico</span>
+</div>
+<div class="price">₹320</div>
 </div>
 </div>
 
 <div class="card dinner">
-<img src="https://images.unsplash.com/photo-1544025162-d76694265947">
+<img src="https://images.unsplash.com/photo-1551782450-a2132b4ba21d">
 <div class="card-content">
-<h3>Chinese Noodles</h3>
-<div class="country">China</div>
-<div class="price">₹240</div>
+<h3>Paneer Tikka</h3>
+<div class="badges">
+<span class="badge veg">Veg</span>
+<span class="badge country">India</span>
+</div>
+<div class="price">₹290</div>
 </div>
 </div>
 
 </div>
 
 <footer>
-© 2026 Royal Pune Grand Hotel | Wagholi, Pune
+© 2026 Royal Grand Hotel Pune | Premium Dining Experience
 </footer>
 
 <script>
 
-function filterCategory(category){
+const buttons=document.querySelectorAll('.controls button');
+
+function filterMenu(category){
+buttons.forEach(btn=>btn.classList.remove('active'));
+event.target.classList.add('active');
+
 const cards=document.querySelectorAll('.card');
+
 cards.forEach(card=>{
 if(category==='all'){
 card.style.display='block';
@@ -275,12 +341,9 @@ card.style.display=card.classList.contains(category)?'block':'none';
 }
 
 document.getElementById('search').addEventListener('keyup',function(){
-let filter=this.value.toLowerCase();
-let cards=document.querySelectorAll('.card');
-
-cards.forEach(card=>{
-let text=card.innerText.toLowerCase();
-card.style.display=text.includes(filter)?'block':'none';
+let value=this.value.toLowerCase();
+document.querySelectorAll('.card').forEach(card=>{
+card.style.display=card.innerText.toLowerCase().includes(value)?'block':'none';
 });
 });
 
