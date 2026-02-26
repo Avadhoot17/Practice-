@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royal Pune Grand Hotel</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:#0f172a;
+color:#fff;
+overflow-x:hidden;
+}
+
+header{
+height:90vh;
+background:url('https://images.unsplash.com/photo-1555992336-03a23c7b20ee') center/cover no-repeat;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+}
+
+header h1{
+font-size:60px;
+background:linear-gradient(45deg,#facc15,#f97316);
+-webkit-background-clip:text;
+color:transparent;
+}
+
+header p{
+margin-top:15px;
+font-size:20px;
+color:#eee;
+}
+
+.search-box{
+margin-top:30px;
+}
+
+.search-box input{
+padding:12px 20px;
+width:300px;
+border:none;
+border-radius:30px;
+outline:none;
+font-size:16px;
+}
+
+nav{
+background:#111827;
+display:flex;
+justify-content:center;
+gap:20px;
+padding:15px;
+flex-wrap:wrap;
+}
+
+nav button{
+background:#1f2937;
+color:white;
+border:none;
+padding:10px 20px;
+border-radius:25px;
+cursor:pointer;
+transition:0.3s;
+}
+
+nav button:hover{
+background:#f97316;
+}
+
+.section-title{
+text-align:center;
+margin:50px 0 20px;
+font-size:32px;
+color:#facc15;
+}
+
+.menu-container{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:25px;
+padding:0 40px 60px;
+}
+
+.card{
+background:#1e293b;
+border-radius:20px;
+overflow:hidden;
+transition:0.4s;
+box-shadow:0 10px 20px rgba(0,0,0,0.5);
+}
+
+.card:hover{
+transform:translateY(-10px);
+}
+
+.card img{
+width:100%;
+height:200px;
+object-fit:cover;
+}
+
+.card-content{
+padding:15px;
+}
+
+.card-content h3{
+margin-bottom:8px;
+}
+
+.price{
+color:#f97316;
+font-weight:bold;
+margin-top:5px;
+}
+
+.country{
+font-size:14px;
+color:#94a3b8;
+}
+
+footer{
+background:#111827;
+text-align:center;
+padding:20px;
+}
+
+@media(max-width:768px){
+header h1{
+font-size:40px;
+}
+.search-box input{
+width:220px;
+}
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Royal Pune Grand</h1>
+<p>Premium Multi-Cuisine Experience</p>
+<div class="search-box">
+<input type="text" id="search" placeholder="Search dish...">
+</div>
+</header>
+
+<nav>
+<button onclick="filterCategory('all')">All</button>
+<button onclick="filterCategory('breakfast')">Breakfast</button>
+<button onclick="filterCategory('lunch')">Lunch</button>
+<button onclick="filterCategory('dinner')">Dinner</button>
+</nav>
+
+<h2 class="section-title">Our Special Menu</h2>
+
+<div class="menu-container" id="menu">
+
+<!-- Breakfast -->
+<div class="card breakfast">
+<img src="https://images.unsplash.com/photo-1551782450-a2132b4ba21d">
+<div class="card-content">
+<h3>Masala Dosa</h3>
+<div class="country">Indian</div>
+<div class="price">₹120</div>
+</div>
+</div>
+
+<div class="card breakfast">
+<img src="https://images.unsplash.com/photo-1504754524776-8f4f37790ca0">
+<div class="card-content">
+<h3>American Pancakes</h3>
+<div class="country">USA</div>
+<div class="price">₹220</div>
+</div>
+</div>
+
+<div class="card breakfast">
+<img src="https://images.unsplash.com/photo-1604908177522-472e3f8f9c56">
+<div class="card-content">
+<h3>French Croissant</h3>
+<div class="country">France</div>
+<div class="price">₹180</div>
+</div>
+</div>
+
+<!-- Lunch -->
+<div class="card lunch">
+<img src="https://images.unsplash.com/photo-1604908176997-4312ad6b6e48">
+<div class="card-content">
+<h3>Butter Chicken</h3>
+<div class="country">Indian</div>
+<div class="price">₹320</div>
+</div>
+</div>
+
+<div class="card lunch">
+<img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c">
+<div class="card-content">
+<h3>Veg Sushi Platter</h3>
+<div class="country">Japan</div>
+<div class="price">₹450</div>
+</div>
+</div>
+
+<div class="card lunch">
+<img src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092">
+<div class="card-content">
+<h3>Italian Pasta Alfredo</h3>
+<div class="country">Italy</div>
+<div class="price">₹350</div>
+</div>
+</div>
+
+<!-- Dinner -->
+<div class="card dinner">
+<img src="https://images.unsplash.com/photo-1543353071-10c8ba85a904">
+<div class="card-content">
+<h3>Paneer Tikka</h3>
+<div class="country">Indian</div>
+<div class="price">₹280</div>
+</div>
+</div>
+
+<div class="card dinner">
+<img src="https://images.unsplash.com/photo-1550547660-d9450f859349">
+<div class="card-content">
+<h3>Mexican Tacos</h3>
+<div class="country">Mexico</div>
+<div class="price">₹300</div>
+</div>
+</div>
+
+<div class="card dinner">
+<img src="https://images.unsplash.com/photo-1544025162-d76694265947">
+<div class="card-content">
+<h3>Chinese Noodles</h3>
+<div class="country">China</div>
+<div class="price">₹240</div>
+</div>
+</div>
+
+</div>
+
+<footer>
+© 2026 Royal Pune Grand Hotel | Wagholi, Pune
+</footer>
+
+<script>
+
+function filterCategory(category){
+const cards=document.querySelectorAll('.card');
+cards.forEach(card=>{
+if(category==='all'){
+card.style.display='block';
+}else{
+card.style.display=card.classList.contains(category)?'block':'none';
+}
+});
+}
+
+document.getElementById('search').addEventListener('keyup',function(){
+let filter=this.value.toLowerCase();
+let cards=document.querySelectorAll('.card');
+
+cards.forEach(card=>{
+let text=card.innerText.toLowerCase();
+card.style.display=text.includes(filter)?'block':'none';
+});
+});
+
+</script>
+
+</body>
+</html>
