@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Future UI Trick Plus</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Future UI Pro</title>
 
 <style>
 :root {
-  --hue: 200;
+  --hue: 220;
   --scale: 1;
   --rotate: 0deg;
   --blur: 0px;
   --glow: 0px;
+  --bg-dark: hsl(220, 40%, 8%);
+  --bg-light: hsl(220, 40%, 95%);
+  --card-color: hsl(var(--hue), 80%, 55%);
 }
 
 * {
@@ -20,34 +24,30 @@
 
 body {
   margin: 0;
-  min-height: 300vh;
-  background:
-    radial-gradient(
-      circle at top,
-      hsl(var(--hue), 80%, 20%),
-      hsl(var(--hue), 80%, 5%)
-    );
+  min-height: 100vh;
+  background: radial-gradient(circle at top, hsl(var(--hue), 60%, 15%), #000);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
+  overflow: hidden;
+  transition: 0.5s;
 }
 
+/* CARD */
 .card {
-  width: 340px;
-  height: 220px;
+  width: 360px;
+  height: 230px;
   border-radius: 24px;
-  background: hsl(var(--hue), 80%, 55%);
+  background: var(--card-color);
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   padding: 20px;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 600;
-  transform:
-    scale(var(--scale))
-    rotate(var(--rotate));
+  transform: scale(var(--scale)) rotate(var(--rotate));
   filter: blur(var(--blur));
   box-shadow:
     0 0 var(--glow) hsl(var(--hue), 90%, 70%),
@@ -55,132 +55,193 @@ body {
   transition: 0.3s ease;
   cursor: pointer;
   user-select: none;
+  position: relative;
+  z-index: 10;
 }
 
-.hint {
+/* CONTROL PANEL */
+.panel {
   position: fixed;
-  bottom: 16px;
-  opacity: 0.6;
-  font-size: 0.8rem;
+  right: 20px;
+  top: 20px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-radius: 16px;
+  width: 240px;
+}
+
+.panel h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+}
+
+.panel label {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.panel input {
+  width: 100%;
+  margin: 5px 0 10px;
+}
+
+.panel button {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 5px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* PARTICLES */
+canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
 }
 </style>
 </head>
-
 <body>
 
+<canvas id="bg"></canvas>
+
 <div class="card" tabindex="0">
-  Touch • Scroll • Hover • Keys
+  Future UI Pro
 </div>
 
-<div class="hint">
-  Try: Scroll | Hover | Double Click | Arrow Keys | Stay Idle
+<div class="panel">
+  <h3>Customization</h3>
+
+  <label>Hue</label>
+  <input type="range" id="hue" min="0" max="360">
+
+  <label>Glow</label>
+  <input type="range" id="glow" min="0" max="80">
+
+  <label>Blur</label>
+  <input type="range" id="blur" min="0" max="5" step="0.5">
+
+  <label>Speed</label>
+  <input type="range" id="speed" min="0" max="5" step="0.2">
+
+  <button id="auto">Toggle Auto Rotate</button>
+  <button id="theme">Toggle Theme</button>
+  <button id="reset">Reset</button>
 </div>
 
 <script>
 const root = document.documentElement;
 const card = document.querySelector('.card');
 
-/* ⚙️ Reactive state */
+let autoRotate = false;
+let speed = 1;
+let themeDark = true;
+
 const state = new Proxy(
-  {
-    hue: 200,
-    scale: 1,
-    rotate: 0,
-    blur: 0,
-    glow: 0,
-    mode: 'active'
-  },
+  { hue: 220, scale: 1, rotate: 0, blur: 0, glow: 0 },
   {
     set(obj, key, value) {
       obj[key] = value;
       root.style.setProperty(
         `--${key}`,
-        typeof value === 'number' && key !== 'rotate'
-          ? value
-          : key === 'rotate'
-          ? value + 'deg'
-          : value
+        key === 'rotate' ? value + 'deg' : value
       );
       return true;
     }
   }
 );
 
-/* 🌀 Scroll = motion */
-addEventListener('scroll', () => {
-  const s = scrollY;
-  state.rotate = s / 8;
-  state.hue = (200 + s / 6) % 360;
-});
+/* CONTROLS */
+document.getElementById('hue').oninput = e => state.hue = e.target.value;
+document.getElementById('glow').oninput = e => state.glow = e.target.value;
+document.getElementById('blur').oninput = e => state.blur = e.target.value;
+document.getElementById('speed').oninput = e => speed = e.target.value;
 
-/* ✋ Hover = focus */
-card.onmouseenter = () => {
-  state.scale = 1.15;
-  state.glow = 40;
+document.getElementById('auto').onclick = () => autoRotate = !autoRotate;
+
+document.getElementById('theme').onclick = () => {
+  themeDark = !themeDark;
+  document.body.style.background = themeDark
+    ? `radial-gradient(circle at top, hsl(${state.hue},60%,15%), #000)`
+    : `radial-gradient(circle at top, #fff, #ddd)`;
+  document.body.style.color = themeDark ? "white" : "black";
 };
 
+document.getElementById('reset').onclick = () => {
+  state.hue = 220;
+  state.scale = 1;
+  state.rotate = 0;
+  state.blur = 0;
+  state.glow = 0;
+};
+
+/* INTERACTION */
+card.onmouseenter = () => {
+  state.scale = 1.15;
+  state.glow = 50;
+};
 card.onmouseleave = () => {
   state.scale = 1;
   state.glow = 0;
 };
 
-/* 👆 Double click = mode switch */
-card.ondblclick = () => {
-  state.mode = state.mode === 'active' ? 'sleep' : 'active';
-  state.blur = state.mode === 'sleep' ? 2 : 0;
-};
-
-/* ⌨️ Keyboard controls */
-card.onkeydown = e => {
-  if (e.key === 'ArrowLeft') state.rotate -= 10;
-  if (e.key === 'ArrowRight') state.rotate += 10;
-  if (e.key === 'ArrowUp') state.scale += 0.05;
-  if (e.key === 'ArrowDown') state.scale -= 0.05;
-};
-
-/* 🕒 Idle detection */
-let idleTimer;
-const idle = () => {
-  clearTimeout(idleTimer);
-  state.mode = 'active';
-  idleTimer = setTimeout(() => {
-    state.mode = 'idle';
-    state.blur = 1.5;
-    state.glow = 15;
-  }, 4000);
-};
-
-['mousemove','scroll','keydown','click'].forEach(e =>
-  addEventListener(e, idle)
-);
-
-/* 🌙 Time-aware behavior */
-const hour = new Date().getHours();
-if (hour >= 19 || hour <= 6) {
-  state.hue = 260;
+/* AUTO ANIMATION LOOP */
+function animate() {
+  if (autoRotate) {
+    state.rotate += 1 * speed;
+    state.hue = (parseInt(state.hue) + 1) % 360;
+  }
+  requestAnimationFrame(animate);
 }
+animate();
 
-/* 🧠 Memory */
-const savedHue = localStorage.getItem('ui-hue');
-if (savedHue) state.hue = savedHue;
+/* PARTICLE BACKGROUND */
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
 
-window.addEventListener('beforeunload', () => {
-  localStorage.setItem('ui-hue', state.hue);
-});
+function resize() {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+}
+resize();
+addEventListener('resize', resize);
 
-/* 👀 Visibility awareness */
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (!e.isIntersecting) {
-      state.scale = 0.9;
-      state.blur = 2;
-    } else {
-      state.scale = 1;
-      state.blur = 0;
-    }
+const particles = Array.from({length: 60}, () => ({
+  x: Math.random()*innerWidth,
+  y: Math.random()*innerHeight,
+  r: Math.random()*2+1,
+  dx: (Math.random()-0.5)*1,
+  dy: (Math.random()-0.5)*1
+}));
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = `hsl(${state.hue},80%,60%)`;
+  particles.forEach(p=>{
+    p.x+=p.dx;
+    p.y+=p.dy;
+    if(p.x<0||p.x>canvas.width)p.dx*=-1;
+    if(p.y<0||p.y>canvas.height)p.dy*=-1;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fill();
   });
+  requestAnimationFrame(draw);
+}
+draw();
+
+/* SAVE SETTINGS */
+window.addEventListener('beforeunload',()=>{
+  localStorage.setItem('future-ui-settings',JSON.stringify(state));
 });
-observer.observe(card);
+const saved = localStorage.getItem('future-ui-settings');
+if(saved){
+  const s = JSON.parse(saved);
+  Object.keys(s).forEach(k=>state[k]=s[k]);
+}
 </script>
 
 </body>
