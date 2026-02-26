@@ -2,304 +2,342 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>HRMS Kanban with Activity Log</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HRMS Kanban Pro</title>
 
 <style>
-* {
-  box-sizing: border-box;
-  font-family: system-ui, -apple-system, sans-serif;
+*{box-sizing:border-box;font-family:system-ui}
+body{
+margin:0;
+background:linear-gradient(135deg,#0f172a,#020617);
+color:#e5e7eb;
 }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a, #020617);
-  color: #e5e7eb;
+/* HEADER */
+header{
+padding:20px;
+text-align:center;
+font-size:22px;
+font-weight:600;
 }
 
-header {
-  padding: 20px;
-  text-align: center;
-  font-size: 22px;
-  font-weight: 600;
+/* TOP PANEL */
+.top{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+justify-content:center;
+padding:0 20px 20px;
 }
 
-.form {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  padding-bottom: 20px;
+.top input,.top select{
+padding:10px;
+border-radius:10px;
+border:none;
 }
 
-.form input {
-  width: 280px;
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
+.top button{
+padding:10px 16px;
+border:none;
+border-radius:10px;
+background:#38bdf8;
+cursor:pointer;
+font-weight:600;
 }
 
-.form button {
-  padding: 14px 20px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  background: linear-gradient(135deg, #38bdf8, #6366f1);
+/* STATS */
+.stats{
+display:flex;
+justify-content:center;
+gap:20px;
+margin-bottom:20px;
+font-size:14px;
 }
 
-.board {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  padding: 0 20px 30px;
+/* BOARD */
+.board{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:16px;
+padding:0 20px 40px;
 }
 
-.column {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(14px);
-  border-radius: 18px;
-  padding: 14px;
-  min-height: 420px;
+.column{
+background:rgba(255,255,255,.05);
+border-radius:18px;
+padding:14px;
+min-height:420px;
 }
 
-.column h3 {
-  text-align: center;
-  margin-bottom: 14px;
+.column h3{
+text-align:center;
+margin-bottom:10px;
+font-size:16px;
 }
 
-/* Candidate Card */
-.card {
-  background: rgba(255,255,255,0.12);
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-  animation: fadeIn 0.3s ease;
-  cursor: pointer;
+.counter{
+text-align:center;
+font-size:12px;
+opacity:.7;
+margin-bottom:10px;
 }
 
-.card:hover {
-  transform: translateY(-2px);
+/* CARD */
+.card{
+background:rgba(255,255,255,.12);
+border-radius:14px;
+padding:12px;
+margin-bottom:10px;
+cursor:grab;
 }
 
-.actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
+.card small{opacity:.7}
+
+.priority{
+font-size:11px;
+padding:3px 6px;
+border-radius:6px;
+margin-left:6px;
+}
+.high{background:#ef4444}
+.medium{background:#f59e0b}
+.low{background:#22c55e}
+
+/* BUTTONS */
+.actions{
+display:flex;
+justify-content:space-between;
+margin-top:8px;
 }
 
-.actions button {
-  border: none;
-  padding: 5px 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 12px;
+.actions button{
+border:none;
+padding:4px 6px;
+border-radius:6px;
+font-size:11px;
+cursor:pointer;
 }
 
-.left { background: #f59e0b; }
-.right { background: #22c55e; }
-.delete { background: #ef4444; }
+.edit{background:#6366f1}
+.delete{background:#ef4444}
 
-/* Modal */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  display: none;
-  align-items: center;
-  justify-content: center;
+/* MODAL */
+.modal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.6);
+display:none;
+align-items:center;
+justify-content:center;
+}
+.modal.active{display:flex}
+
+.modal-box{
+width:380px;
+background:#020617;
+border-radius:18px;
+padding:20px;
 }
 
-.modal.active {
-  display: flex;
+.modal-box input, .modal-box select{
+width:100%;
+margin-bottom:8px;
+padding:8px;
+border-radius:8px;
+border:none;
 }
 
-.modal-box {
-  width: 360px;
-  background: #020617;
-  border-radius: 18px;
-  padding: 20px;
-  animation: slideUp 0.3s ease;
-}
-
-.modal-box h3 {
-  margin-bottom: 12px;
-}
-
-.log {
-  font-size: 13px;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  opacity: 0.85;
-}
-
-.close {
-  margin-top: 12px;
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 10px;
-  background: #38bdf8;
-  cursor: pointer;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.modal-box button{
+width:100%;
+padding:8px;
+border:none;
+border-radius:8px;
+background:#38bdf8;
+cursor:pointer;
+margin-top:5px;
 }
 </style>
 </head>
-
 <body>
 
-<header>HRMS – Candidate Pipeline</header>
+<header>HRMS – Candidate Pipeline Pro</header>
 
-<div class="form">
-  <input id="nameInput" placeholder="Candidate name" />
-  <button onclick="addCandidate()">Add Candidate</button>
+<div class="top">
+<input id="nameInput" placeholder="Candidate name">
+<input id="roleInput" placeholder="Position">
+<select id="priorityInput">
+<option value="low">Low</option>
+<option value="medium">Medium</option>
+<option value="high">High</option>
+</select>
+<button onclick="addCandidate()">Add</button>
+<input id="searchInput" placeholder="Search...">
+<button onclick="exportData()">Export</button>
+<button onclick="clearAll()">Clear All</button>
 </div>
+
+<div class="stats" id="stats"></div>
 
 <div class="board" id="board"></div>
 
-<!-- Activity Modal -->
+<!-- EDIT MODAL -->
 <div class="modal" id="modal">
-  <div class="modal-box">
-    <h3 id="modalTitle"></h3>
-    <div id="logList"></div>
-    <button class="close" onclick="closeModal()">Close</button>
-  </div>
+<div class="modal-box">
+<h3>Edit Candidate</h3>
+<input id="editName">
+<input id="editRole">
+<select id="editPriority">
+<option value="low">Low</option>
+<option value="medium">Medium</option>
+<option value="high">High</option>
+</select>
+<button onclick="saveEdit()">Save</button>
+<button onclick="closeModal()">Cancel</button>
+</div>
 </div>
 
 <script>
-const stages = ["Applied", "Interview", "Selected", "Joined"];
-const board = document.getElementById("board");
+const stages=["Applied","Interview","Selected","Joined"];
+let candidates=JSON.parse(localStorage.getItem("hrmsPro"))||[];
+let searchQuery="";
+let editingId=null;
 
-let candidates = JSON.parse(localStorage.getItem("hrmsLogData")) || [];
-let activeCandidate = null;
+const board=document.getElementById("board");
 
-function save() {
-  localStorage.setItem("hrmsLogData", JSON.stringify(candidates));
+function save(){
+localStorage.setItem("hrmsPro",JSON.stringify(candidates));
 }
 
-function now() {
-  return new Date().toLocaleString();
+function render(){
+board.innerHTML="";
+
+let filtered=candidates.filter(c=>
+c.name.toLowerCase().includes(searchQuery) ||
+c.role.toLowerCase().includes(searchQuery)
+);
+
+document.getElementById("stats").innerHTML=
+`Total: ${candidates.length} | Selected: ${candidates.filter(c=>c.stage===2).length} | Joined: ${candidates.filter(c=>c.stage===3).length}`;
+
+stages.forEach((stage,stageIndex)=>{
+const col=document.createElement("div");
+col.className="column";
+col.innerHTML=`<h3>${stage}</h3><div class="counter">${filtered.filter(c=>c.stage===stageIndex).length}</div>`;
+
+filtered.filter(c=>c.stage===stageIndex).forEach(c=>{
+const card=document.createElement("div");
+card.className="card";
+card.draggable=true;
+
+card.innerHTML=`
+<strong>${c.name}</strong>
+<small> – ${c.role}</small>
+<span class="priority ${c.priority}">${c.priority}</span>
+<div class="actions">
+<button class="edit">Edit</button>
+<button class="delete">Delete</button>
+</div>
+`;
+
+card.querySelector(".edit").onclick=e=>{
+e.stopPropagation();
+openEdit(c);
+};
+
+card.querySelector(".delete").onclick=e=>{
+e.stopPropagation();
+if(confirm("Delete candidate?")){
+candidates=candidates.filter(x=>x.id!==c.id);
+save();render();
+}
+};
+
+card.ondragstart=()=>{
+card.classList.add("dragging");
+card.dataset.id=c.id;
+};
+
+col.ondragover=e=>e.preventDefault();
+col.ondrop=e=>{
+const id=+document.querySelector(".dragging").dataset.id;
+moveCandidate(id,stageIndex);
+};
+
+col.appendChild(card);
+});
+
+board.appendChild(col);
+});
 }
 
-function render() {
-  board.innerHTML = "";
+function addCandidate(){
+const name=nameInput.value.trim();
+const role=roleInput.value.trim();
+const priority=priorityInput.value;
+if(!name||!role)return;
 
-  stages.forEach((stage, stageIndex) => {
-    const col = document.createElement("div");
-    col.className = "column";
-    col.innerHTML = `<h3>${stage}</h3>`;
+candidates.push({
+id:Date.now(),
+name,
+role,
+priority,
+stage:0
+});
 
-    candidates.filter(c => c.stage === stageIndex).forEach(c => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `<strong>${c.name}</strong>`;
-
-      card.onclick = () => openModal(c);
-
-      const actions = document.createElement("div");
-      actions.className = "actions";
-
-      if (c.stage > 0) {
-        const left = document.createElement("button");
-        left.textContent = "◀";
-        left.className = "left";
-        left.onclick = e => {
-          e.stopPropagation();
-          moveCandidate(c.id, -1);
-        };
-        actions.appendChild(left);
-      }
-
-      if (c.stage < stages.length - 1) {
-        const right = document.createElement("button");
-        right.textContent = "▶";
-        right.className = "right";
-        right.onclick = e => {
-          e.stopPropagation();
-          moveCandidate(c.id, 1);
-        };
-        actions.appendChild(right);
-      }
-
-      const del = document.createElement("button");
-      del.textContent = "✕";
-      del.className = "delete";
-      del.onclick = e => {
-        e.stopPropagation();
-        deleteCandidate(c.id);
-      };
-
-      actions.appendChild(del);
-      card.appendChild(actions);
-      col.appendChild(card);
-    });
-
-    board.appendChild(col);
-  });
+nameInput.value="";
+roleInput.value="";
+save();render();
 }
 
-function addCandidate() {
-  const name = document.getElementById("nameInput").value.trim();
-  if (!name) return;
-
-  candidates.push({
-    id: Date.now(),
-    name,
-    stage: 0,
-    logs: [`Created at Applied – ${now()}`]
-  });
-
-  document.getElementById("nameInput").value = "";
-  save();
-  render();
+function moveCandidate(id,newStage){
+const c=candidates.find(x=>x.id===id);
+if(!c)return;
+c.stage=newStage;
+save();render();
 }
 
-function moveCandidate(id, dir) {
-  const c = candidates.find(x => x.id === id);
-  if (!c) return;
-
-  const from = stages[c.stage];
-  c.stage += dir;
-  const to = stages[c.stage];
-
-  c.logs.push(`Moved from ${from} → ${to} at ${now()}`);
-  save();
-  render();
+function openEdit(c){
+editingId=c.id;
+editName.value=c.name;
+editRole.value=c.role;
+editPriority.value=c.priority;
+modal.classList.add("active");
 }
 
-function deleteCandidate(id) {
-  candidates = candidates.filter(c => c.id !== id);
-  save();
-  render();
+function saveEdit(){
+const c=candidates.find(x=>x.id===editingId);
+if(!c)return;
+c.name=editName.value;
+c.role=editRole.value;
+c.priority=editPriority.value;
+modal.classList.remove("active");
+save();render();
 }
 
-/* Modal */
-function openModal(candidate) {
-  activeCandidate = candidate;
-  document.getElementById("modalTitle").textContent = candidate.name + " – Activity Log";
-  const logList = document.getElementById("logList");
-  logList.innerHTML = "";
-
-  candidate.logs.forEach(log => {
-    const div = document.createElement("div");
-    div.className = "log";
-    div.textContent = log;
-    logList.appendChild(div);
-  });
-
-  document.getElementById("modal").classList.add("active");
+function closeModal(){
+modal.classList.remove("active");
 }
 
-function closeModal() {
-  document.getElementById("modal").classList.remove("active");
+searchInput.oninput=e=>{
+searchQuery=e.target.value.toLowerCase();
+render();
+};
+
+function exportData(){
+const data=JSON.stringify(candidates,null,2);
+const blob=new Blob([data],{type:"application/json"});
+const url=URL.createObjectURL(blob);
+const a=document.createElement("a");
+a.href=url;
+a.download="hrms-data.json";
+a.click();
+}
+
+function clearAll(){
+if(confirm("Clear all data?")){
+candidates=[];
+save();render();
+}
 }
 
 render();
