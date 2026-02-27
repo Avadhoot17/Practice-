@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecosystem Evolution Simulator</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{
+background:#0f172a;
+color:#e2e8f0;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+height:100vh;
+overflow:hidden;
+}
+h1{position:absolute;top:15px;font-size:18px}
+canvas{
+border-radius:12px;
+box-shadow:0 0 30px rgba(0,0,0,.6);
+}
+.controls{
+position:absolute;
+bottom:15px;
+display:flex;
+gap:10px;
+}
+button{
+padding:8px 14px;
+border:none;
+border-radius:8px;
+background:#38bdf8;
+color:white;
+cursor:pointer;
+}
+.stats{
+position:absolute;
+right:20px;
+top:20px;
+font-size:13px;
+opacity:.8;
+}
+</style>
+</head>
+<body>
+
+<h1>Ecosystem Evolution Simulator</h1>
+<canvas id="canvas"></canvas>
+
+<div class="controls">
+<button onclick="togglePause()">Pause</button>
+<button onclick="reset()">Reset</button>
+<button onclick="speedUp()">Speed +</button>
+<button onclick="slowDown()">Speed -</button>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<script>
+
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+
+canvas.width=window.innerWidth*0.8;
+canvas.height=window.innerHeight*0.7;
+
+let creatures=[];
+let food=[];
+let paused=false;
+let speed=1;
+
+class Creature{
+constructor(){
+this.x=Math.random()*canvas.width;
+this.y=Math.random()*canvas.height;
+this.energy=100;
+this.size=4+Math.random()*4;
+this.speed=1+Math.random();
+this.color=`hsl(${Math.random()*360},70%,60%)`;
+}
+move(){
+this.x+= (Math.random()-.5)*this.speed*speed;
+this.y+= (Math.random()-.5)*this.speed*speed;
+this.energy-=0.2;
+
+this.x=Math.max(0,Math.min(canvas.width,this.x));
+this.y=Math.max(0,Math.min(canvas.height,this.y));
+}
+draw(){
+ctx.beginPath();
+ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+ctx.fillStyle=this.color;
+ctx.fill();
+}
+eat(){
+food.forEach((f,i)=>{
+if(Math.hypot(this.x-f.x,this.y-f.y)<this.size+3){
+this.energy+=20;
+food.splice(i,1);
+}
+});
+}
+reproduce(){
+if(this.energy>200){
+this.energy=100;
+creatures.push(new Creature());
+}
+}
+}
+
+function spawnFood(){
+if(food.length<40){
+food.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height
+});
+}
+}
+
+function drawFood(){
+ctx.fillStyle="#22c55e";
+food.forEach(f=>{
+ctx.beginPath();
+ctx.arc(f.x,f.y,3,0,Math.PI*2);
+ctx.fill();
+});
+}
+
+function update(){
+if(paused) return;
+
+ctx.fillStyle="rgba(15,23,42,.3)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+spawnFood();
+drawFood();
+
+creatures.forEach((c,i)=>{
+c.move();
+c.eat();
+c.reproduce();
+c.draw();
+
+if(c.energy<=0){
+creatures.splice(i,1);
+}
+});
+
+document.getElementById("stats").innerHTML=
+`Creatures: ${creatures.length}<br>
+Food: ${food.length}<br>
+Speed: ${speed}`;
+
+requestAnimationFrame(update);
+}
+
+function init(){
+creatures=[];
+for(let i=0;i<20;i++){
+creatures.push(new Creature());
+}
+food=[];
+}
+
+function togglePause(){paused=!paused}
+function reset(){init()}
+function speedUp(){speed+=0.5}
+function slowDown(){speed=Math.max(0.5,speed-0.5)}
+
+init();
+update();
+
+</script>
+
+</body>
+</html>
