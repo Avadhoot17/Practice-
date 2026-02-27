@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NeuroPattern Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{
+background:#0f172a;
+color:#e2e8f0;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+height:100vh;
+overflow:hidden;
+}
+h1{
+position:absolute;
+top:20px;
+font-size:18px;
+letter-spacing:1px;
+}
+canvas{
+border-radius:12px;
+box-shadow:0 0 40px rgba(0,0,0,.6);
+}
+.stats{
+position:absolute;
+bottom:20px;
+font-size:13px;
+opacity:.7;
+}
+button{
+position:absolute;
+right:20px;
+top:20px;
+padding:8px 14px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:#38bdf8;
+color:#fff;
+}
+</style>
+</head>
+<body>
+
+<h1>NeuroPattern Simulator</h1>
+<button id="reset">Reset Memory</button>
+<canvas id="canvas"></canvas>
+<div class="stats" id="stats"></div>
+
+<script>
+
+/* ============================
+   Adaptive Brain Engine
+============================ */
+
+const Brain = (()=>{
+
+let memory = JSON.parse(localStorage.getItem("neuroProfile")) || {
+clicks:0,
+intervals:[],
+avgDelay:0,
+colorShift:200
+};
+
+function update(delay){
+memory.clicks++;
+memory.intervals.push(delay);
+
+if(memory.intervals.length>10)
+memory.intervals.shift();
+
+memory.avgDelay =
+memory.intervals.reduce((a,b)=>a+b,0)/memory.intervals.length;
+
+memory.colorShift = (memory.colorShift + delay/20) % 360;
+
+localStorage.setItem("neuroProfile",JSON.stringify(memory));
+}
+
+function reset(){
+memory={
+clicks:0,
+intervals:[],
+avgDelay:0,
+colorShift:200
+};
+localStorage.removeItem("neuroProfile");
+}
+
+function get(){
+return memory;
+}
+
+return {update,get,reset};
+
+})();
+
+/* ============================
+   Canvas Engine
+============================ */
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+function resize(){
+canvas.width = window.innerWidth * .8;
+canvas.height = window.innerHeight * .6;
+}
+resize();
+window.onresize=resize;
+
+let particles = [];
+
+function createParticles(count){
+particles=[];
+for(let i=0;i<count;i++){
+particles.push({
+x:canvas.width/2,
+y:canvas.height/2,
+angle:Math.random()*Math.PI*2,
+speed:Math.random()*2+1,
+life:100+Math.random()*100
+});
+}
+}
+
+createParticles(120);
+
+/* ============================
+   Animation Loop
+============================ */
+
+function animate(){
+const profile = Brain.get();
+
+ctx.fillStyle="rgba(15,23,42,.25)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+particles.forEach(p=>{
+p.x += Math.cos(p.angle)*p.speed;
+p.y += Math.sin(p.angle)*p.speed;
+p.life--;
+
+ctx.beginPath();
+ctx.arc(p.x,p.y,2,0,Math.PI*2);
+ctx.fillStyle=`hsl(${profile.colorShift},70%,60%)`;
+ctx.fill();
+
+if(p.life<=0){
+p.x=canvas.width/2;
+p.y=canvas.height/2;
+p.life=100+Math.random()*100;
+p.angle=Math.random()*Math.PI*2;
+}
+});
+
+document.getElementById("stats").innerHTML=
+`Clicks: ${profile.clicks} |
+Avg Delay: ${profile.avgDelay.toFixed(0)} ms |
+Color Mood: ${profile.colorShift.toFixed(0)}`;
+
+requestAnimationFrame(animate);
+}
+
+animate();
+
+/* ============================
+   Interaction Intelligence
+============================ */
+
+let lastClick = Date.now();
+
+canvas.onclick = ()=>{
+const now = Date.now();
+const delay = now - lastClick;
+lastClick = now;
+
+Brain.update(delay);
+
+/* adapt particle speed */
+particles.forEach(p=>{
+p.speed = 1 + (Brain.get().avgDelay/300);
+});
+};
+
+document.getElementById("reset").onclick=()=>{
+Brain.reset();
+createParticles(120);
+};
+
+</script>
+
+</body>
+</html>
