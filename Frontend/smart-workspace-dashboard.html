@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Workspace Dashboard</title>
+
+<style>
+:root{
+--bg:#0f172a;
+--card:#1e293b;
+--accent:#38bdf8;
+--text:#e2e8f0;
+}
+
+.light{
+--bg:#f1f5f9;
+--card:#ffffff;
+--accent:#2563eb;
+--text:#111827;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui}
+
+body{
+background:var(--bg);
+color:var(--text);
+min-height:100vh;
+display:flex;
+flex-direction:column;
+}
+
+header{
+padding:20px;
+text-align:center;
+font-weight:600;
+font-size:20px;
+}
+
+.top-bar{
+display:flex;
+gap:10px;
+justify-content:center;
+flex-wrap:wrap;
+padding-bottom:20px;
+}
+
+.top-bar input{
+padding:10px;
+border-radius:8px;
+border:none;
+width:220px;
+}
+
+.top-bar button{
+padding:10px 15px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:var(--accent);
+color:white;
+font-weight:600;
+}
+
+.stats{
+display:flex;
+justify-content:center;
+gap:20px;
+padding-bottom:20px;
+font-size:14px;
+}
+
+.board{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:15px;
+padding:0 20px 40px;
+flex:1;
+}
+
+.column{
+background:var(--card);
+border-radius:14px;
+padding:12px;
+min-height:300px;
+}
+
+.column h3{
+text-align:center;
+margin-bottom:10px;
+font-size:15px;
+}
+
+.card{
+background:rgba(255,255,255,.08);
+padding:10px;
+border-radius:10px;
+margin-bottom:8px;
+cursor:grab;
+transition:.2s;
+}
+
+.card:hover{
+transform:translateY(-2px);
+}
+
+.card small{
+opacity:.6;
+font-size:11px;
+}
+
+.actions{
+display:flex;
+justify-content:space-between;
+margin-top:6px;
+}
+
+.actions button{
+border:none;
+padding:4px 6px;
+border-radius:6px;
+font-size:11px;
+cursor:pointer;
+}
+
+.delete{background:#ef4444;color:white}
+.edit{background:#6366f1;color:white}
+
+.notification{
+position:fixed;
+bottom:20px;
+right:20px;
+background:var(--accent);
+padding:10px 16px;
+border-radius:10px;
+display:none;
+color:white;
+font-size:13px;
+}
+</style>
+</head>
+<body>
+
+<header>Smart Workspace Dashboard</header>
+
+<div class="top-bar">
+<input id="titleInput" placeholder="Task title">
+<input id="descInput" placeholder="Description">
+<button id="addBtn">Add Task</button>
+<button id="themeBtn">Toggle Theme</button>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="board" id="board"></div>
+
+<div class="notification" id="notify"></div>
+
+<script>
+
+/* =========================
+   STATE MODULE
+========================= */
+
+const State = (() => {
+
+let data = JSON.parse(localStorage.getItem("workspaceData")) || [];
+
+function save(){
+localStorage.setItem("workspaceData",JSON.stringify(data));
+}
+
+function get(){
+return data;
+}
+
+function set(newData){
+data = newData;
+save();
+}
+
+return {get,set,save};
+
+})();
+
+
+/* =========================
+   UI MODULE
+========================= */
+
+const UI = (() => {
+
+const stages = ["Todo","In Progress","Review","Completed"];
+const board = document.getElementById("board");
+const stats = document.getElementById("stats");
+
+function render(){
+
+board.innerHTML="";
+
+const tasks = State.get();
+
+stats.innerHTML =
+`Total: ${tasks.length} | Completed: ${tasks.filter(t=>t.stage===3).length}`;
+
+stages.forEach((stage,stageIndex)=>{
+
+const col = document.createElement("div");
+col.className="column";
+col.innerHTML=`<h3>${stage}</h3>`;
+
+tasks.filter(t=>t.stage===stageIndex)
+.forEach(task=>{
+
+const card = document.createElement("div");
+card.className="card";
+card.draggable=true;
+card.dataset.id=task.id;
+
+card.innerHTML=`
+<strong>${task.title}</strong><br>
+<small>${task.desc}</small>
+<div class="actions">
+<button class="edit">Edit</button>
+<button class="delete">Delete</button>
+</div>
+`;
+
+card.querySelector(".delete").onclick = e=>{
+e.stopPropagation();
+App.deleteTask(task.id);
+};
+
+card.querySelector(".edit").onclick = e=>{
+e.stopPropagation();
+App.editTask(task.id);
+};
+
+card.ondragstart = ()=>{
+card.classList.add("dragging");
+};
+
+col.ondragover = e=>e.preventDefault();
+
+col.ondrop = ()=>{
+const id = +document.querySelector(".dragging").dataset.id;
+App.moveTask(id,stageIndex);
+};
+
+col.appendChild(card);
+});
+
+board.appendChild(col);
+});
+
+}
+
+return {render};
+
+})();
+
+
+/* =========================
+   NOTIFICATION MODULE
+========================= */
+
+const Notify = (() => {
+
+const el = document.getElementById("notify");
+
+function show(message){
+el.textContent = message;
+el.style.display="block";
+setTimeout(()=>el.style.display="none",2000);
+}
+
+return {show};
+
+})();
+
+
+/* =========================
+   APP CONTROLLER
+========================= */
+
+const App = (() => {
+
+function addTask(title,desc){
+
+const tasks = State.get();
+
+tasks.push({
+id:Date.now(),
+title,
+desc,
+stage:0
+});
+
+State.save();
+UI.render();
+Notify.show("Task Added");
+}
+
+function deleteTask(id){
+
+let tasks = State.get();
+tasks = tasks.filter(t=>t.id!==id);
+State.set(tasks);
+
+UI.render();
+Notify.show("Task Deleted");
+}
+
+function editTask(id){
+
+const tasks = State.get();
+const task = tasks.find(t=>t.id===id);
+if(!task) return;
+
+const newTitle = prompt("Edit Title",task.title);
+const newDesc = prompt("Edit Description",task.desc);
+
+if(newTitle!==null) task.title=newTitle;
+if(newDesc!==null) task.desc=newDesc;
+
+State.save();
+UI.render();
+Notify.show("Task Updated");
+}
+
+function moveTask(id,newStage){
+
+const tasks = State.get();
+const task = tasks.find(t=>t.id===id);
+if(!task) return;
+
+task.stage = newStage;
+
+State.save();
+UI.render();
+Notify.show("Task Moved");
+}
+
+return {addTask,deleteTask,editTask,moveTask};
+
+})();
+
+
+/* =========================
+   EVENTS
+========================= */
+
+document.getElementById("addBtn").onclick = ()=>{
+const title = titleInput.value.trim();
+const desc = descInput.value.trim();
+if(!title) return;
+
+App.addTask(title,desc);
+
+titleInput.value="";
+descInput.value="";
+};
+
+document.getElementById("themeBtn").onclick = ()=>{
+document.body.classList.toggle("light");
+};
+
+UI.render();
+
+</script>
+
+</body>
+</html>
