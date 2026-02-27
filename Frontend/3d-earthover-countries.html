@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Realistic 3D Earth</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;overflow:hidden}
+canvas{display:block}
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<script>
+
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+
+function resize(){
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+}
+resize();
+window.addEventListener("resize",resize);
+
+let rotationY=0;
+let rotationX=0;
+let zoom=1;
+let dragging=false;
+let lastX,lastY;
+
+const radius=250;
+
+/* Load real Earth texture */
+const earthTexture=new Image();
+earthTexture.crossOrigin="anonymous";
+earthTexture.src="https://upload.wikimedia.org/wikipedia/commons/8/83/Equirectangular_projection_SW.jpg";
+
+/* Projection math */
+function latLonToXYZ(lat,lon){
+const phi=(90-lat)*Math.PI/180;
+const theta=(lon+180)*Math.PI/180;
+
+return{
+x: radius*Math.sin(phi)*Math.cos(theta),
+y: radius*Math.cos(phi),
+z: radius*Math.sin(phi)*Math.sin(theta)
+};
+}
+
+function rotate(point){
+let {x,y,z}=point;
+
+let cosY=Math.cos(rotationY);
+let sinY=Math.sin(rotationY);
+let dx=x*cosY - z*sinY;
+let dz=x*sinY + z*cosY;
+x=dx; z=dz;
+
+let cosX=Math.cos(rotationX);
+let sinX=Math.sin(rotationX);
+let dy=y*cosX - z*sinX;
+dz=y*sinX + z*cosX;
+y=dy; z=dz;
+
+return {x,y,z};
+}
+
+function project(point){
+const perspective=800;
+const scale=zoom*perspective/(perspective-point.z);
+return{
+x: canvas.width/2 + point.x*scale,
+y: canvas.height/2 + point.y*scale,
+visible: point.z>0
+};
+}
+
+function drawSphere(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+/* Draw ocean base */
+ctx.beginPath();
+ctx.arc(canvas.width/2,canvas.height/2,radius*zoom,0,Math.PI*2);
+ctx.fillStyle="#000";
+ctx.fill();
+
+/* Texture mapping (approximate) */
+for(let lat=-90;lat<90;lat+=2){
+for(let lon=-180;lon<180;lon+=2){
+
+let p=rotate(latLonToXYZ(lat,lon));
+if(p.z<=0) continue;
+
+let s=project(p);
+
+let u=(lon+180)/360;
+let v=(90-lat)/180;
+
+ctx.drawImage(
+earthTexture,
+u*earthTexture.width,
+v*earthTexture.height,
+2,2,
+s.x,s.y,
+2*zoom,2*zoom
+);
+}
+}
+
+/* Lighting */
+const gradient=ctx.createRadialGradient(
+canvas.width/2-100,
+canvas.height/2-100,
+80,
+canvas.width/2,
+canvas.height/2,
+radius*zoom
+);
+gradient.addColorStop(0,"rgba(255,255,255,0.2)");
+gradient.addColorStop(1,"rgba(0,0,0,0.85)");
+ctx.fillStyle=gradient;
+ctx.beginPath();
+ctx.arc(canvas.width/2,canvas.height/2,radius*zoom,0,Math.PI*2);
+ctx.fill();
+
+/* Atmosphere glow */
+ctx.beginPath();
+ctx.arc(canvas.width/2,canvas.height/2,radius*zoom+10,0,Math.PI*2);
+ctx.strokeStyle="rgba(0,150,255,0.3)";
+ctx.lineWidth=8;
+ctx.stroke();
+}
+
+function animate(){
+requestAnimationFrame(animate);
+rotationY+=0.002;
+drawSphere();
+}
+earthTexture.onload=()=>animate();
+
+/* Mouse Controls */
+canvas.addEventListener("mousedown",e=>{
+dragging=true;
+lastX=e.clientX;
+lastY=e.clientY;
+});
+
+canvas.addEventListener("mousemove",e=>{
+if(dragging){
+rotationY+=(e.clientX-lastX)*0.005;
+rotationX+=(e.clientY-lastY)*0.005;
+lastX=e.clientX;
+lastY=e.clientY;
+}
+});
+
+canvas.addEventListener("mouseup",()=>dragging=false);
+
+canvas.addEventListener("wheel",e=>{
+e.preventDefault();
+zoom+=e.deltaY*-0.001;
+zoom=Math.min(Math.max(.6,zoom),2);
+});
+
+</script>
+
+</body>
+</html>
