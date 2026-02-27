@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Web OS</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+
+body{
+height:100vh;
+overflow:hidden;
+background:linear-gradient(135deg,#0f172a,#1e293b);
+color:white;
+}
+
+/* Boot Screen */
+#boot{
+position:fixed;
+inset:0;
+background:#000;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+z-index:9999;
+}
+
+/* Desktop */
+.desktop{
+height:100%;
+position:relative;
+}
+
+/* Taskbar */
+.taskbar{
+position:absolute;
+bottom:0;
+left:0;
+right:0;
+height:40px;
+background:rgba(0,0,0,.6);
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 10px;
+backdrop-filter:blur(8px);
+}
+
+.start-btn{
+padding:5px 12px;
+background:#38bdf8;
+border-radius:6px;
+cursor:pointer;
+}
+
+.clock{
+font-size:13px;
+}
+
+/* Start Menu */
+.start-menu{
+position:absolute;
+bottom:45px;
+left:10px;
+width:200px;
+background:#1e293b;
+border-radius:10px;
+display:none;
+flex-direction:column;
+}
+
+.start-menu button{
+padding:10px;
+background:none;
+border:none;
+color:white;
+text-align:left;
+cursor:pointer;
+}
+
+.start-menu button:hover{
+background:#334155;
+}
+
+/* Windows */
+.window{
+position:absolute;
+width:300px;
+background:#1e293b;
+border-radius:10px;
+box-shadow:0 10px 40px rgba(0,0,0,.5);
+display:flex;
+flex-direction:column;
+}
+
+.window-header{
+background:#0f172a;
+padding:8px;
+cursor:move;
+display:flex;
+justify-content:space-between;
+align-items:center;
+border-top-left-radius:10px;
+border-top-right-radius:10px;
+}
+
+.window-header span{
+font-size:13px;
+}
+
+.window-header button{
+background:none;
+border:none;
+color:white;
+cursor:pointer;
+}
+
+.window-body{
+padding:10px;
+flex:1;
+overflow:auto;
+font-size:14px;
+}
+
+textarea{
+width:100%;
+height:100px;
+border:none;
+border-radius:6px;
+padding:6px;
+}
+
+/* Calculator */
+.calc input{
+width:100%;
+padding:6px;
+margin-bottom:6px;
+}
+.calc button{
+width:100%;
+padding:6px;
+border:none;
+background:#38bdf8;
+color:white;
+cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div id="boot">Booting Mini Web OS...</div>
+
+<div class="desktop" id="desktop">
+
+<div class="start-menu" id="startMenu">
+<button onclick="OS.openApp('notes')">Notes</button>
+<button onclick="OS.openApp('calculator')">Calculator</button>
+<button onclick="OS.openApp('about')">About</button>
+</div>
+
+<div class="taskbar">
+<div class="start-btn" onclick="OS.toggleStart()">Start</div>
+<div class="clock" id="clock"></div>
+</div>
+
+</div>
+
+<script>
+
+/* =========================
+   OS CORE
+========================= */
+
+const OS = (function(){
+
+let zIndex = 10;
+const desktop = document.getElementById("desktop");
+
+function toggleStart(){
+const menu = document.getElementById("startMenu");
+menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+}
+
+function openApp(name){
+
+document.getElementById("startMenu").style.display="none";
+
+const win = document.createElement("div");
+win.className="window";
+win.style.top = Math.random()*200+50+"px";
+win.style.left = Math.random()*300+50+"px";
+win.style.zIndex = ++zIndex;
+
+let content = "";
+
+if(name==="notes"){
+content=`
+<textarea id="notesArea">${localStorage.getItem("notes")||""}</textarea>
+<button onclick="localStorage.setItem('notes',document.getElementById('notesArea').value)">Save</button>
+`;
+}
+
+if(name==="calculator"){
+content=`
+<div class="calc">
+<input id="calcInput" placeholder="2+2*5">
+<button onclick="document.getElementById('calcInput').value = eval(document.getElementById('calcInput').value)">Calculate</button>
+</div>
+`;
+}
+
+if(name==="about"){
+content=`Mini Web OS<br>Built with Vanilla JS<br>Drag windows.`;
+}
+
+win.innerHTML=`
+<div class="window-header">
+<span>${name.toUpperCase()}</span>
+<button onclick="this.closest('.window').remove()">✕</button>
+</div>
+<div class="window-body">${content}</div>
+`;
+
+makeDraggable(win);
+desktop.appendChild(win);
+}
+
+function makeDraggable(win){
+const header = win.querySelector(".window-header");
+let offsetX, offsetY;
+
+header.onmousedown = e=>{
+offsetX = e.clientX - win.offsetLeft;
+offsetY = e.clientY - win.offsetTop;
+win.style.zIndex = ++zIndex;
+
+document.onmousemove = e=>{
+win.style.left = e.clientX - offsetX + "px";
+win.style.top = e.clientY - offsetY + "px";
+};
+};
+
+document.onmouseup = ()=>{
+document.onmousemove=null;
+};
+}
+
+return {openApp,toggleStart};
+
+})();
+
+/* =========================
+   CLOCK
+========================= */
+
+function updateClock(){
+const now = new Date();
+clock.textContent = now.toLocaleTimeString();
+}
+setInterval(updateClock,1000);
+updateClock();
+
+/* =========================
+   BOOT SEQUENCE
+========================= */
+
+setTimeout(()=>{
+document.getElementById("boot").style.display="none";
+},2000);
+
+</script>
+
+</body>
+</html>
