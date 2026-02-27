@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Realistic Solar System Simulation</title>
+<title>Realistic Solar System (Slow Motion)</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
@@ -14,42 +14,26 @@ display:flex;
 height:100vh;
 overflow:hidden;
 }
-#container{
-flex:1;
-position:relative;
-}
-canvas{
-display:block;
-}
+#container{flex:1;position:relative}
+canvas{display:block}
 #panel{
-width:300px;
+width:280px;
 background:#0f172a;
 padding:20px;
-overflow-y:auto;
 border-left:1px solid #1e293b;
+overflow-y:auto;
 }
 h2{margin-bottom:10px}
-.control{
-margin:10px 0;
-}
-button, input[type=range]{
-width:100%;
-margin-top:5px;
-}
+label{font-size:13px}
+button,input{width:100%;margin-top:6px}
 button{
 padding:8px;
 background:#38bdf8;
 border:none;
-color:#000;
-cursor:pointer;
 font-weight:600;
+cursor:pointer;
 }
-label{font-size:13px}
-.data{
-font-size:12px;
-margin-top:10px;
-opacity:.8;
-}
+.data{font-size:12px;margin-top:15px;opacity:.8}
 </style>
 </head>
 <body>
@@ -61,14 +45,10 @@ opacity:.8;
 <div id="panel">
 <h2>Solar System</h2>
 
-<div class="control">
 <label>Simulation Speed</label>
-<input type="range" id="speed" min="0.1" max="5" step="0.1" value="1">
-</div>
+<input type="range" id="speed" min="0.5" max="5" step="0.1" value="1">
 
-<div class="control">
 <button id="pauseBtn">Pause</button>
-</div>
 
 <div class="data" id="planetData"></div>
 </div>
@@ -79,19 +59,18 @@ const canvas=document.getElementById("canvas");
 const ctx=canvas.getContext("2d");
 
 function resize(){
-canvas.width=window.innerWidth-300;
+canvas.width=window.innerWidth-280;
 canvas.height=window.innerHeight;
 }
 resize();
 window.addEventListener("resize",resize);
 
-const center={x:canvas.width/2,y:canvas.height/2};
-
 let speedMultiplier=1;
 let paused=false;
 
-/* ---------- Starfield ---------- */
 const stars=[];
+function createStars(){
+stars.length=0;
 for(let i=0;i<300;i++){
 stars.push({
 x:Math.random()*canvas.width,
@@ -99,6 +78,8 @@ y:Math.random()*canvas.height,
 size:Math.random()*2
 });
 }
+}
+createStars();
 
 /* ---------- Planet Class ---------- */
 class Planet{
@@ -113,18 +94,19 @@ this.rotation=0;
 }
 
 update(){
-this.angle+= (speedMultiplier/this.orbitalPeriod);
-this.rotation+=0.02;
+const BASE_SPEED=0.002; // slow & realistic
+this.angle+=(BASE_SPEED*speedMultiplier)/this.orbitalPeriod;
+this.rotation+=0.003;
 }
 
-drawOrbit(){
+drawOrbit(center){
 ctx.beginPath();
 ctx.strokeStyle="rgba(255,255,255,0.1)";
 ctx.arc(center.x,center.y,this.distance,0,Math.PI*2);
 ctx.stroke();
 }
 
-draw(){
+draw(center){
 const x=center.x+Math.cos(this.angle)*this.distance;
 const y=center.y+Math.sin(this.angle)*this.distance;
 
@@ -136,18 +118,25 @@ ctx.beginPath();
 ctx.fillStyle=this.color;
 ctx.arc(0,0,this.radius,0,Math.PI*2);
 ctx.fill();
+
 ctx.restore();
 
-/* Label */
 ctx.fillStyle="#fff";
 ctx.font="11px system-ui";
-ctx.fillText(this.name,x+this.radius+3,y);
+ctx.fillText(this.name,x+this.radius+4,y);
+}
+
+getPosition(center){
+return{
+x:center.x+Math.cos(this.angle)*this.distance,
+y:center.y+Math.sin(this.angle)*this.distance
+};
 }
 }
 
-/* ---------- Planets Data ---------- */
+/* ---------- Planets ---------- */
 const planets=[
-new Planet("Mercury","#a9a9a9",4,50,0.24),
+new Planet("Mercury","#b1b1b1",4,50,0.24),
 new Planet("Venus","#eccc9a",6,75,0.62),
 new Planet("Earth","#2e8bff",6,100,1),
 new Planet("Mars","#b22222",5,130,1.88),
@@ -168,43 +157,43 @@ function drawStars(){
 ctx.fillStyle="#000";
 ctx.fillRect(0,0,canvas.width,canvas.height);
 ctx.fillStyle="#fff";
-stars.forEach(s=>{
+for(const s of stars){
 ctx.fillRect(s.x,s.y,s.size,s.size);
-});
+}
 }
 
 function animate(){
 requestAnimationFrame(animate);
 if(paused) return;
 
-center.x=canvas.width/2;
-center.y=canvas.height/2;
-
 drawStars();
+
+const center={
+x:canvas.width/2,
+y:canvas.height/2
+};
 
 /* Sun */
 ctx.beginPath();
 ctx.fillStyle="yellow";
-ctx.shadowBlur=30;
+ctx.shadowBlur=40;
 ctx.shadowColor="orange";
 ctx.arc(center.x,center.y,20,0,Math.PI*2);
 ctx.fill();
 ctx.shadowBlur=0;
 
-/* Planets */
-planets.forEach(p=>{
+for(const p of planets){
 p.update();
-p.drawOrbit();
-p.draw();
+p.drawOrbit(center);
+p.draw(center);
 
-/* Moon for Earth */
+/* Moon */
 if(p.name==="Earth"){
-const ex=center.x+Math.cos(p.angle)*p.distance;
-const ey=center.y+Math.sin(p.angle)*p.distance;
-moon.angle+=0.05*speedMultiplier;
+const earthPos=p.getPosition(center);
+moon.angle+=0.01*speedMultiplier;
 
-const mx=ex+Math.cos(moon.angle)*moon.distance;
-const my=ey+Math.sin(moon.angle)*moon.distance;
+const mx=earthPos.x+Math.cos(moon.angle)*moon.distance;
+const my=earthPos.y+Math.sin(moon.angle)*moon.distance;
 
 ctx.beginPath();
 ctx.fillStyle="#ccc";
@@ -214,24 +203,24 @@ ctx.fill();
 
 /* Saturn Ring */
 if(p.name==="Saturn"){
-const sx=center.x+Math.cos(p.angle)*p.distance;
-const sy=center.y+Math.sin(p.angle)*p.distance;
+const saturnPos=p.getPosition(center);
 ctx.beginPath();
 ctx.strokeStyle="rgba(255,255,255,0.5)";
-ctx.ellipse(sx,sy,18,8,0,0,Math.PI*2);
+ctx.ellipse(saturnPos.x,saturnPos.y,18,8,0,0,Math.PI*2);
 ctx.stroke();
 }
+}
 
-});
+updatePanel();
+}
 
-/* Data Panel */
+function updatePanel(){
 document.getElementById("planetData").innerHTML=
 planets.map(p=>
-`${p.name} <br>
-Distance: ${p.distance} AU (scaled)<br>
+`<strong>${p.name}</strong><br>
+Distance (scaled): ${p.distance}<br>
 Orbital Period: ${p.orbitalPeriod} years<br><br>`
 ).join("");
-
 }
 
 animate();
