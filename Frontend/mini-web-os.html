@@ -3,165 +3,136 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mini Web OS</title>
+<title>Mini Web OS Pro</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{height:100vh;overflow:hidden;background:#0f172a;color:#fff}
 
-body{
-height:100vh;
-overflow:hidden;
-background:linear-gradient(135deg,#0f172a,#1e293b);
-color:white;
-}
-
-/* Boot Screen */
+/* Boot */
 #boot{
-position:fixed;
-inset:0;
-background:#000;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:22px;
-z-index:9999;
+position:fixed;inset:0;background:#000;
+display:flex;align-items:center;justify-content:center;
+font-size:22px;z-index:9999;
 }
 
 /* Desktop */
 .desktop{
-height:100%;
-position:relative;
+height:100%;position:relative;
+background:linear-gradient(135deg,#0f172a,#1e293b);
 }
+
+/* Icons */
+.icon{
+width:70px;text-align:center;
+margin:15px;cursor:pointer;
+}
+.icon img{width:40px}
 
 /* Taskbar */
 .taskbar{
-position:absolute;
-bottom:0;
-left:0;
-right:0;
-height:40px;
-background:rgba(0,0,0,.6);
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 10px;
+position:absolute;bottom:0;left:0;right:0;
+height:40px;background:rgba(0,0,0,.6);
+display:flex;align-items:center;
+padding:0 10px;gap:10px;
 backdrop-filter:blur(8px);
 }
-
-.start-btn{
-padding:5px 12px;
-background:#38bdf8;
-border-radius:6px;
-cursor:pointer;
+.start-btn{background:#38bdf8;padding:5px 10px;border-radius:6px;cursor:pointer}
+.task-items{display:flex;gap:5px;flex:1}
+.task-item{
+background:#334155;padding:4px 8px;border-radius:6px;
+cursor:pointer;font-size:12px;
 }
+.clock{font-size:12px}
 
-.clock{
-font-size:13px;
-}
-
-/* Start Menu */
+/* Start menu */
 .start-menu{
-position:absolute;
-bottom:45px;
-left:10px;
-width:200px;
-background:#1e293b;
-border-radius:10px;
-display:none;
+position:absolute;bottom:45px;left:10px;
+width:200px;background:#1e293b;
+border-radius:10px;display:none;
 flex-direction:column;
 }
-
 .start-menu button{
-padding:10px;
-background:none;
-border:none;
-color:white;
-text-align:left;
-cursor:pointer;
+padding:10px;border:none;background:none;
+color:white;text-align:left;cursor:pointer;
 }
+.start-menu button:hover{background:#334155}
 
-.start-menu button:hover{
-background:#334155;
-}
-
-/* Windows */
+/* Window */
 .window{
-position:absolute;
-width:300px;
-background:#1e293b;
-border-radius:10px;
-box-shadow:0 10px 40px rgba(0,0,0,.5);
-display:flex;
-flex-direction:column;
+position:absolute;width:350px;height:300px;
+background:#1e293b;border-radius:10px;
+display:flex;flex-direction:column;
+box-shadow:0 15px 40px rgba(0,0,0,.6);
+resize:both;overflow:hidden;
 }
-
 .window-header{
-background:#0f172a;
-padding:8px;
-cursor:move;
-display:flex;
-justify-content:space-between;
-align-items:center;
-border-top-left-radius:10px;
-border-top-right-radius:10px;
+background:#0f172a;padding:8px;
+cursor:move;display:flex;
+justify-content:space-between;align-items:center;
+}
+.window-body{flex:1;padding:10px;overflow:auto}
+.window-controls button{
+background:none;border:none;color:white;cursor:pointer;
+margin-left:5px;
 }
 
-.window-header span{
-font-size:13px;
+/* Context menu */
+.context-menu{
+position:absolute;background:#1e293b;
+border-radius:8px;padding:5px;
+display:none;flex-direction:column;
+z-index:9999;
 }
+.context-menu button{
+background:none;border:none;color:white;
+padding:6px;text-align:left;cursor:pointer;
+}
+.context-menu button:hover{background:#334155}
 
-.window-header button{
-background:none;
-border:none;
-color:white;
-cursor:pointer;
+/* Terminal */
+.terminal{
+background:#000;color:#0f0;
+font-family:monospace;height:100%;
+display:flex;flex-direction:column;
 }
-
-.window-body{
-padding:10px;
-flex:1;
-overflow:auto;
-font-size:14px;
-}
-
-textarea{
-width:100%;
-height:100px;
-border:none;
-border-radius:6px;
-padding:6px;
-}
-
-/* Calculator */
-.calc input{
-width:100%;
-padding:6px;
-margin-bottom:6px;
-}
-.calc button{
-width:100%;
-padding:6px;
-border:none;
-background:#38bdf8;
-color:white;
-cursor:pointer;
+.terminal-output{flex:1;overflow:auto;font-size:13px}
+.terminal-input{
+border:none;padding:6px;background:#111;
+color:#0f0;font-family:monospace;
 }
 </style>
 </head>
 <body>
 
-<div id="boot">Booting Mini Web OS...</div>
+<div id="boot">Initializing Web OS...</div>
 
 <div class="desktop" id="desktop">
 
+<!-- Desktop Icons -->
+<div style="display:flex;flex-wrap:wrap">
+<div class="icon" onclick="OS.openApp('notes')">📝<br>Notes</div>
+<div class="icon" onclick="OS.openApp('calculator')">🧮<br>Calculator</div>
+<div class="icon" onclick="OS.openApp('terminal')">💻<br>Terminal</div>
+</div>
+
+<!-- Context Menu -->
+<div class="context-menu" id="contextMenu">
+<button onclick="OS.openApp('notes')">New Notes</button>
+<button onclick="location.reload()">Refresh</button>
+</div>
+
+<!-- Start Menu -->
 <div class="start-menu" id="startMenu">
 <button onclick="OS.openApp('notes')">Notes</button>
 <button onclick="OS.openApp('calculator')">Calculator</button>
-<button onclick="OS.openApp('about')">About</button>
+<button onclick="OS.openApp('terminal')">Terminal</button>
 </div>
 
+<!-- Taskbar -->
 <div class="taskbar">
 <div class="start-btn" onclick="OS.toggleStart()">Start</div>
+<div class="task-items" id="taskItems"></div>
 <div class="clock" id="clock"></div>
 </div>
 
@@ -169,103 +140,189 @@ cursor:pointer;
 
 <script>
 
-/* =========================
-   OS CORE
-========================= */
-
 const OS = (function(){
 
-let zIndex = 10;
+let z = 10;
 const desktop = document.getElementById("desktop");
+const taskItems = document.getElementById("taskItems");
 
 function toggleStart(){
 const menu = document.getElementById("startMenu");
-menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+menu.style.display = menu.style.display==="flex"?"none":"flex";
+}
+
+function focus(win){
+z++;
+win.style.zIndex=z;
+}
+
+function minimize(win){
+win.style.display="none";
+}
+
+function restore(win){
+win.style.display="flex";
+focus(win);
+}
+
+function addTaskItem(win,name){
+const btn=document.createElement("div");
+btn.className="task-item";
+btn.textContent=name;
+btn.onclick=()=>{
+if(win.style.display==="none") restore(win);
+else minimize(win);
+};
+taskItems.appendChild(btn);
 }
 
 function openApp(name){
 
 document.getElementById("startMenu").style.display="none";
 
-const win = document.createElement("div");
+const win=document.createElement("div");
 win.className="window";
-win.style.top = Math.random()*200+50+"px";
-win.style.left = Math.random()*300+50+"px";
-win.style.zIndex = ++zIndex;
+win.style.top=Math.random()*200+50+"px";
+win.style.left=Math.random()*300+50+"px";
+win.style.zIndex=++z;
 
-let content = "";
+let content="";
 
 if(name==="notes"){
 content=`
-<textarea id="notesArea">${localStorage.getItem("notes")||""}</textarea>
-<button onclick="localStorage.setItem('notes',document.getElementById('notesArea').value)">Save</button>
+<textarea style="width:100%;height:150px">${localStorage.getItem("notes")||""}</textarea>
+<button onclick="localStorage.setItem('notes',this.previousElementSibling.value)">Save</button>
 `;
 }
 
 if(name==="calculator"){
 content=`
-<div class="calc">
 <input id="calcInput" placeholder="2+2*5">
-<button onclick="document.getElementById('calcInput').value = eval(document.getElementById('calcInput').value)">Calculate</button>
-</div>
+<button onclick="calc()">Calculate</button>
 `;
 }
 
-if(name==="about"){
-content=`Mini Web OS<br>Built with Vanilla JS<br>Drag windows.`;
+if(name==="terminal"){
+content=`
+<div class="terminal">
+<div class="terminal-output" id="termOut"></div>
+<input class="terminal-input" id="termIn" placeholder="Type command">
+</div>
+`;
 }
 
 win.innerHTML=`
 <div class="window-header">
 <span>${name.toUpperCase()}</span>
+<div class="window-controls">
+<button onclick="OS.minimizeWindow(this)">—</button>
 <button onclick="this.closest('.window').remove()">✕</button>
+</div>
 </div>
 <div class="window-body">${content}</div>
 `;
 
 makeDraggable(win);
 desktop.appendChild(win);
+addTaskItem(win,name);
+focus(win);
+
+if(name==="terminal") initTerminal();
+
+}
+
+function minimizeWindow(btn){
+minimize(btn.closest(".window"));
 }
 
 function makeDraggable(win){
-const header = win.querySelector(".window-header");
-let offsetX, offsetY;
+const header=win.querySelector(".window-header");
+let offsetX,offsetY,isDown=false;
 
-header.onmousedown = e=>{
-offsetX = e.clientX - win.offsetLeft;
-offsetY = e.clientY - win.offsetTop;
-win.style.zIndex = ++zIndex;
+header.addEventListener("mousedown",e=>{
+isDown=true;
+focus(win);
+offsetX=e.clientX-win.offsetLeft;
+offsetY=e.clientY-win.offsetTop;
+});
 
-document.onmousemove = e=>{
-win.style.left = e.clientX - offsetX + "px";
-win.style.top = e.clientY - offsetY + "px";
-};
-};
+document.addEventListener("mousemove",e=>{
+if(!isDown) return;
+win.style.left=e.clientX-offsetX+"px";
+win.style.top=e.clientY-offsetY+"px";
+});
 
-document.onmouseup = ()=>{
-document.onmousemove=null;
-};
+document.addEventListener("mouseup",()=>isDown=false);
 }
 
-return {openApp,toggleStart};
+return {openApp,toggleStart,minimizeWindow};
 
 })();
 
-/* =========================
-   CLOCK
-========================= */
+/* Calculator Safe Eval */
+function calc(){
+const input=document.getElementById("calcInput");
+if(!/^[0-9+\-*/().\s]+$/.test(input.value)) return alert("Invalid");
+input.value=Function("return "+input.value)();
+}
 
+/* Terminal */
+function initTerminal(){
+const out=document.getElementById("termOut");
+const input=document.getElementById("termIn");
+
+function print(text){
+out.innerHTML+=text+"<br>";
+out.scrollTop=out.scrollHeight;
+}
+
+print("MiniOS Terminal Ready");
+
+input.onkeydown=e=>{
+if(e.key==="Enter"){
+const cmd=input.value.trim();
+print("> "+cmd);
+
+if(cmd==="help"){
+print("Commands: help, time, clear");
+}
+else if(cmd==="time"){
+print(new Date().toString());
+}
+else if(cmd==="clear"){
+out.innerHTML="";
+}
+else{
+print("Unknown command");
+}
+
+input.value="";
+}
+};
+}
+
+/* Clock */
 function updateClock(){
-const now = new Date();
-clock.textContent = now.toLocaleTimeString();
+clock.textContent=new Date().toLocaleTimeString();
 }
 setInterval(updateClock,1000);
 updateClock();
 
-/* =========================
-   BOOT SEQUENCE
-========================= */
+/* Context Menu */
+desktop.oncontextmenu=e=>{
+e.preventDefault();
+const menu=document.getElementById("contextMenu");
+menu.style.display="flex";
+menu.style.left=e.pageX+"px";
+menu.style.top=e.pageY+"px";
+};
 
+document.onclick=()=>{
+document.getElementById("contextMenu").style.display="none";
+document.getElementById("startMenu").style.display="none";
+};
+
+/* Boot */
 setTimeout(()=>{
 document.getElementById("boot").style.display="none";
 },2000);
