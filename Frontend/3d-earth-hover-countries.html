@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Earth - Hover Countries</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{
+background:#000;
+overflow:hidden;
+}
+canvas{
+display:block;
+}
+#tooltip{
+position:absolute;
+background:rgba(0,0,0,0.8);
+color:#fff;
+padding:6px 10px;
+border-radius:6px;
+font-size:13px;
+pointer-events:none;
+display:none;
+}
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<div id="tooltip"></div>
+
+<script>
+
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+
+const tooltip=document.getElementById("tooltip");
+
+function resize(){
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+}
+resize();
+window.addEventListener("resize",resize);
+
+/* -----------------------------
+   Basic 3D Sphere Settings
+------------------------------*/
+let rotationY=0;
+let rotationX=0;
+let zoom=1;
+let autoRotate=true;
+
+const radius=200;
+
+/* -----------------------------
+   Country Data (simplified bounds)
+   lat/lon ranges
+------------------------------*/
+const countries=[
+{name:"USA", lat:[24,49], lon:[-125,-66]},
+{name:"India", lat:[8,37], lon:[68,97]},
+{name:"Brazil", lat:[-34,5], lon:[-74,-34]},
+{name:"Australia", lat:[-44,-10], lon:[113,154]},
+{name:"China", lat:[18,53], lon:[73,135]},
+{name:"United Kingdom", lat:[50,59], lon:[-8,2]},
+{name:"Canada", lat:[42,83], lon:[-140,-52]},
+{name:"Russia", lat:[41,82], lon:[30,180]}
+];
+
+/* -----------------------------
+   Convert lat/lon to 3D sphere
+------------------------------*/
+function latLonToXYZ(lat,lon){
+const phi=(90-lat)*Math.PI/180;
+const theta=(lon+180)*Math.PI/180;
+
+return{
+x: radius*Math.sin(phi)*Math.cos(theta),
+y: radius*Math.cos(phi),
+z: radius*Math.sin(phi)*Math.sin(theta)
+};
+}
+
+/* -----------------------------
+   Rotate 3D point
+------------------------------*/
+function rotate(point){
+let x=point.x;
+let y=point.y;
+let z=point.z;
+
+/* Y rotation */
+let cosY=Math.cos(rotationY);
+let sinY=Math.sin(rotationY);
+let dx=x*cosY - z*sinY;
+let dz=x*sinY + z*cosY;
+x=dx; z=dz;
+
+/* X rotation */
+let cosX=Math.cos(rotationX);
+let sinX=Math.sin(rotationX);
+let dy=y*cosX - z*sinX;
+dz=y*sinX + z*cosX;
+y=dy; z=dz;
+
+return {x,y,z};
+}
+
+/* -----------------------------
+   Project 3D to 2D
+------------------------------*/
+function project(point){
+const scale=zoom*400/(400-point.z);
+return{
+x: canvas.width/2 + point.x*scale,
+y: canvas.height/2 + point.y*scale,
+visible: point.z > -radius
+};
+}
+
+/* -----------------------------
+   Detect hovered country
+------------------------------*/
+function detectCountry(mouseX,mouseY){
+for(let c of countries){
+
+for(let lat=c.lat[0]; lat<=c.lat[1]; lat+=2){
+for(let lon=c.lon[0]; lon<=c.lon[1]; lon+=2){
+
+let p=rotate(latLonToXYZ(lat,lon));
+let screen=project(p);
+
+if(screen.visible){
+if(Math.hypot(mouseX-screen.x,mouseY-screen.y)<4){
+return c.name;
+}
+}
+}
+}
+}
+return null;
+}
+
+/* -----------------------------
+   Draw Earth
+------------------------------*/
+function drawEarth(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+/* Sphere base */
+ctx.beginPath();
+ctx.arc(canvas.width/2,canvas.height/2,radius*zoom,0,Math.PI*2);
+ctx.fillStyle="#0b3d91";
+ctx.fill();
+
+/* Lat lines */
+ctx.strokeStyle="rgba(255,255,255,0.05)";
+for(let lat=-80; lat<=80; lat+=20){
+ctx.beginPath();
+for(let lon=-180; lon<=180; lon+=5){
+let p=rotate(latLonToXYZ(lat,lon));
+let s=project(p);
+if(lon===-180) ctx.moveTo(s.x,s.y);
+else ctx.lineTo(s.x,s.y);
+}
+ctx.stroke();
+}
+
+/* Shading */
+const gradient=ctx.createRadialGradient(
+canvas.width/2 - 60,
+canvas.height/2 - 60,
+50,
+canvas.width/2,
+canvas.height/2,
+radius*zoom
+);
+gradient.addColorStop(0,"rgba(255,255,255,0.2)");
+gradient.addColorStop(1,"rgba(0,0,0,0.8)");
+ctx.fillStyle=gradient;
+ctx.beginPath();
+ctx.arc(canvas.width/2,canvas.height/2,radius*zoom,0,Math.PI*2);
+ctx.fill();
+}
+
+/* -----------------------------
+   Animation Loop
+------------------------------*/
+function animate(){
+requestAnimationFrame(animate);
+if(autoRotate) rotationY+=0.003;
+drawEarth();
+}
+animate();
+
+/* -----------------------------
+   Mouse Controls
+------------------------------*/
+let dragging=false;
+let lastX,lastY;
+
+canvas.addEventListener("mousedown",e=>{
+dragging=true;
+lastX=e.clientX;
+lastY=e.clientY;
+});
+
+canvas.addEventListener("mousemove",e=>{
+if(dragging){
+rotationY+=(e.clientX-lastX)*0.005;
+rotationX+=(e.clientY-lastY)*0.005;
+lastX=e.clientX;
+lastY=e.clientY;
+}
+
+/* Hover detection */
+const country=detectCountry(e.clientX,e.clientY);
+if(country){
+tooltip.style.display="block";
+tooltip.style.left=e.clientX+15+"px";
+tooltip.style.top=e.clientY+15+"px";
+tooltip.textContent=country;
+}else{
+tooltip.style.display="none";
+}
+});
+
+canvas.addEventListener("mouseup",()=>dragging=false);
+
+canvas.addEventListener("wheel",e=>{
+e.preventDefault();
+zoom+=e.deltaY*-0.001;
+zoom=Math.min(Math.max(.6,zoom),2);
+});
+
+</script>
+
+</body>
+</html>
