@@ -3,121 +3,155 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#define QUEUE_SIZE 10
-#define THREAD_COUNT 4
-
-// -------- Task structure --------
+// -------- Task --------
 typedef struct {
     void (*function)(void *);
     void *arg;
 } Task;
 
-// -------- Thread pool structure --------
+// -------- ThreadPool --------
 typedef struct {
-    pthread_t threads[THREAD_COUNT];
-    Task queue[QUEUE_SIZE];
+
+    pthread_t *threads;
+    Task *queue;
+
+    int thread_count;
+    int queue_size;
 
     int front;
     int rear;
     int count;
 
+    int shutdown;
+
     pthread_mutex_t mutex;
     pthread_cond_t not_empty;
     pthread_cond_t not_full;
 
-    int shutdown;
 } ThreadPool;
 
-ThreadPool pool;
+// -------- Worker --------
+void *worker(void *arg)
+{
+    ThreadPool *pool = (ThreadPool *)arg;
 
-// -------- Worker function --------
-void *worker(void *arg) {
-    while (1) {
-        pthread_mutex_lock(&pool.mutex);
+    while (1)
+    {
+        pthread_mutex_lock(&pool->mutex);
 
-        while (pool.count == 0 && !pool.shutdown)
-            pthread_cond_wait(&pool.not_empty, &pool.mutex);
+        while (pool->count == 0 && !pool->shutdown)
+            pthread_cond_wait(&pool->not_empty, &pool->mutex);
 
-        if (pool.shutdown) {
-            pthread_mutex_unlock(&pool.mutex);
+        if (pool->shutdown && pool->count == 0)
+        {
+            pthread_mutex_unlock(&pool->mutex);
             pthread_exit(NULL);
         }
 
-        Task task = pool.queue[pool.front];
-        pool.front = (pool.front + 1) % QUEUE_SIZE;
-        pool.count--;
+        Task task = pool->queue[pool->front];
 
-        pthread_cond_signal(&pool.not_full);
-        pthread_mutex_unlock(&pool.mutex);
+        pool->front = (pool->front + 1) % pool->queue_size;
+        pool->count--;
+
+        pthread_cond_signal(&pool->not_full);
+        pthread_mutex_unlock(&pool->mutex);
 
         task.function(task.arg);
     }
 }
 
-// -------- Initialize thread pool --------
-void thread_pool_init() {
-    pool.front = pool.rear = pool.count = 0;
-    pool.shutdown = 0;
+// -------- Create Pool --------
+ThreadPool *thread_pool_create(int thread_count, int queue_size)
+{
+    ThreadPool *pool = malloc(sizeof(ThreadPool));
 
-    pthread_mutex_init(&pool.mutex, NULL);
-    pthread_cond_init(&pool.not_empty, NULL);
-    pthread_cond_init(&pool.not_full, NULL);
+    pool->thread_count = thread_count;
+    pool->queue_size = queue_size;
 
-    for (int i = 0; i < THREAD_COUNT; i++)
-        pthread_create(&pool.threads[i], NULL, worker, NULL);
+    pool->threads = malloc(sizeof(pthread_t) * thread_count);
+    pool->queue = malloc(sizeof(Task) * queue_size);
+
+    pool->front = pool->rear = pool->count = 0;
+    pool->shutdown = 0;
+
+    pthread_mutex_init(&pool->mutex, NULL);
+    pthread_cond_init(&pool->not_empty, NULL);
+    pthread_cond_init(&pool->not_full, NULL);
+
+    for (int i = 0; i < thread_count; i++)
+        pthread_create(&pool->threads[i], NULL, worker, pool);
+
+    return pool;
 }
 
-// -------- Add task to queue --------
-void thread_pool_submit(void (*function)(void *), void *arg) {
-    pthread_mutex_lock(&pool.mutex);
+// -------- Submit Task --------
+void thread_pool_submit(ThreadPool *pool, void (*function)(void *), void *arg)
+{
+    pthread_mutex_lock(&pool->mutex);
 
-    while (pool.count == QUEUE_SIZE)
-        pthread_cond_wait(&pool.not_full, &pool.mutex);
+    while (pool->count == pool->queue_size)
+        pthread_cond_wait(&pool->not_full, &pool->mutex);
 
-    pool.queue[pool.rear].function = function;
-    pool.queue[pool.rear].arg = arg;
-    pool.rear = (pool.rear + 1) % QUEUE_SIZE;
-    pool.count++;
+    pool->queue[pool->rear].function = function;
+    pool->queue[pool->rear].arg = arg;
 
-    pthread_cond_signal(&pool.not_empty);
-    pthread_mutex_unlock(&pool.mutex);
+    pool->rear = (pool->rear + 1) % pool->queue_size;
+    pool->count++;
+
+    pthread_cond_signal(&pool->not_empty);
+    pthread_mutex_unlock(&pool->mutex);
 }
 
-// -------- Shutdown pool --------
-void thread_pool_shutdown() {
-    pthread_mutex_lock(&pool.mutex);
-    pool.shutdown = 1;
-    pthread_cond_broadcast(&pool.not_empty);
-    pthread_mutex_unlock(&pool.mutex);
+// -------- Destroy Pool --------
+void thread_pool_destroy(ThreadPool *pool)
+{
+    pthread_mutex_lock(&pool->mutex);
 
-    for (int i = 0; i < THREAD_COUNT; i++)
-        pthread_join(pool.threads[i], NULL);
+    pool->shutdown = 1;
+    pthread_cond_broadcast(&pool->not_empty);
 
-    pthread_mutex_destroy(&pool.mutex);
-    pthread_cond_destroy(&pool.not_empty);
-    pthread_cond_destroy(&pool.not_full);
+    pthread_mutex_unlock(&pool->mutex);
+
+    for (int i = 0; i < pool->thread_count; i++)
+        pthread_join(pool->threads[i], NULL);
+
+    pthread_mutex_destroy(&pool->mutex);
+    pthread_cond_destroy(&pool->not_empty);
+    pthread_cond_destroy(&pool->not_full);
+
+    free(pool->threads);
+    free(pool->queue);
+    free(pool);
 }
 
-// -------- Example task --------
-void print_task(void *arg) {
+// -------- Example Task --------
+void example_task(void *arg)
+{
     int num = *(int *)arg;
+
     printf("Task %d executed by thread %lu\n", num, pthread_self());
+
     sleep(1);
+
     free(arg);
 }
 
 // -------- Main --------
-int main() {
-    thread_pool_init();
+int main()
+{
+    ThreadPool *pool = thread_pool_create(4, 10);
 
-    for (int i = 1; i <= 20; i++) {
+    for (int i = 1; i <= 20; i++)
+    {
         int *num = malloc(sizeof(int));
         *num = i;
-        thread_pool_submit(print_task, num);
+
+        thread_pool_submit(pool, example_task, num);
     }
 
-    sleep(5); // allow tasks to finish
-    thread_pool_shutdown();
+    sleep(6);
+
+    thread_pool_destroy(pool);
 
     return 0;
 }
