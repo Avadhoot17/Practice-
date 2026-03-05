@@ -1,33 +1,52 @@
-// ===== Reducer =====
-function counterReducer(state, action) {
-    switch (action.type) {
-        case "INC":
-            return { ...state, count: state.count + 1 };
-
-        case "SET":
-            return { ...state, count: action.payload };
-
-        default:
-            return state;
-    }
+// ===== Thunk Middleware =====
+function thunkMiddleware({ dispatch, getState }) {
+    return next => action => {
+        if (typeof action === "function") {
+            return action(dispatch, getState);
+        }
+        return next(action);
+    };
 }
 
-// ===== Create Store =====
-ClosureThunkStore.use(thunkMiddleware);
-ClosureThunkStore.create(counterReducer, { count: 0 });
+// ===== Store Creator =====
+function createStore(reducer, initialState, middleware = []) {
+    let state = initialState;
+    const listeners = [];
 
-// ===== Subscribe =====
-ClosureThunkStore.subscribe(s => console.log("State:", s));
+    const store = {
+        getState: () => state,
 
-// ===== Normal dispatch =====
-ClosureThunkStore.dispatch({ type: "INC" });
+        dispatch: action => {
+            throw new Error("Dispatching while constructing middleware");
+        },
 
-// ===== Async dispatch using thunk =====
-ClosureThunkStore.dispatch((dispatch, getState) => {
-    console.log("Before async:", getState());
+        subscribe: listener => {
+            listeners.push(listener);
 
-    setTimeout(() => {
-        dispatch({ type: "SET", payload: 10 });
-        console.log("After async:", getState());
-    }, 1000);
-});
+            return () => {
+                const index = listeners.indexOf(listener);
+                if (index > -1) listeners.splice(index, 1);
+            };
+        }
+    };
+
+    function baseDispatch(action) {
+        state = reducer(state, action);
+        listeners.forEach(l => l(state));
+        return action;
+    }
+
+    let dispatch = baseDispatch;
+
+    // Apply middleware
+    middleware.slice().reverse().forEach(mw => {
+        dispatch = mw({
+            getState: store.getState,
+            dispatch: (...args) => dispatch(...args)
+        })(dispatch);
+    });
+
+    store.dispatch = dispatch;
+
+    return store;
+}
