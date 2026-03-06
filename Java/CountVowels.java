@@ -1,35 +1,87 @@
+import java.util.*;
+
 class VowelConsonantCount {
 
-    public static void count(String input) {
-        if (input == null) {
+    public static void countCharacters(String input) {
+
+        if (input == null || input.isEmpty()) {
             System.out.println("Invalid input");
             return;
         }
 
         int vowels = 0;
         int consonants = 0;
+        int digits = 0;
+        int spaces = 0;
+        int special = 0;
 
-        input = input.toLowerCase();
+        Map<Character, Integer> vowelFreq = new HashMap<>();
 
-        for (int i = 0; i < input.length(); i++) {
-            char ch = input.charAt(i);
+        vowelFreq.put('a',0);
+        vowelFreq.put('e',0);
+        vowelFreq.put('i',0);
+        vowelFreq.put('o',0);
+        vowelFreq.put('u',0);
 
-            if (ch >= 'a' && ch <= 'z') {
-                if (ch == 'a' || ch == 'e' || ch == 'i' || 
-                    ch == 'o' || ch == 'u') {
+        for(char ch : input.toCharArray()) {
+
+            if(Character.isLetter(ch)) {
+
+                char lower = Character.toLowerCase(ch);
+
+                if(vowelFreq.containsKey(lower)) {
                     vowels++;
-                } else {
+                    vowelFreq.put(lower, vowelFreq.get(lower) + 1);
+                }
+                else {
                     consonants++;
                 }
             }
+
+            else if(Character.isDigit(ch)) {
+                digits++;
+            }
+
+            else if(Character.isWhitespace(ch)) {
+                spaces++;
+            }
+
+            else {
+                special++;
+            }
         }
 
-        System.out.println("Vowels: " + vowels);
-        System.out.println("Consonants: " + consonants);
+        printResults(input, vowels, consonants, digits, spaces, special, vowelFreq);
     }
 
+
+    public static void printResults(String text, int v, int c, int d, int sp, int sc, Map<Character,Integer> vf) {
+
+        System.out.println("Input Text: " + text);
+        System.out.println("\n---- Character Statistics ----");
+
+        System.out.println("Vowels      : " + v);
+        System.out.println("Consonants  : " + c);
+        System.out.println("Digits      : " + d);
+        System.out.println("Spaces      : " + sp);
+        System.out.println("Special Char: " + sc);
+
+        System.out.println("\nVowel Frequency:");
+        for(char ch : vf.keySet()) {
+            System.out.println(ch + " : " + vf.get(ch));
+        }
+    }
+
+
     public static void main(String[] args) {
-        String text = "Hello World! Hello World!";
-        count(text);
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter text: ");
+        String text = sc.nextLine();
+
+        countCharacters(text);
+
+        sc.close();
     }
 }
