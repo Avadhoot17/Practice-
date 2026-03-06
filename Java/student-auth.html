@@ -2,220 +2,363 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Student Login & Register</title>
+<title>Student Login System</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Segoe UI", sans-serif;
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI;
 }
 
-body {
-    height: 100vh;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+body{
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+background:linear-gradient(135deg,#667eea,#764ba2);
 }
 
-/* Card animation on load */
-.container {
-    width: 380px;
-    background: #fff;
-    border-radius: 14px;
-    padding: 30px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-    animation: slideFade 0.8s ease forwards;
+/* container */
+
+.container{
+width:400px;
+background:white;
+padding:35px;
+border-radius:12px;
+box-shadow:0 20px 40px rgba(0,0,0,0.25);
+animation:card .7s ease;
 }
 
-@keyframes slideFade {
-    from {
-        opacity: 0;
-        transform: translateY(40px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+@keyframes card{
+from{opacity:0;transform:translateY(40px)}
+to{opacity:1;transform:translateY(0)}
 }
 
-h2 {
-    text-align: center;
-    margin-bottom: 22px;
-    color: #333;
+h2{
+text-align:center;
+margin-bottom:25px;
+color:#333;
 }
 
-/* Input animation */
-.input-group {
-    position: relative;
-    margin-bottom: 22px;
+/* input */
+
+.input-group{
+position:relative;
+margin-bottom:22px;
 }
 
-.input-group input {
-    width: 100%;
-    padding: 12px 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    outline: none;
-    font-size: 14px;
-    transition: 0.3s;
+.input-group input{
+width:100%;
+padding:12px 40px;
+border:1px solid #ccc;
+border-radius:6px;
+outline:none;
+font-size:14px;
 }
 
-.input-group input:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+.input-group i{
+position:absolute;
+left:12px;
+top:50%;
+transform:translateY(-50%);
+color:#888;
 }
 
-.input-group label {
-    position: absolute;
-    top: 50%;
-    left: 10px;
-    color: #888;
-    font-size: 13px;
-    transform: translateY(-50%);
-    pointer-events: none;
-    transition: 0.3s;
-    background: #fff;
-    padding: 0 5px;
+.input-group .togglePass{
+right:12px;
+left:auto;
+cursor:pointer;
 }
 
-.input-group input:focus + label,
-.input-group input:not(:placeholder-shown) + label {
-    top: -7px;
-    font-size: 11px;
-    color: #667eea;
+/* focus */
+
+.input-group input:focus{
+border-color:#667eea;
+box-shadow:0 0 0 3px rgba(102,126,234,.15);
 }
 
-/* Button animation */
-button {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    background: #667eea;
-    color: #fff;
-    font-size: 15px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+/* password strength */
+
+.strength{
+height:5px;
+border-radius:5px;
+margin-top:5px;
+background:#eee;
 }
 
-button:hover {
-    background: #5a67d8;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+.strength div{
+height:100%;
+width:0%;
+border-radius:5px;
+transition:.3s;
 }
 
-button:active {
-    transform: scale(0.97);
+/* button */
+
+button{
+width:100%;
+padding:12px;
+border:none;
+background:#667eea;
+color:white;
+font-size:15px;
+border-radius:6px;
+cursor:pointer;
+transition:.3s;
 }
 
-/* Toggle animation */
-.toggle {
-    text-align: center;
-    margin-top: 18px;
-    font-size: 14px;
+button:hover{
+background:#5a67d8;
 }
 
-.toggle span {
-    color: #667eea;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.3s;
+button.loading{
+opacity:.7;
+pointer-events:none;
 }
 
-.toggle span:hover {
-    letter-spacing: 0.5px;
+/* toggle text */
+
+.toggle{
+text-align:center;
+margin-top:18px;
 }
 
-/* Form switch animation */
-form {
-    animation: fadeIn 0.4s ease;
+.toggle span{
+color:#667eea;
+cursor:pointer;
+font-weight:600;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+/* extra */
+
+.extra{
+display:flex;
+justify-content:space-between;
+font-size:13px;
+margin-bottom:15px;
 }
 
-.register {
-    display: none;
+.extra a{
+text-decoration:none;
+color:#667eea;
 }
+
+.error{
+color:red;
+font-size:12px;
+margin-top:3px;
+display:none;
+}
+
+.register{
+display:none;
+}
+
+/* popup */
+
+.popup{
+position:fixed;
+top:20px;
+right:-300px;
+background:#4CAF50;
+color:white;
+padding:12px 18px;
+border-radius:6px;
+box-shadow:0 10px 20px rgba(0,0,0,.2);
+transition:.5s;
+}
+
+.popup.show{
+right:20px;
+}
+
 </style>
 </head>
 
 <body>
 
+<div class="popup" id="popup">Success!</div>
+
 <div class="container">
-    <h2 id="title">Student Login</h2>
 
-    <!-- Login -->
-    <form id="loginForm">
-        <div class="input-group">
-            <input type="email" required placeholder=" ">
-            <label>Email</label>
-        </div>
+<h2 id="title">Student Login</h2>
 
-        <div class="input-group">
-            <input type="password" required placeholder=" ">
-            <label>Password</label>
-        </div>
+<!-- LOGIN -->
 
-        <button type="submit">Login</button>
-    </form>
+<form id="loginForm">
 
-    <!-- Register -->
-    <form id="registerForm" class="register">
-        <div class="input-group">
-            <input type="text" required placeholder=" ">
-            <label>Full Name</label>
-        </div>
+<div class="input-group">
+<i class="fa fa-envelope"></i>
+<input type="email" placeholder="Email" required>
+</div>
 
-        <div class="input-group">
-            <input type="email" required placeholder=" ">
-            <label>Email</label>
-        </div>
+<div class="input-group">
+<i class="fa fa-lock"></i>
+<input type="password" id="loginPass" placeholder="Password" required>
+<i class="fa fa-eye togglePass" onclick="togglePassword('loginPass',this)"></i>
+</div>
 
-        <div class="input-group">
-            <input type="password" required placeholder=" ">
-            <label>Password</label>
-        </div>
+<div class="extra">
+<label><input type="checkbox"> Remember</label>
+<a href="#">Forgot?</a>
+</div>
 
-        <button type="submit">Register</button>
-    </form>
+<button type="submit" id="loginBtn">Login</button>
 
-    <div class="toggle">
-        <span id="toggleText">Create an account</span>
-    </div>
+</form>
+
+
+<!-- REGISTER -->
+
+<form id="registerForm" class="register">
+
+<div class="input-group">
+<i class="fa fa-user"></i>
+<input type="text" placeholder="Full Name" required>
+</div>
+
+<div class="input-group">
+<i class="fa fa-envelope"></i>
+<input type="email" placeholder="Email" required>
+</div>
+
+<div class="input-group">
+<i class="fa fa-lock"></i>
+<input type="password" id="regPass" placeholder="Password" required onkeyup="checkStrength()">
+<i class="fa fa-eye togglePass" onclick="togglePassword('regPass',this)"></i>
+<div class="strength"><div id="strengthBar"></div></div>
+</div>
+
+<div class="input-group">
+<i class="fa fa-lock"></i>
+<input type="password" id="confirmPass" placeholder="Confirm Password" required>
+</div>
+
+<div class="error" id="passError">Passwords do not match</div>
+
+<button type="submit" id="registerBtn">Register</button>
+
+</form>
+
+<div class="toggle">
+<span id="toggleText">Create an account</span>
+</div>
+
 </div>
 
 <script>
-const loginForm = document.getElementById("loginForm");
-const registerForm = document.getElementById("registerForm");
-const toggleText = document.getElementById("toggleText");
-const title = document.getElementById("title");
 
-toggleText.onclick = () => {
-    if (loginForm.style.display !== "none") {
-        loginForm.style.display = "none";
-        registerForm.style.display = "block";
-        title.innerText = "Student Register";
-        toggleText.innerText = "Already have an account?";
-    } else {
-        loginForm.style.display = "block";
-        registerForm.style.display = "none";
-        title.innerText = "Student Login";
-        toggleText.innerText = "Create an account";
-    }
-};
+/* form switch */
+
+const loginForm=document.getElementById("loginForm")
+const registerForm=document.getElementById("registerForm")
+const toggleText=document.getElementById("toggleText")
+const title=document.getElementById("title")
+
+toggleText.onclick=()=>{
+
+if(loginForm.style.display!=="none"){
+
+loginForm.style.display="none"
+registerForm.style.display="block"
+title.innerText="Student Register"
+toggleText.innerText="Already have account?"
+
+}else{
+
+loginForm.style.display="block"
+registerForm.style.display="none"
+title.innerText="Student Login"
+toggleText.innerText="Create an account"
+
+}
+
+}
+
+
+/* password show hide */
+
+function togglePassword(id,icon){
+
+const input=document.getElementById(id)
+
+if(input.type==="password"){
+input.type="text"
+icon.classList.replace("fa-eye","fa-eye-slash")
+}else{
+input.type="password"
+icon.classList.replace("fa-eye-slash","fa-eye")
+}
+
+}
+
+
+/* password strength */
+
+function checkStrength(){
+
+const pass=document.getElementById("regPass").value
+const bar=document.getElementById("strengthBar")
+
+let strength=0
+
+if(pass.length>5) strength++
+if(pass.match(/[A-Z]/)) strength++
+if(pass.match(/[0-9]/)) strength++
+if(pass.match(/[^A-Za-z0-9]/)) strength++
+
+const width=[0,25,50,75,100]
+const colors=["red","orange","yellow","blue","green"]
+
+bar.style.width=width[strength]+"%"
+bar.style.background=colors[strength]
+
+}
+
+
+/* register validation */
+
+registerForm.onsubmit=(e)=>{
+
+const pass=document.getElementById("regPass").value
+const confirm=document.getElementById("confirmPass").value
+const error=document.getElementById("passError")
+
+if(pass!==confirm){
+e.preventDefault()
+error.style.display="block"
+}else{
+showPopup("Registration Successful")
+}
+
+}
+
+
+/* login */
+
+loginForm.onsubmit=(e)=>{
+showPopup("Login Successful")
+}
+
+
+/* popup */
+
+function showPopup(text){
+
+const popup=document.getElementById("popup")
+popup.innerText=text
+popup.classList.add("show")
+
+setTimeout(()=>{
+popup.classList.remove("show")
+},3000)
+
+}
+
 </script>
 
 </body>
