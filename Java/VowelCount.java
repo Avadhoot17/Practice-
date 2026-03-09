@@ -17,7 +17,7 @@ public class VowelCount {
             }
         }
 
-        System.out.println("Number of vowels: " + count);
+        System.out.println("Number  of  vowels: " + count);
 
         sc.close();
     }
