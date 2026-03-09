@@ -3,7 +3,7 @@ import java.util.*;
 
 public class FastIO {
 
-    /* ---------------- FAST SCANNER ---------------- */
+    /* ---------------- FAST SCANNER ---------------- */   
 
     static class FastScanner {
 
