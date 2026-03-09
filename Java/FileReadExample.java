@@ -42,9 +42,9 @@ public class FileReadExample {
             }
 
             System.out.println("\n----- File Statistics -----");
-            System.out.println("Total Lines      : " + lineCount);
-            System.out.println("Total Words      : " + wordCount);
-            System.out.println("Total Characters : " + charCount);
+            System.out.println("Total Lines       : " + lineCount);
+            System.out.println("Total Words       : " + wordCount);
+            System.out.println("Total Characters  : " + charCount);
 
         } catch (IOException e) {
             System.out.println("Error reading file: " + e.getMessage());
