@@ -10,7 +10,7 @@ public class Main {
 
         int t = Integer.parseInt(br.readLine());
 
-        while (t-- > 0) {
+        while (t-- > 0) {  
 
             st = new StringTokenizer(br.readLine());
 
