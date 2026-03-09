@@ -32,12 +32,12 @@ public class AutoRunMethods {
 
         TaskRunner obj = new TaskRunner();
 
-        // Get all methods using reflection
+        // Get all methods using reflection in java
         Method[] methods = obj.getClass().getDeclaredMethods();
 
         for (Method method : methods) {
 
-            // Check if method has @AutoRun annotation
+            // Check if method has @AutoRun annotation in java
             if (method.isAnnotationPresent(AutoRun.class)) {
 
                 System.out.println("Executing: " + method.getName());
