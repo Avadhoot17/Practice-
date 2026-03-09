@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 public class CaptionGenerator {
 
-    // Caption building blocks
+    // Caption building blocks in java
     static String[] starters = {
         "Some momments",
         "This phase",
