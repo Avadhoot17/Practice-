@@ -1,0 +1,43 @@
+import java.util.PriorityQueue;
+
+class ListNode {
+
+    int val;
+    ListNode next;
+
+    ListNode(int val){
+        this.val = val;
+    }
+}
+
+public class MergeKLists {
+
+    public static ListNode mergeKLists(ListNode[] lists) {
+
+        PriorityQueue<ListNode> pq = new PriorityQueue<>((a,b) -> a.val - b.val);
+
+        for(ListNode node : lists) {
+            if(node != null) pq.add(node);
+        }
+
+        ListNode dummy = new ListNode(0);
+        ListNode current = dummy;
+
+        while(!pq.isEmpty()) {
+
+            ListNode node = pq.poll();
+            current.next = node;
+            current = current.next;
+
+            if(node.next != null)
+                pq.add(node.next);
+        }
+
+        return dummy.next;
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println("Merged Successfully");
+    }
+}
