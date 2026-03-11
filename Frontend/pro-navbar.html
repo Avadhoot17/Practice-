@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Website Navbar</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+background:#f5f5f5;
+}
+
+header{
+position:sticky;
+top:0;
+background:#111;
+z-index:1000;
+}
+
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 40px;
+}
+
+.logo{
+color:white;
+font-size:22px;
+font-weight:bold;
+}
+
+.nav-links{
+display:flex;
+list-style:none;
+}
+
+.nav-links li{
+position:relative;
+}
+
+.nav-links a{
+color:white;
+text-decoration:none;
+padding:10px 15px;
+display:block;
+}
+
+.nav-links a:hover{
+background:#333;
+border-radius:5px;
+}
+
+/* dropdown */
+
+.dropdown{
+display:none;
+position:absolute;
+background:#222;
+top:40px;
+min-width:150px;
+}
+
+.dropdown a{
+padding:10px;
+}
+
+.nav-links li:hover .dropdown{
+display:block;
+}
+
+/* search */
+
+.search-box input{
+padding:6px 10px;
+border:none;
+border-radius:4px;
+}
+
+/* toggle button */
+
+.toggle{
+color:white;
+font-size:22px;
+cursor:pointer;
+display:none;
+}
+
+/* dark mode */
+
+.dark{
+background:#111;
+color:white;
+}
+
+/* responsive */
+
+@media(max-width:768px){
+
+.nav-links{
+position:absolute;
+top:60px;
+left:0;
+background:#111;
+width:100%;
+flex-direction:column;
+display:none;
+}
+
+.nav-links.show{
+display:flex;
+}
+
+.toggle{
+display:block;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="navbar">
+
+<div class="logo">MySite</div>
+
+<div class="toggle" onclick="toggleMenu()">☰</div>
+
+<ul class="nav-links" id="menu">
+
+<li><a href="#" class="active">Home</a></li>
+
+<li>
+<a href="#">Services ▾</a>
+
+<div class="dropdown">
+<a href="#">Web Design</a>
+<a href="#">Development</a>
+<a href="#">SEO</a>
+</div>
+
+</li>
+
+<li><a href="#">Projects</a></li>
+<li><a href="#">About</a></li>
+<li><a href="#">Contact</a></li>
+
+</ul>
+
+<div class="search-box">
+<input type="text" placeholder="Search">
+</div>
+
+<button onclick="darkMode()">🌙</button>
+
+</div>
+
+</header>
+
+<section style="padding:40px;height:2000px">
+<h2>Scroll Page</h2>
+<p>This navbar is sticky, responsive and feature rich.</p>
+</section>
+
+<script>
+
+function toggleMenu(){
+document.getElementById("menu").classList.toggle("show");
+}
+
+function darkMode(){
+document.body.classList.toggle("dark");
+}
+
+</script>
+
+</body>
+</html>
