@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Responsive Navbar</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+}
+
+.navbar{
+background:#222;
+padding:15px;
+}
+
+.navbar a{
+color:white;
+text-decoration:none;
+margin:15px;
+font-size:18px;
+}
+
+.menu{
+display:flex;
+}
+
+.menu-btn{
+display:none;
+font-size:25px;
+color:white;
+cursor:pointer;
+}
+
+@media(max-width:768px){
+
+.menu{
+display:none;
+flex-direction:column;
+}
+
+.menu.show{
+display:flex;
+}
+
+.menu-btn{
+display:block;
+}
+
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="navbar">
+
+<span class="menu-btn" onclick="toggleMenu()">☰</span>
+
+<div class="menu" id="menu">
+<a href="#">Home</a>
+<a href="#">About</a>
+<a href="#">Services</a>
+<a href="#">Contact</a>
+</div>
+
+</div>
+
+<script>
+function toggleMenu(){
+document.getElementById("menu").classList.toggle("show");
+}
+</script>
+
+</body>
+</html>
