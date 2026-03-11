@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Floating Navbar</title>
+
+<style>
+
+body{
+margin:0;
+height:2000px;
+font-family:Arial;
+background:#f0f2f5;
+}
+
+.navbar{
+position:fixed;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+display:flex;
+gap:40px;
+
+background:white;
+padding:15px 35px;
+border-radius:50px;
+
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+.navbar a{
+text-decoration:none;
+color:#444;
+font-size:20px;
+transition:0.3s;
+}
+
+.navbar a:hover{
+transform:translateY(-5px);
+color:#0077ff;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+<a href="#">🏠</a>
+<a href="#">🔍</a>
+<a href="#">➕</a>
+<a href="#">❤️</a>
+<a href="#">👤</a>
+</div>
+
+</body>
+</html>
