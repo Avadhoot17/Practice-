@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ledger — Finance Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #f0ebe3;
+    --bg2: #fffdf9;
+    --text: #1c1916;
+    --muted: #8a8278;
+    --border: rgba(28,25,22,0.1);
+    --green: #2d6a4f;
+    --green-bg: #d8f3dc;
+    --red: #9b2335;
+    --red-bg: #fde8e8;
+    --accent: #c07a3a;
+    --accent-bg: #fdf0e0;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--text);
+    color: var(--bg);
+    padding: 36px 24px;
+    display: flex; flex-direction: column;
+    gap: 48px;
+  }
+
+  .brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    letter-spacing: -0.5px;
+  }
+
+  .brand em { font-style: italic; opacity: 0.5; }
+
+  .nav { display: flex; flex-direction: column; gap: 4px; }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(240,235,227,0.6);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.2px;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: var(--bg); }
+  .nav-item.active { background: rgba(255,255,255,0.12); color: var(--bg); font-weight: 500; }
+
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 16px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 12px;
+  }
+
+  .user-name { font-size: 14px; font-weight: 500; color: var(--bg); }
+  .user-sub { font-size: 11px; color: rgba(240,235,227,0.4); letter-spacing: 0.5px; margin-top: 2px; }
+
+  /* Main content */
+  .main {
+    padding: 40px 48px;
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 32px;
+  }
+
+  .page-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .page-title em { font-style: italic; color: var(--muted); }
+
+  .month-select {
+    display: flex; gap: 6px;
+  }
+
+  .month-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    border-radius: 100px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .month-btn.active, .month-btn:hover { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+  /* Cards row */
+  .cards-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  .card {
+    background: var(--bg2);
+    border-radius: 20px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(28,25,22,0.08); }
+
+  .card-label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .card-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: -1px;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .card-delta {
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+
+  .card-delta.up   { background: var(--green-bg); color: var(--green); }
+  .card-delta.down { background: var(--red-bg);   color: var(--red); }
+
+  .card.accent { background: var(--text); }
+  .card.accent .card-label { color: rgba(240,235,227,0.5); }
+  .card.accent .card-value { color: var(--bg); }
+
+  /* Mid row */
+  .mid-row { display: grid; grid-template-columns: 1fr 340px; gap: 16px; }
+
+  /* Chart card */
+  .chart-card {
+    background: var(--bg2);
+    border-radius: 20px;
+    padding: 28px;
+    border: 1px solid var(--border);
+  }
+
+  .chart-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 400;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+
+  .chart-wrap { position: relative; height: 200px; }
+
+  canvas { border-radius: 8px; }
+
+  /* Spending breakdown */
+  .breakdown-card {
+    background: var(--bg2);
+    border-radius: 20px;
+    padding: 28px;
+    border: 1px solid var(--border);
+  }
+
+  .breakdown-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 400;
+    margin-bottom: 20px;
+  }
+
+  .cat-row {
+    display: flex; flex-direction: column; gap: 14px;
+  }
+
+  .cat-item { display: flex; flex-direction: column; gap: 6px; }
+
+  .cat-header {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .cat-name { font-size: 13px; font-weight: 500; }
+  .cat-amt  { font-size: 13px; color: var(--muted); }
+
+  .cat-bar-bg {
+    height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden;
+  }
+
+  .cat-bar {
+    height: 100%; border-radius: 3px;
+    transition: width 1s cubic-bezier(0.34,1.2,0.64,1);
+  }
+
+  /* Transactions */
+  .tx-card {
+    background: var(--bg2);
+    border-radius: 20px;
+    padding: 28px;
+    border: 1px solid var(--border);
+  }
+
+  .tx-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .tx-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 400;
+  }
+
+  .see-all {
+    font-size: 12px; color: var(--accent); font-weight: 500;
+    cursor: pointer; letter-spacing: 0.5px;
+  }
+
+  .tx-list { display: flex; flex-direction: column; gap: 0; }
+
+  .tx-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.1s;
+    border-radius: 8px;
+    margin: 0 -8px;
+    padding-left: 8px; padding-right: 8px;
+  }
+
+  .tx-item:hover { background: var(--bg); }
+  .tx-item:last-child { border-bottom: none; }
+
+  .tx-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+
+  .tx-info { flex: 1; }
+  .tx-name { font-size: 14px; font-weight: 500; }
+  .tx-cat  { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; margin-top: 1px; }
+
+  .tx-right { text-align: right; }
+  .tx-amount { font-size: 15px; font-weight: 600; font-family: 'Playfair Display', serif; }
+  .tx-amount.neg { color: var(--red); }
+  .tx-amount.pos { color: var(--green); }
+  .tx-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">Ledger<em>.</em></div>
+    <nav class="nav">
+      <div class="nav-item active"><span class="nav-icon">◈</span> Overview</div>
+      <div class="nav-item"><span class="nav-icon">↕</span> Transactions</div>
+      <div class="nav-item"><span class="nav-icon">◎</span> Budget</div>
+      <div class="nav-item"><span class="nav-icon">⬡</span> Investments</div>
+      <div class="nav-item"><span class="nav-icon">◇</span> Goals</div>
+      <div class="nav-item"><span class="nav-icon">⚙</span> Settings</div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-name">Alex Morgan</div>
+      <div class="user-sub">Personal · Premium</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-header">
+      <div class="page-title">Good morning,<br><em>Alex.</em></div>
+      <div class="month-select">
+        <button class="month-btn">Jan</button>
+        <button class="month-btn">Feb</button>
+        <button class="month-btn active">Mar</button>
+        <button class="month-btn">Apr</button>
+      </div>
+    </div>
+
+    <div class="cards-row">
+      <div class="card accent">
+        <div class="card-label">Net Worth</div>
+        <div class="card-value">$84,320</div>
+        <div class="card-delta up">↑ 3.2% this month</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Monthly Income</div>
+        <div class="card-value">$6,200</div>
+        <div class="card-delta up">↑ $400 vs Feb</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Monthly Spend</div>
+        <div class="card-value">$3,847</div>
+        <div class="card-delta down">↑ $212 vs Feb</div>
+      </div>
+    </div>
+
+    <div class="mid-row">
+      <div class="chart-card">
+        <h3>Cash flow — March 2026</h3>
+        <div class="chart-wrap"><canvas id="cashChart"></canvas></div>
+      </div>
+      <div class="breakdown-card">
+        <h3>Spending</h3>
+        <div class="cat-row" id="catRow"></div>
+      </div>
+    </div>
+
+    <div class="tx-card">
+      <div class="tx-header">
+        <h3>Recent transactions</h3>
+        <span class="see-all">See all →</span>
+      </div>
+      <div class="tx-list" id="txList"></div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// Cash flow chart
+new Chart(document.getElementById('cashChart'), {
+  type: 'bar',
+  data: {
+    labels: ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19'],
+    datasets: [
+      {
+        label: 'Income',
+        data: [0,0,0,6200,0,0,0,0,0,0,0,0,0,0,400,0,0,0,0],
+        backgroundColor: 'rgba(45,106,79,0.7)',
+        borderRadius: 4,
+      },
+      {
+        label: 'Expenses',
+        data: [-120,-85,0,-230,-410,-0,-95,0,-180,-0,-330,-45,-90,0,-220,-180,-60,-400,-102],
+        backgroundColor: 'rgba(155,35,53,0.55)',
+        borderRadius: 4,
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 10, family: 'Outfit' }, color: '#8a8278' } },
+      y: { grid: { color: 'rgba(28,25,22,0.06)' }, ticks: { font: { size: 10, family: 'Outfit' }, color: '#8a8278', callback: v => '$' + Math.abs(v) } }
+    }
+  }
+});
+
+// Categories
+const cats = [
+  { name: 'Housing', amt: 1400, pct: 36, color: '#1c1916' },
+  { name: 'Food & Dining', amt: 820, pct: 21, color: '#c07a3a' },
+  { name: 'Transport', amt: 490, pct: 13, color: '#2d6a4f' },
+  { name: 'Entertainment', amt: 340, pct: 9, color: '#6d4c8c' },
+  { name: 'Shopping', amt: 520, pct: 14, color: '#1e6091' },
+  { name: 'Other', amt: 277, pct: 7, color: '#8a8278' },
+];
+const catRow = document.getElementById('catRow');
+cats.forEach(c => {
+  catRow.innerHTML += `
+    <div class="cat-item">
+      <div class="cat-header">
+        <span class="cat-name">${c.name}</span>
+        <span class="cat-amt">$${c.amt} · ${c.pct}%</span>
+      </div>
+      <div class="cat-bar-bg">
+        <div class="cat-bar" id="bar_${c.name}" style="width:0;background:${c.color}"></div>
+      </div>
+    </div>
+  `;
+});
+setTimeout(() => {
+  cats.forEach(c => {
+    document.getElementById('bar_' + c.name).style.width = c.pct + '%';
+  });
+}, 300);
+
+// Transactions
+const txns = [
+  { icon: '🏠', name: 'Rent — March', cat: 'Housing', amount: -1400, date: 'Mar 1', pos: false },
+  { icon: '💳', name: 'Salary deposit', cat: 'Income', amount: 6200, date: 'Mar 4', pos: true },
+  { icon: '🛒', name: 'Whole Foods Market', cat: 'Food & Dining', amount: -134, date: 'Mar 7', pos: false },
+  { icon: '⛽', name: 'Shell Gas Station', cat: 'Transport', amount: -68, date: 'Mar 9', pos: false },
+  { icon: '🎬', name: 'Netflix', cat: 'Entertainment', amount: -18, date: 'Mar 10', pos: false },
+  { icon: '🍕', name: 'Domino\'s Pizza', cat: 'Food & Dining', amount: -32, date: 'Mar 11', pos: false },
+  { icon: '💸', name: 'Freelance payment', cat: 'Income', amount: 400, date: 'Mar 14', pos: true },
+  { icon: '📦', name: 'Amazon order', cat: 'Shopping', amount: -89, date: 'Mar 15', pos: false },
+];
+
+const bgColors = ['#fdf0e0','#d8f3dc','#fde8e8','#e8eeff','#f3e8ff','#e8f8ff'];
+const txList = document.getElementById('txList');
+txns.forEach((t, i) => {
+  const div = document.createElement('div');
+  div.className = 'tx-item';
+  div.innerHTML = `
+    <div class="tx-icon" style="background:${bgColors[i % bgColors.length]}">${t.icon}</div>
+    <div class="tx-info">
+      <div class="tx-name">${t.name}</div>
+      <div class="tx-cat">${t.cat.toUpperCase()}</div>
+    </div>
+    <div class="tx-right">
+      <div class="tx-amount ${t.pos ? 'pos' : 'neg'}">${t.pos ? '+' : ''}$${Math.abs(t.amount).toLocaleString()}</div>
+      <div class="tx-date">${t.date}</div>
+    </div>
+  `;
+  txList.appendChild(div);
+});
+</script>
+</body>
+</html>
