@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Particle Clock</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Cinzel:wght@400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --cream: #f5efe0;
+    --bg: #080806;
+    --bg2: #0f0e0a;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: none;
+  }
+
+  canvas#bg { position: fixed; inset: 0; z-index: 0; }
+
+  .cursor {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+    position: fixed;
+    pointer-events: none;
+    z-index: 998;
+    transform: translate(-50%, -50%);
+    transition: all 0.18s ease;
+    opacity: 0.5;
+  }
+
+  .wrapper {
+    position: relative; z-index: 10;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 0;
+  }
+
+  .label-top {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 6px;
+    color: var(--gold);
+    opacity: 0.7;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+
+  .clock-ring {
+    position: relative;
+    width: 340px; height: 340px;
+  }
+
+  canvas#clock {
+    position: absolute; inset: 0;
+  }
+
+  .time-display {
+    position: absolute;
+    inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 6px;
+  }
+
+  .time-main {
+    font-size: 68px;
+    font-weight: 300;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: var(--cream);
+    text-shadow: 0 0 40px rgba(201,168,76,0.3);
+  }
+
+  .time-seconds {
+    font-size: 16px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: var(--gold);
+    opacity: 0.8;
+  }
+
+  .date-display {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--cream);
+    opacity: 0.4;
+    font-weight: 300;
+    margin-top: 28px;
+    text-transform: uppercase;
+  }
+
+  .divider {
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 16px 0;
+    opacity: 0.5;
+  }
+
+  .timezone {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 5px;
+    color: var(--gold);
+    opacity: 0.45;
+  }
+
+  .corner {
+    position: fixed;
+    width: 40px; height: 40px;
+    opacity: 0.25;
+  }
+  .corner::before, .corner::after {
+    content: '';
+    position: absolute;
+    background: var(--gold);
+  }
+  .corner::before { width: 1px; height: 100%; }
+  .corner::after  { width: 100%; height: 1px; }
+  .corner.tl { top: 32px; left: 32px; }
+  .corner.tr { top: 32px; right: 32px; transform: scaleX(-1); }
+  .corner.bl { bottom: 32px; left: 32px; transform: scaleY(-1); }
+  .corner.br { bottom: 32px; right: 32px; transform: scale(-1); }
+</style>
+</head>
+<body>
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="ring"></div>
+<canvas id="bg"></canvas>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="wrapper">
+  <div class="label-top">Tempus Fugit</div>
+  <div class="clock-ring">
+    <canvas id="clock" width="340" height="340"></canvas>
+    <div class="time-display">
+      <div class="time-main" id="hm">00:00</div>
+      <div class="time-seconds" id="sec">00</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="date-display" id="date"></div>
+  <div class="divider"></div>
+  <div class="timezone" id="tz"></div>
+</div>
+
+<script>
+// Custom cursor
+const cur = document.getElementById('cur');
+const ring = document.getElementById('ring');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px';
+  setTimeout(() => { ring.style.left = e.clientX + 'px'; ring.style.top = e.clientY + 'px'; }, 60);
+});
+
+// Background particles
+const bgCanvas = document.getElementById('bg');
+const bctx = bgCanvas.getContext('2d');
+let W, H, particles = [];
+
+function resize() {
+  W = bgCanvas.width = innerWidth;
+  H = bgCanvas.height = innerHeight;
+  particles = Array.from({length: 80}, () => ({
+    x: Math.random() * W, y: Math.random() * H,
+    r: Math.random() * 1.2 + 0.2,
+    vx: (Math.random() - 0.5) * 0.15,
+    vy: (Math.random() - 0.5) * 0.15,
+    a: Math.random()
+  }));
+}
+resize(); window.addEventListener('resize', resize);
+
+function drawBg() {
+  bctx.clearRect(0, 0, W, H);
+  // Subtle radial glow center
+  const grd = bctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, H * 0.7);
+  grd.addColorStop(0, 'rgba(201,168,76,0.04)');
+  grd.addColorStop(1, 'rgba(0,0,0,0)');
+  bctx.fillStyle = grd;
+  bctx.fillRect(0, 0, W, H);
+
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+    if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+    bctx.beginPath();
+    bctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    bctx.fillStyle = `rgba(201,168,76,${p.a * 0.4})`;
+    bctx.fill();
+  });
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+
+// Clock face
+const clockCanvas = document.getElementById('clock');
+const ctx = clockCanvas.getContext('2d');
+const cx = 170, cy = 170, R = 155;
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+function drawClock() {
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds(), ms = now.getMilliseconds();
+  const smooth_s = s + ms / 1000;
+  const smooth_m = m + smooth_s / 60;
+  const smooth_h = (h % 12) + smooth_m / 60;
+
+  ctx.clearRect(0, 0, 340, 340);
+
+  // Outer ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(201,168,76,0.15)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Inner ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, R - 12, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(201,168,76,0.07)';
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
+
+  // Tick marks
+  for (let i = 0; i < 60; i++) {
+    const angle = (i / 60) * Math.PI * 2 - Math.PI / 2;
+    const isMajor = i % 5 === 0;
+    const inner = R - (isMajor ? 18 : 10);
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(angle) * inner, cy + Math.sin(angle) * inner);
+    ctx.lineTo(cx + Math.cos(angle) * (R - 2), cy + Math.sin(angle) * (R - 2));
+    ctx.strokeStyle = isMajor ? 'rgba(201,168,76,0.7)' : 'rgba(201,168,76,0.2)';
+    ctx.lineWidth = isMajor ? 1.5 : 0.5;
+    ctx.stroke();
+  }
+
+  // Second arc (progress)
+  ctx.beginPath();
+  ctx.arc(cx, cy, R - 6, -Math.PI/2, -Math.PI/2 + (smooth_s/60)*Math.PI*2);
+  ctx.strokeStyle = 'rgba(201,168,76,0.5)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Hour hand
+  drawHand(smooth_h / 12 * Math.PI * 2, R * 0.45, 2.5, 'rgba(245,239,224,0.9)');
+  // Minute hand
+  drawHand(smooth_m / 60 * Math.PI * 2, R * 0.65, 1.5, 'rgba(245,239,224,0.8)');
+  // Second hand
+  drawHand(smooth_s / 60 * Math.PI * 2, R * 0.75, 0.8, '#c9a84c');
+
+  // Center dot
+  ctx.beginPath();
+  ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+  ctx.fillStyle = '#c9a84c';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(cx, cy, 2, 0, Math.PI * 2);
+  ctx.fillStyle = '#f5efe0';
+  ctx.fill();
+
+  // Update DOM
+  document.getElementById('hm').textContent =
+    String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  document.getElementById('sec').textContent = String(s).padStart(2,'0');
+  document.getElementById('date').textContent =
+    DAYS[now.getDay()] + ', ' + MONTHS[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+  document.getElementById('tz').textContent =
+    Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  requestAnimationFrame(drawClock);
+}
+
+function drawHand(angle, length, width, color) {
+  const a = angle - Math.PI / 2;
+  ctx.beginPath();
+  ctx.moveTo(cx - Math.cos(a) * length * 0.2, cy - Math.sin(a) * length * 0.2);
+  ctx.lineTo(cx + Math.cos(a) * length, cy + Math.sin(a) * length);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+}
+
+drawClock();
+</script>
+</body>
+</html>
