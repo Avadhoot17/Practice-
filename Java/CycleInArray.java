@@ -12,8 +12,8 @@ public class AdvancedCycleDetector {
 
         if (result.hasCycle) {
             System.out.println("Cycle Detected ✅");
-            System.out.println("Cycle Start Index: " + result.startIndex);
-            System.out.println("Cycle Length: " + result.cycleLength);
+            System.out.println("The Cycle Start Index: " + result.startIndex);
+            System.out.println("The Cycle Length: " + result.cycleLength);
         } else {
             System.out.println("No Cycle ❌");
         }
