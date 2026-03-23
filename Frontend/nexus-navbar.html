@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus — Navbar</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #080a0f;
+  --surface: #0e1118;
+  --card: #13161f;
+  --border: rgba(255,255,255,0.07);
+  --border-hover: rgba(255,255,255,0.14);
+  --accent: #e8ff47;
+  --accent-dim: rgba(232,255,71,0.10);
+  --accent-glow: rgba(232,255,71,0.30);
+  --text: #f0f2f8;
+  --muted: #555b6e;
+  --muted2: #8891a5;
+  --success: #3dffa0;
+  --danger: #ff4f6a;
+  --nav-h: 68px;
+  --radius: 16px;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════
+   NAVBAR
+═══════════════════════════════════════ */
+#navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: var(--nav-h);
+  display: flex; align-items: center;
+  padding: 0 32px;
+  transition: background 0.4s var(--ease),
+              border-color 0.4s var(--ease),
+              box-shadow 0.4s var(--ease),
+              height 0.3s var(--ease);
+  border-bottom: 1px solid transparent;
+}
+#navbar.scrolled {
+  background: rgba(8,10,15,0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-color: var(--border);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  height: 60px;
+}
+
+.nav-inner {
+  width: 100%; max-width: 1280px;
+  margin: 0 auto;
+  display: flex; align-items: center; gap: 0;
+}
+
+/* ── LOGO ── */
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; flex-shrink: 0;
+  margin-right: 48px;
+}
+.nav-logo-mark {
+  width: 34px; height: 34px;
+  background: var(--accent);
+  border-radius: 9px;
+  display: grid; place-items: center;
+  transition: transform 0.3s var(--spring), box-shadow 0.3s;
+}
+.nav-logo:hover .nav-logo-mark {
+  transform: rotate(-8deg) scale(1.08);
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+.nav-logo-mark svg { width: 18px; height: 18px; }
+.nav-logo-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px; letter-spacing: 2.5px;
+  color: var(--text);
+}
+
+/* ── PRIMARY LINKS ── */
+.nav-links {
+  display: flex; align-items: center; gap: 2px;
+  flex: 1;
+  list-style: none;
+}
+.nav-item { position: relative; }
+
+.nav-link {
+  display: flex; align-items: center; gap: 5px;
+  padding: 8px 14px;
+  font-size: 14px; font-weight: 500;
+  color: var(--muted2);
+  text-decoration: none;
+  border-radius: 9px;
+  transition: color 0.2s, background 0.2s;
+  white-space: nowrap;
+  cursor: pointer; border: none; background: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.nav-link svg { transition: transform 0.25s var(--ease); }
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-link.active { color: var(--text); }
+.nav-link.has-dropdown:hover svg,
+.nav-link.has-dropdown.open svg { transform: rotate(180deg); }
+
+/* active dot */
+.nav-item.active .nav-link::after {
+  content: '';
+  position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+}
+
+/* ── MEGA DROPDOWN ── */
+.dropdown {
+  position: absolute; top: calc(100% + 10px); left: 50%;
+  transform: translateX(-50%) translateY(-8px) scale(0.97);
+  opacity: 0; pointer-events: none;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03) inset;
+  transition: opacity 0.22s var(--ease), transform 0.22s var(--ease);
+  min-width: 520px;
+  overflow: hidden;
+}
+.nav-item:hover .dropdown,
+.nav-item.open .dropdown {
+  opacity: 1; pointer-events: all;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.dropdown-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+}
+.dropdown-col {
+  background: var(--card);
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.dropdown-heading {
+  font-size: 10px; font-weight: 600; letter-spacing: 1.2px;
+  color: var(--muted); text-transform: uppercase;
+  padding: 4px 10px 8px;
+}
+.dropdown-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+.dropdown-item:hover { background: rgba(255,255,255,0.05); }
+.dropdown-item:hover .di-icon { border-color: var(--accent); background: var(--accent-dim); }
+.dropdown-item:hover .di-icon svg { color: var(--accent); }
+.di-icon {
+  width: 36px; height: 36px; flex-shrink: 0;
+  background: var(--input-bg, rgba(255,255,255,0.04));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid; place-items: center;
+  transition: all 0.2s;
+}
+.di-icon svg { color: var(--muted2); transition: color 0.2s; }
+.di-body { flex: 1; min-width: 0; }
+.di-title { font-size: 13.5px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.di-desc  { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+/* dropdown footer */
+.dropdown-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.015);
+}
+.dropdown-footer-tag {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--muted);
+}
+.tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 6px var(--success); }
+.dropdown-footer-link {
+  font-size: 12px; color: var(--accent); text-decoration: none;
+  display: flex; align-items: center; gap: 4px;
+  transition: gap 0.2s;
+}
+.dropdown-footer-link:hover { gap: 7px; }
+
+/* simple dropdown */
+.dropdown-simple {
+  position: absolute; top: calc(100% + 10px); left: 50%;
+  transform: translateX(-50%) translateY(-8px) scale(0.97);
+  opacity: 0; pointer-events: none;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  transition: opacity 0.22s var(--ease), transform 0.22s var(--ease);
+  min-width: 200px;
+  padding: 8px;
+  overflow: hidden;
+}
+.nav-item:hover .dropdown-simple,
+.nav-item.open .dropdown-simple {
+  opacity: 1; pointer-events: all;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+.ds-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 8px;
+  font-size: 13.5px; color: var(--muted2);
+  cursor: pointer; text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.ds-item:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+.ds-item svg { color: var(--muted); transition: color 0.15s; }
+.ds-item:hover svg { color: var(--accent); }
+
+/* ── SEARCH ── */
+.nav-search {
+  position: relative; margin: 0 16px 0 auto;
+}
+.search-trigger {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+.search-trigger:hover { border-color: var(--border-hover); background: rgba(255,255,255,0.06); color: var(--muted2); }
+.search-trigger kbd {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  padding: 2px 5px; color: var(--muted);
+}
+
+/* Search overlay */
+.search-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding-top: 120px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.search-overlay.open { opacity: 1; pointer-events: all; }
+.search-box {
+  width: 100%; max-width: 580px;
+  background: var(--card);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  overflow: hidden;
+  transform: translateY(-16px) scale(0.98);
+  transition: transform 0.25s var(--spring);
+}
+.search-overlay.open .search-box { transform: translateY(0) scale(1); }
+.search-input-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.search-input-row svg { color: var(--muted); flex-shrink: 0; }
+.search-input {
+  flex: 1; background: none; border: none; outline: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px; color: var(--text);
+  caret-color: var(--accent);
+}
+.search-input::placeholder { color: var(--muted); }
+.search-close {
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--muted);
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  padding: 3px 7px; cursor: pointer;
+  transition: all 0.15s;
+}
+.search-close:hover { color: var(--text); border-color: var(--border-hover); }
+.search-results {
+  padding: 12px 8px;
+  max-height: 340px; overflow-y: auto;
+}
+.search-section { padding: 4px 12px 8px; font-size: 11px; font-weight: 600; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
+.search-result-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 9px;
+  cursor: pointer; transition: background 0.15s;
+}
+.search-result-item:hover, .search-result-item.selected { background: rgba(255,255,255,0.06); }
+.search-result-item.selected .sri-title { color: var(--accent); }
+.sri-icon {
+  width: 32px; height: 32px; flex-shrink: 0;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 7px; display: grid; place-items: center;
+}
+.sri-icon svg { color: var(--muted2); }
+.sri-title { font-size: 13.5px; font-weight: 500; color: var(--text); }
+.sri-meta  { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+.search-footer {
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 16px;
+  background: rgba(255,255,255,0.015);
+}
+.sf-hint { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--muted); }
+.sf-hint kbd {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px; padding: 2px 5px;
+}
+
+/* ── NOTIFICATION BELL ── */
+.nav-bell {
+  position: relative;
+  width: 38px; height: 38px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  display: grid; place-items: center;
+  cursor: pointer; flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s;
+  margin-right: 10px;
+}
+.nav-bell:hover { border-color: var(--border-hover); background: rgba(255,255,255,0.07); }
+.nav-bell svg { color: var(--muted2); transition: color 0.2s; }
+.nav-bell:hover svg { color: var(--text); }
+.bell-badge {
+  position: absolute; top: 6px; right: 7px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+  border: 2px solid var(--card);
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+@keyframes pulse-badge {
+  0%,100% { box-shadow: 0 0 6px var(--accent-glow); }
+  50%      { box-shadow: 0 0 14px var(--accent-glow); }
+}
+
+/* notif panel */
+.notif-panel {
+  position: absolute; top: calc(100% + 12px); right: -8px;
+  width: 340px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  opacity: 0; pointer-events: none;
+  transform: translateY(-10px) scale(0.97);
+  transition: opacity 0.22s var(--ease), transform 0.22s var(--ease);
+  overflow: hidden;
+}
+.nav-bell.open .notif-panel {
+  opacity: 1; pointer-events: all;
+  transform: translateY(0) scale(1);
+}
+.notif-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.notif-header h4 { font-size: 13.5px; font-weight: 600; }
+.notif-mark { font-size: 12px; color: var(--accent); cursor: pointer; }
+.notif-mark:hover { text-decoration: underline; }
+.notif-list { padding: 8px; max-height: 260px; overflow-y: auto; }
+.notif-item {
+  display: flex; gap: 12px; padding: 10px; border-radius: 9px;
+  cursor: pointer; transition: background 0.15s;
+  position: relative;
+}
+.notif-item:hover { background: rgba(255,255,255,0.05); }
+.notif-item.unread::before {
+  content: '';
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 5px var(--accent);
+}
+.notif-item.unread { padding-left: 22px; }
+.ni-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  flex-shrink: 0; display: grid; place-items: center;
+  font-size: 14px; font-weight: 600;
+}
+.ni-body { flex: 1; }
+.ni-msg  { font-size: 12.5px; color: var(--text); line-height: 1.4; }
+.ni-msg strong { color: var(--text); }
+.ni-time { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.notif-footer {
+  padding: 10px 18px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  background: rgba(255,255,255,0.015);
+}
+.notif-footer a { font-size: 12.5px; color: var(--muted2); text-decoration: none; }
+.notif-footer a:hover { color: var(--accent); }
+
+/* ── AVATAR/USER MENU ── */
+.nav-user {
+  position: relative;
+  display: flex; align-items: center; gap: 9px;
+  padding: 5px 8px 5px 5px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer; flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s;
+}
+.nav-user:hover { border-color: var(--border-hover); background: rgba(255,255,255,0.07); }
+.user-avatar {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: linear-gradient(135deg, #e8ff47, #3dffa0);
+  display: grid; place-items: center;
+  font-size: 11px; font-weight: 700; color: #080a0f;
+  flex-shrink: 0;
+}
+.user-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.user-role { font-size: 11px; color: var(--muted); }
+.user-caret { color: var(--muted); transition: transform 0.25s var(--ease); margin-left: 2px; }
+.nav-user.open .user-caret { transform: rotate(180deg); }
+
+.user-menu {
+  position: absolute; top: calc(100% + 10px); right: 0;
+  width: 220px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  overflow: hidden;
+  opacity: 0; pointer-events: none;
+  transform: translateY(-10px) scale(0.97);
+  transition: opacity 0.22s var(--ease), transform 0.22s var(--ease);
+}
+.nav-user.open .user-menu {
+  opacity: 1; pointer-events: all;
+  transform: translateY(0) scale(1);
+}
+.user-menu-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.umh-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.umh-email { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.user-menu-body { padding: 6px; }
+.um-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 8px;
+  font-size: 13.5px; color: var(--muted2);
+  cursor: pointer; text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.um-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+.um-item svg { color: var(--muted); flex-shrink: 0; transition: color 0.15s; }
+.um-item:hover svg { color: var(--accent); }
+.um-item.danger { color: var(--danger); }
+.um-item.danger svg { color: var(--danger); opacity: 0.7; }
+.um-item.danger:hover { background: rgba(255,79,106,0.08); }
+.um-divider { height: 1px; background: var(--border); margin: 6px 0; }
+.um-badge {
+  margin-left: auto;
+  background: var(--accent-dim); color: var(--accent);
+  font-size: 10px; font-weight: 600; letter-spacing: 0.4px;
+  padding: 2px 7px; border-radius: 20px;
+}
+
+/* ── MOBILE HAMBURGER ── */
+.nav-hamburger {
+  display: none;
+  flex-direction: column; gap: 5px;
+  background: none; border: none; cursor: pointer;
+  padding: 8px; margin-left: auto;
+}
+.ham-line {
+  width: 22px; height: 2px; border-radius: 2px;
+  background: var(--text);
+  transition: transform 0.3s var(--ease), opacity 0.3s, width 0.3s var(--ease);
+  transform-origin: center;
+}
+.nav-hamburger.open .ham-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open .ham-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav-hamburger.open .ham-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* mobile drawer */
+.mobile-drawer {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg); z-index: 99;
+  padding: 90px 24px 40px;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.35s var(--ease);
+}
+.mobile-drawer.open { transform: translateX(0); }
+.mob-section { margin-bottom: 32px; }
+.mob-section-title { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; padding: 0 4px; }
+.mob-link {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 10px; border-radius: 10px;
+  font-size: 15px; font-weight: 500; color: var(--muted2);
+  cursor: pointer; text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.mob-link:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+.mob-link svg { color: var(--muted); }
+.mob-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+.mob-btn-secondary {
+  width: 100%; padding: 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 500; color: var(--text);
+  cursor: pointer; transition: background 0.2s;
+}
+.mob-btn-secondary:hover { background: rgba(255,255,255,0.08); }
+.mob-btn-primary {
+  width: 100%; padding: 14px;
+  background: var(--accent); color: #080a0f;
+  border: none; border-radius: 11px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.mob-btn-primary:hover { box-shadow: 0 6px 24px var(--accent-glow); }
+
+/* ── CTA BUTTONS ── */
+.nav-cta {
+  display: flex; align-items: center; gap: 8px;
+  flex-shrink: 0;
+}
+.btn-ghost {
+  padding: 8px 16px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px; font-weight: 500; color: var(--muted2);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.btn-ghost:hover { border-color: var(--border-hover); color: var(--text); background: rgba(255,255,255,0.04); }
+.btn-accent {
+  padding: 8px 18px;
+  background: var(--accent); color: #080a0f;
+  border: none; border-radius: 9px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px; font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.btn-accent:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--accent-glow); }
+.btn-accent:active { transform: translateY(0); }
+
+/* ── PROGRESS BAR ── */
+#progress-bar {
+  position: fixed; top: 0; left: 0; z-index: 101;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), #3dffa0);
+  box-shadow: 0 0 10px var(--accent-glow);
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+/* ── ANNOUNCEMENT STRIP ── */
+.announcement {
+  background: var(--accent-dim);
+  border-bottom: 1px solid rgba(232,255,71,0.15);
+  padding: 8px 20px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-size: 13px; color: var(--text);
+  position: fixed; top: 0; left: 0; right: 0; z-index: 99;
+  transition: transform 0.4s var(--ease);
+}
+.announcement.hidden { transform: translateY(-100%); }
+.ann-tag {
+  background: var(--accent); color: #080a0f;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+  padding: 2px 8px; border-radius: 20px;
+}
+.ann-close {
+  position: absolute; right: 16px;
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 18px; line-height: 1;
+  transition: color 0.15s;
+}
+.ann-close:hover { color: var(--text); }
+.ann-link { color: var(--accent); text-decoration: none; font-weight: 500; }
+.ann-link:hover { text-decoration: underline; }
+
+/* ═══════════════════════════════════════
+   DEMO PAGE CONTENT
+═══════════════════════════════════════ */
+#bg-canvas {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+}
+.page-content {
+  position: relative; z-index: 1;
+  padding-top: 130px;
+}
+.hero {
+  max-width: 900px; margin: 0 auto;
+  padding: 80px 32px 60px;
+  text-align: center;
+}
+.hero-label {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--accent-dim); border: 1px solid rgba(232,255,71,0.2);
+  border-radius: 20px; padding: 5px 14px;
+  font-size: 12px; font-weight: 500; color: var(--accent);
+  letter-spacing: 0.3px; margin-bottom: 28px;
+  animation: fadeUp 0.6s var(--ease) 0.1s both;
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 8vw, 96px); letter-spacing: 3px;
+  line-height: 0.95; color: var(--text); margin-bottom: 24px;
+  animation: fadeUp 0.6s var(--ease) 0.2s both;
+}
+.hero h1 span { color: var(--accent); }
+.hero p {
+  font-size: 17px; color: var(--muted2); max-width: 520px;
+  margin: 0 auto 40px; line-height: 1.65;
+  animation: fadeUp 0.6s var(--ease) 0.3s both;
+}
+.hero-btns {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  animation: fadeUp 0.6s var(--ease) 0.4s both;
+}
+.hero-primary {
+  padding: 14px 28px;
+  background: var(--accent); color: #080a0f;
+  border: none; border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.hero-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px var(--accent-glow); }
+.hero-secondary {
+  padding: 14px 28px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 500; color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.hero-secondary:hover { border-color: var(--border-hover); background: rgba(255,255,255,0.08); }
+
+/* scroll blocks */
+.demo-blocks {
+  max-width: 1200px; margin: 60px auto 0;
+  padding: 0 32px 120px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+}
+.demo-block {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 28px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.demo-block:hover { border-color: var(--border-hover); transform: translateY(-3px); }
+.db-tag {
+  display: inline-block;
+  font-size: 10px; font-weight: 600; letter-spacing: 1px;
+  text-transform: uppercase; padding: 4px 10px; border-radius: 20px;
+  margin-bottom: 16px;
+}
+.db-tag.green  { background: rgba(61,255,160,0.1);  color: var(--success); }
+.db-tag.yellow { background: var(--accent-dim);     color: var(--accent); }
+.db-tag.red    { background: rgba(255,79,106,0.1);  color: var(--danger); }
+.db-icon { width: 44px; height: 44px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; display: grid; place-items: center; margin-bottom: 16px; }
+.db-icon svg { color: var(--muted2); }
+.demo-block h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.demo-block p  { font-size: 13.5px; color: var(--muted2); line-height: 1.5; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .nav-links, .nav-search, .nav-bell, .nav-user, .nav-cta { display: none !important; }
+  .nav-hamburger { display: flex !important; }
+  .mobile-drawer { display: block; }
+  .demo-blocks { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .hero { padding: 60px 20px 40px; }
+  .hero-btns { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div id="progress-bar"></div>
+
+<!-- ANNOUNCEMENT STRIP -->
+<div class="announcement" id="ann" style="position:relative; z-index:102;">
+  <span class="ann-tag">NEW</span>
+  Nexus 2.0 is live — <a class="ann-link" href="#">See what's new →</a>
+  <button class="ann-close" onclick="dismissAnn()">×</button>
+</div>
+
+<!-- ═══ NAVBAR ═══ -->
+<nav id="navbar">
+  <div class="nav-inner">
+
+    <!-- LOGO -->
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-mark">
+        <svg viewBox="0 0 18 18" fill="none">
+          <path d="M9 2L15.5 6V12L9 16L2.5 12V6L9 2Z" fill="#080a0f"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">NEXUS</span>
+    </a>
+
+    <!-- PRIMARY LINKS -->
+    <ul class="nav-links">
+
+      <!-- Products (mega) -->
+      <li class="nav-item">
+        <button class="nav-link has-dropdown">
+          Products
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="dropdown">
+          <div class="dropdown-grid">
+            <div class="dropdown-col">
+              <p class="dropdown-heading">Platform</p>
+              <a class="dropdown-item" href="#">
+                <div class="di-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+                <div class="di-body"><p class="di-title">Dashboard</p><p class="di-desc">Real-time analytics & control center</p></div>
+              </a>
+              <a class="dropdown-item" href="#">
+                <div class="di-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                <div class="di-body"><p class="di-title">Deployments</p><p class="di-desc">Zero-downtime deploy pipelines</p></div>
+              </a>
+              <a class="dropdown-item" href="#">
+                <div class="di-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg></div>
+                <div class="di-body"><p class="di-title">Edge Network</p><p class="di-desc">Ultra-low latency global delivery</p></div>
+              </a>
+            </div>
+            <div class="dropdown-col">
+              <p class="dropdown-heading">Developer</p>
+              <a class="dropdown-item" href="#">
+                <div class="di-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+                <div class="di-body"><p class="di-title">API & SDK</p><p class="di-desc">Integrate with any stack in minutes</p></div>
+              </a>
+              <a class="dropdown-item" href="#">
+                <div class="di-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                <div class="di-body"><p class="di-title">Docs</p><p class="di-desc">Comprehensive guides & references</p></div>
+              </a>
+              <a class="dropdown-item" href="#">
+                <div class="di-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+                <div class="di-body"><p class="di-title">CLI Tools</p><p class="di-desc">Automate workflows from terminal</p></div>
+              </a>
+            </div>
+          </div>
+          <div class="dropdown-footer">
+            <div class="dropdown-footer-tag">
+              <span class="tag-dot"></span>
+              <span>All systems operational</span>
+            </div>
+            <a class="dropdown-footer-link" href="#">
+              View all products
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+      </li>
+
+      <!-- Solutions -->
+      <li class="nav-item">
+        <button class="nav-link has-dropdown">
+          Solutions
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="dropdown-simple">
+          <a class="ds-item" href="#">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+            Enterprise
+          </a>
+          <a class="ds-item" href="#">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg>
+            Startups
+          </a>
+          <a class="ds-item" href="#">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Developers
+          </a>
+          <a class="ds-item" href="#">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            Teams
+          </a>
+        </div>
+      </li>
+
+      <!-- Pricing (plain link) -->
+      <li class="nav-item active">
+        <a class="nav-link active" href="#">Pricing</a>
+      </li>
+
+      <!-- Resources -->
+      <li class="nav-item">
+        <button class="nav-link has-dropdown">
+          Resources
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="dropdown-simple">
+          <a class="ds-item" href="#">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+            Blog
+          </a>
+          <a class="ds-item" href="#">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            Changelog
+          </a>
+          <a class="ds-item" href="#">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            Community
+          </a>
+          <a class="ds-item" href="#">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+            Support
+          </a>
+        </div>
+      </li>
+
+    </ul>
+
+    <!-- SEARCH TRIGGER -->
+    <div class="nav-search">
+      <button class="search-trigger" onclick="openSearch()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        Search…
+        <kbd>⌘K</kbd>
+      </button>
+    </div>
+
+    <!-- BELL -->
+    <div class="nav-bell" id="bell" onclick="toggleBell()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span class="bell-badge"></span>
+      <div class="notif-panel">
+        <div class="notif-header">
+          <h4>Notifications</h4>
+          <span class="notif-mark">Mark all read</span>
+        </div>
+        <div class="notif-list">
+          <div class="notif-item unread">
+            <div class="ni-avatar" style="background:linear-gradient(135deg,#e8ff47,#3dffa0);color:#080a0f">JD</div>
+            <div class="ni-body">
+              <p class="ni-msg"><strong>Jordan</strong> deployed to production successfully</p>
+              <p class="ni-time">2 min ago</p>
+            </div>
+          </div>
+          <div class="notif-item unread">
+            <div class="ni-avatar" style="background:linear-gradient(135deg,#ff4f6a,#ff9234);color:#fff">SL</div>
+            <div class="ni-body">
+              <p class="ni-msg"><strong>Sam</strong> invited you to the Alpha workspace</p>
+              <p class="ni-time">18 min ago</p>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="ni-avatar" style="background:linear-gradient(135deg,#8b5cf6,#3dffa0);color:#fff">⚡</div>
+            <div class="ni-body">
+              <p class="ni-msg">Your API usage hit <strong>90%</strong> of the monthly limit</p>
+              <p class="ni-time">1 hour ago</p>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="ni-avatar" style="background:rgba(255,255,255,0.07);color:#8891a5">RP</div>
+            <div class="ni-body">
+              <p class="ni-msg"><strong>Riley</strong> left a comment on your deployment</p>
+              <p class="ni-time">3 hours ago</p>
+            </div>
+          </div>
+        </div>
+        <div class="notif-footer"><a href="#">View all notifications</a></div>
+      </div>
+    </div>
+
+    <!-- USER MENU -->
+    <div class="nav-user" id="user-menu-trigger" onclick="toggleUser()">
+      <div class="user-avatar">AX</div>
+      <div>
+        <p class="user-name">Alex Morgan</p>
+        <p class="user-role">Pro plan</p>
+      </div>
+      <svg class="user-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      <div class="user-menu">
+        <div class="user-menu-header">
+          <p class="umh-name">Alex Morgan</p>
+          <p class="umh-email">alex@nexus.io</p>
+        </div>
+        <div class="user-menu-body">
+          <a class="um-item" href="#">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profile
+          </a>
+          <a class="um-item" href="#">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M4.93 19.07l1.41-1.41M19.07 19.07l-1.41-1.41M22 12h-2M4 12H2M12 22v-2M12 4V2"/></svg>
+            Settings
+          </a>
+          <a class="um-item" href="#">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Security
+          </a>
+          <a class="um-item" href="#">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            Workspace
+            <span class="um-badge">PRO</span>
+          </a>
+          <div class="um-divider"></div>
+          <a class="um-item danger" href="#">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+            Sign out
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- HAMBURGER -->
+    <button class="nav-hamburger" id="hamburger" onclick="toggleDrawer()">
+      <span class="ham-line"></span>
+      <span class="ham-line"></span>
+      <span class="ham-line"></span>
+    </button>
+
+  </div>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<div class="mobile-drawer" id="drawer">
+  <div class="mob-section">
+    <p class="mob-section-title">Platform</p>
+    <a class="mob-link" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Dashboard</a>
+    <a class="mob-link" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Deployments</a>
+    <a class="mob-link" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> API & SDK</a>
+  </div>
+  <div class="mob-section">
+    <p class="mob-section-title">Company</p>
+    <a class="mob-link" href="#">Pricing</a>
+    <a class="mob-link" href="#">Blog</a>
+    <a class="mob-link" href="#">Changelog</a>
+    <a class="mob-link" href="#">Support</a>
+  </div>
+  <div class="mob-btns">
+    <button class="mob-btn-secondary">Sign In</button>
+    <button class="mob-btn-primary">Get Started Free</button>
+  </div>
+</div>
+
+<!-- SEARCH OVERLAY -->
+<div class="search-overlay" id="search-overlay" onclick="closeSearchOutside(event)">
+  <div class="search-box">
+    <div class="search-input-row">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input class="search-input" id="search-input" placeholder="Search docs, components, pages…" oninput="filterSearch(this.value)" onkeydown="searchKeydown(event)">
+      <button class="search-close" onclick="closeSearch()">esc</button>
+    </div>
+    <div class="search-results" id="search-results"></div>
+    <div class="search-footer">
+      <span class="sf-hint"><kbd>↑↓</kbd> Navigate</span>
+      <span class="sf-hint"><kbd>↵</kbd> Select</span>
+      <span class="sf-hint"><kbd>esc</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE CONTENT -->
+<div class="page-content">
+  <div class="hero">
+    <div class="hero-label">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      Scroll to see navbar transform
+    </div>
+    <h1>Build the <span>future</span><br>ship today</h1>
+    <p>The platform that takes you from zero to production in minutes. Infinite scale, zero configuration headaches.</p>
+    <div class="hero-btns">
+      <button class="hero-primary">Start for free →</button>
+      <button class="hero-secondary">View documentation</button>
+    </div>
+  </div>
+  <div class="demo-blocks">
+    <div class="demo-block">
+      <span class="db-tag green">Performance</span>
+      <div class="db-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <h3>Edge-first delivery</h3>
+      <p>Content served from 300+ edge nodes globally. Sub-10ms latency anywhere on earth.</p>
+    </div>
+    <div class="demo-block">
+      <span class="db-tag yellow">Developer</span>
+      <div class="db-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+      <h3>DX-first API</h3>
+      <p>Typed SDKs, generous free tier, instant webhooks, and a CLI that gets out of your way.</p>
+    </div>
+    <div class="demo-block">
+      <span class="db-tag red">Security</span>
+      <div class="db-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <h3>Zero-trust by default</h3>
+      <p>SOC2 Type II, end-to-end encryption, and audit logs for every single request.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   CANVAS BG
+═══════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, t = 0;
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resize); resize();
+  const orbs = [{x:.1,y:.15,r:350,c:'rgba(232,255,71,0.035)'},{x:.9,y:.6,r:300,c:'rgba(61,255,160,0.025)'},{x:.5,y:.95,r:280,c:'rgba(232,255,71,0.02)'}];
+  function frame() {
+    ctx.clearRect(0,0,W,H); t += 0.003;
+    orbs.forEach((o,i) => {
+      const x=o.x*W+Math.sin(t+i*1.3)*40, y=o.y*H+Math.cos(t+i*0.9)*25;
+      const g=ctx.createRadialGradient(x,y,0,x,y,o.r);
+      g.addColorStop(0,o.c); g.addColorStop(1,'transparent');
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,o.r,0,Math.PI*2); ctx.fill();
+    });
+    ctx.strokeStyle='rgba(255,255,255,0.02)'; ctx.lineWidth=1;
+    for(let x=0;x<W;x+=70){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=70){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ═══════════════════════════════════════
+   SCROLL EFFECTS
+═══════════════════════════════════════ */
+const navbar = document.getElementById('navbar');
+const progressBar = document.getElementById('progress-bar');
+const ann = document.getElementById('ann');
+let annHeight = ann.offsetHeight;
+
+// Offset navbar for announcement
+navbar.style.top = annHeight + 'px';
+
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY > 30;
+  navbar.classList.toggle('scrolled', scrolled);
+
+  // progress bar
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = total > 0 ? (window.scrollY / total) * 100 : 0;
+  progressBar.style.width = pct + '%';
+});
+
+/* ═══════════════════════════════════════
+   ANNOUNCEMENT
+═══════════════════════════════════════ */
+function dismissAnn() {
+  ann.style.transition = 'opacity 0.3s, max-height 0.4s 0.2s, padding 0.4s 0.2s';
+  ann.style.opacity = '0';
+  ann.style.maxHeight = '0';
+  ann.style.padding = '0';
+  ann.style.overflow = 'hidden';
+  navbar.style.transition = 'top 0.4s var(--ease), background 0.4s, border-color 0.4s, box-shadow 0.4s, height 0.3s';
+  navbar.style.top = '0px';
+}
+
+/* ═══════════════════════════════════════
+   BELL & USER MENUS
+═══════════════════════════════════════ */
+function toggleBell() {
+  const bell = document.getElementById('bell');
+  const user = document.getElementById('user-menu-trigger');
+  user.classList.remove('open');
+  bell.classList.toggle('open');
+}
+function toggleUser() {
+  const bell = document.getElementById('bell');
+  const user = document.getElementById('user-menu-trigger');
+  bell.classList.remove('open');
+  user.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#bell')) document.getElementById('bell').classList.remove('open');
+  if (!e.target.closest('#user-menu-trigger')) document.getElementById('user-menu-trigger').classList.remove('open');
+});
+
+/* ═══════════════════════════════════════
+   MOBILE DRAWER
+═══════════════════════════════════════ */
+function toggleDrawer() {
+  const ham = document.getElementById('hamburger');
+  const drawer = document.getElementById('drawer');
+  ham.classList.toggle('open');
+  drawer.classList.toggle('open');
+  document.body.style.overflow = drawer.classList.contains('open') ? 'hidden' : '';
+}
+
+/* ═══════════════════════════════════════
+   SEARCH
+═══════════════════════════════════════ */
+const searchData = [
+  { icon: '⚡', title: 'Getting Started', meta: 'Documentation', cat: 'Docs' },
+  { icon: '📦', title: 'Deployments Guide', meta: 'Documentation', cat: 'Docs' },
+  { icon: '🔑', title: 'Authentication API', meta: 'API Reference', cat: 'API' },
+  { icon: '📡', title: 'Webhooks Setup', meta: 'API Reference', cat: 'API' },
+  { icon: '💡', title: 'Introducing Edge v2', meta: 'Blog · 3 min read', cat: 'Blog' },
+  { icon: '📈', title: 'Pricing Plans', meta: 'Page', cat: 'Pages' },
+  { icon: '🛡️', title: 'Security Overview', meta: 'Page', cat: 'Pages' },
+  { icon: '🧩', title: 'CLI Reference', meta: 'Documentation', cat: 'Docs' },
+];
+let searchIdx = 0;
+
+function openSearch() {
+  const overlay = document.getElementById('search-overlay');
+  overlay.classList.add('open');
+  setTimeout(() => document.getElementById('search-input').focus(), 100);
+  renderSearch('');
+}
+function closeSearch() {
+  document.getElementById('search-overlay').classList.remove('open');
+  document.getElementById('search-input').value = '';
+}
+function closeSearchOutside(e) {
+  if (e.target === document.getElementById('search-overlay')) closeSearch();
+}
+function renderSearch(query) {
+  const results = document.getElementById('search-results');
+  const filtered = query
+    ? searchData.filter(d => d.title.toLowerCase().includes(query.toLowerCase()) || d.cat.toLowerCase().includes(query.toLowerCase()))
+    : searchData;
+  if (!filtered.length) { results.innerHTML = '<p style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">No results found.</p>'; return; }
+  const cats = [...new Set(filtered.map(d => d.cat))];
+  results.innerHTML = cats.map(cat => {
+    const items = filtered.filter(d => d.cat === cat);
+    return `<p class="search-section">${cat}</p>` + items.map((item, i) =>
+      `<div class="search-result-item${i===0&&cat===cats[0]?' selected':''}" onmouseenter="selectResult(this)" onclick="closeSearch()">
+        <div class="sri-icon"><span style="font-size:15px">${item.icon}</span></div>
+        <div><p class="sri-title">${item.title}</p><p class="sri-meta">${item.meta}</p></div>
+      </div>`
+    ).join('');
+  }).join('');
+  searchIdx = 0;
+}
+function filterSearch(v) { renderSearch(v); searchIdx = 0; }
+function selectResult(el) {
+  document.querySelectorAll('.search-result-item').forEach(i => i.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function searchKeydown(e) {
+  const items = document.querySelectorAll('.search-result-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') { e.preventDefault(); searchIdx = Math.min(searchIdx+1, items.length-1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); searchIdx = Math.max(searchIdx-1, 0); }
+  else if (e.key === 'Enter') { closeSearch(); return; }
+  else if (e.key === 'Escape') { closeSearch(); return; }
+  items.forEach((el, i) => el.classList.toggle('selected', i === searchIdx));
+  items[searchIdx].scrollIntoView({block:'nearest'});
+}
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+  if (e.key === 'Escape') closeSearch();
+});
+</script>
+</body>
+</html>
