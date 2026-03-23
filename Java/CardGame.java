@@ -17,7 +17,7 @@ public class AdvancedCardGame {
         int userScore = 0;
         int computerScore = 0;
 
-        System.out.println("=== Welcome to High Card Game ===");
+        System.out.println("=== Welcome to the High Card Game ===");
 
         boolean play = true;
 
