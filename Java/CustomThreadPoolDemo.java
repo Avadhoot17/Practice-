@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 import java.util.List;
 
-// -------- Task Queue --------
+// -------- Task Queue ----------
 class TaskQueue {
     private final LinkedList<Runnable> queue = new LinkedList<>();
 
