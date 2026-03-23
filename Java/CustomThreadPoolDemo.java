@@ -7,7 +7,7 @@ class TaskQueue {
 
     public synchronized void addTask(Runnable task) {
         queue.addLast(task);
-        notify(); // wake up waiting worker
+        notify(); // wake up waiting worker---------
     }
 
     public synchronized Runnable getTask() throws InterruptedException {
