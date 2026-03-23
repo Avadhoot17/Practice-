@@ -44,7 +44,7 @@ class Worker extends Thread {
     }
 }
 
-// -------- Custom Thread Pool --------
+// -------------- Custom Thread Pool --------
 class CustomThreadPool {
     private final List<Worker> workers = new LinkedList<>();
     private final TaskQueue queue = new TaskQueue();
