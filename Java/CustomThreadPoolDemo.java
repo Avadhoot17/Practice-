@@ -18,7 +18,7 @@ class TaskQueue {
     }
 }
 
-// -------- Worker Thread --------
+// -------- Worker Thread --------------
 class Worker extends Thread {
     private final TaskQueue taskQueue;
     private boolean running = true;
