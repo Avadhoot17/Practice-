@@ -80,7 +80,7 @@ public class FastIO {
         return res;
     }
 
-    /* ---------------- DEBUG ---------------- */
+    /* ---------------- DEBUG ------------------- */
 
     static void printArray(int[] arr){
         for(int x:arr)
@@ -88,7 +88,7 @@ public class FastIO {
         System.out.println();
     }
 
-    /* ---------------- MAIN ---------------- */
+    /* ---------------- MAIN ------------------- */
 
     public static void main(String[] args) throws Exception {
 
