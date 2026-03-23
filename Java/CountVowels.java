@@ -5,7 +5,7 @@ class VowelConsonantCount {
     public static void countCharacters(String input) {
 
         if (input == null || input.isEmpty()) {
-            System.out.println("Invalid input");
+            System.out.println("Invalid input!");
             return;
         }
 
