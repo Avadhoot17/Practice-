@@ -3,7 +3,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class FileWriteExample2 {
-
+fef
     public static void main(String[] args) {
 
         try {
