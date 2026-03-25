@@ -5,7 +5,7 @@ import java.io.IOException;
 public class FileWriteExample2 {
 
     public static void main(String[] args) {
-
+essdsd
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter("output.txt"));
 
