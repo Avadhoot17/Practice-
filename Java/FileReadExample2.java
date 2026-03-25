@@ -8,7 +8,7 @@ public class FileWriteExample2 {
 
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter("output.txt"));
-sss
+
             bw.write("Hello Java");
             bw.newLine();
             bw.write("BufferedWriter Example");
