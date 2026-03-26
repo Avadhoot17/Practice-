@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vayu — India Weather</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --card: rgba(255,255,255,0.04);
+    --card-border: rgba(255,255,255,0.08);
+    --text: #f0eee8;
+    --muted: rgba(240,238,232,0.45);
+    --accent: #e8c97a;
+    --accent2: #7ac4e8;
+    --glow: rgba(232,201,122,0.15);
+    --radius: 20px;
+    --transition: 0.4s cubic-bezier(0.23,1,0.32,1);
+  }
+
+  /* Season themes */
+  body.summer { --bg:#0d0608; --accent:#ff7043; --accent2:#ffb300; --glow:rgba(255,112,67,0.15); }
+  body.monsoon { --bg:#040d14; --accent:#64b5f6; --accent2:#26c6da; --glow:rgba(100,181,246,0.15); }
+  body.winter { --bg:#060a12; --accent:#b0c4de; --accent2:#90caf9; --glow:rgba(176,196,222,0.15); }
+  body.spring { --bg:#060e08; --accent:#81c784; --accent2:#aed581; --glow:rgba(129,199,132,0.15); }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 1.2s ease;
+  }
+
+  /* Animated background */
+  .bg-canvas {
+    position: fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;
+  }
+  .orb {
+    position:absolute; border-radius:50%;
+    filter: blur(120px); opacity:0.18;
+    animation: drift 18s ease-in-out infinite alternate;
+  }
+  .orb1 { width:600px;height:600px;top:-10%;left:-10%;background:radial-gradient(circle,var(--accent),transparent 70%);animation-delay:0s; }
+  .orb2 { width:400px;height:400px;bottom:-5%;right:5%;background:radial-gradient(circle,var(--accent2),transparent 70%);animation-delay:-6s; }
+  .orb3 { width:300px;height:300px;top:40%;left:40%;background:radial-gradient(circle,var(--glow),transparent 70%);animation-delay:-12s; }
+
+  @keyframes drift {
+    0%{transform:translate(0,0) scale(1);}
+    100%{transform:translate(60px,40px) scale(1.1);}
+  }
+
+  /* Particles */
+  #particles { position:fixed;inset:0;z-index:0;pointer-events:none; }
+
+  /* Layout */
+  .app { position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:28px 24px; }
+
+  /* Header */
+  header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:36px; padding-bottom:20px;
+    border-bottom:1px solid var(--card-border);
+  }
+  .logo {
+    font-family:'Cormorant Garamond',serif; font-size:2.2rem; font-weight:700;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    letter-spacing:2px;
+  }
+  .logo span { font-style:italic; font-weight:300; }
+  .live-badge {
+    display:flex;align-items:center;gap:8px; font-size:0.72rem;
+    color:var(--muted); letter-spacing:1.5px; text-transform:uppercase;
+  }
+  .live-dot { width:7px;height:7px;border-radius:50%;background:#4caf50;animation:pulse 1.8s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);} }
+
+  .clock-widget {
+    text-align:right;
+  }
+  #live-time { font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:600; color:var(--accent); }
+  #live-date { font-size:0.75rem; color:var(--muted); letter-spacing:1px; }
+
+  /* Search */
+  .search-section { margin-bottom:36px; }
+  .search-bar {
+    display:flex;gap:12px;align-items:center;
+    background:var(--card); border:1px solid var(--card-border);
+    border-radius:16px; padding:6px 6px 6px 20px;
+    backdrop-filter:blur(20px); transition:border-color var(--transition);
+  }
+  .search-bar:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px var(--glow); }
+  .search-bar input {
+    flex:1; background:none; border:none; outline:none;
+    color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.95rem;
+  }
+  .search-bar input::placeholder { color:var(--muted); }
+  .search-btn {
+    padding:10px 22px; border-radius:11px; border:none; cursor:pointer;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#0a0e1a; font-family:'DM Sans',sans-serif; font-weight:600;
+    font-size:0.85rem; letter-spacing:0.5px; transition:opacity 0.2s,transform 0.2s;
+  }
+  .search-btn:hover { opacity:0.85; transform:scale(1.04); }
+
+  /* Quick city pills */
+  .city-pills {
+    display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;
+  }
+  .pill {
+    padding:6px 14px; border-radius:30px; font-size:0.78rem; cursor:pointer;
+    border:1px solid var(--card-border); color:var(--muted);
+    background:var(--card); backdrop-filter:blur(10px);
+    transition:all 0.25s; letter-spacing:0.5px;
+  }
+  .pill:hover { border-color:var(--accent); color:var(--accent); }
+
+  /* Main hero card */
+  .hero-card {
+    background:var(--card); border:1px solid var(--card-border);
+    border-radius:24px; padding:40px; margin-bottom:28px;
+    backdrop-filter:blur(30px); position:relative; overflow:hidden;
+    transition:all var(--transition);
+  }
+  .hero-card::before {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(135deg,var(--glow),transparent 60%);
+    pointer-events:none;
+  }
+  .hero-top { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:24px; }
+  .hero-city { font-family:'Cormorant Garamond',serif; font-size:3.2rem; font-weight:700; line-height:1.1; }
+  .hero-country { font-size:0.8rem; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-top:4px; }
+  .hero-temp-block { text-align:right; }
+  .hero-temp {
+    font-family:'Cormorant Garamond',serif; font-size:6rem; font-weight:300; line-height:1;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  .hero-feels { font-size:0.8rem; color:var(--muted); margin-top:4px; }
+
+  .weather-icon-big { font-size:5rem; margin:20px 0 10px; display:block; filter:drop-shadow(0 0 20px var(--glow)); }
+  .hero-desc { font-family:'Playfair Display',serif; font-style:italic; font-size:1.3rem; color:var(--accent); margin-bottom:24px; }
+
+  .hero-stats {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:16px; margin-top:24px;
+  }
+  .stat-box {
+    background:rgba(255,255,255,0.04); border:1px solid var(--card-border);
+    border-radius:14px; padding:14px 16px; text-align:center;
+    transition:transform 0.2s, border-color 0.2s;
+  }
+  .stat-box:hover { transform:translateY(-4px); border-color:var(--accent); }
+  .stat-label { font-size:0.68rem; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:6px; }
+  .stat-val { font-size:1.3rem; font-family:'Cormorant Garamond',serif; font-weight:600; color:var(--accent); }
+
+  /* Section title */
+  .sec-title {
+    font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:600;
+    letter-spacing:1px; margin-bottom:18px; display:flex; align-items:center; gap:10px;
+  }
+  .sec-title::after { content:''; flex:1; height:1px; background:var(--card-border); }
+
+  /* City grid */
+  .city-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px;
+    margin-bottom:32px;
+  }
+  .city-card {
+    background:var(--card); border:1px solid var(--card-border);
+    border-radius:var(--radius); padding:22px; cursor:pointer;
+    backdrop-filter:blur(20px); transition:all var(--transition);
+    position:relative; overflow:hidden;
+  }
+  .city-card::after {
+    content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2)); transform:scaleX(0); transition:transform 0.3s;
+  }
+  .city-card:hover { transform:translateY(-6px); border-color:var(--accent); }
+  .city-card:hover::after { transform:scaleX(1); }
+  .city-card-name { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600; margin-bottom:4px; }
+  .city-card-state { font-size:0.7rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:14px; }
+  .city-card-row { display:flex; justify-content:space-between; align-items:center; }
+  .city-card-temp { font-size:2rem; font-family:'Cormorant Garamond',serif; font-weight:300; color:var(--accent); }
+  .city-card-icon { font-size:2.2rem; filter:drop-shadow(0 0 10px var(--glow)); }
+  .city-card-desc { font-size:0.75rem; color:var(--muted); margin-top:8px; text-transform:capitalize; }
+  .city-card-wind { font-size:0.73rem; color:var(--muted); margin-top:4px; }
+
+  /* Forecast */
+  .forecast-strip {
+    display:flex; gap:12px; overflow-x:auto; padding-bottom:8px; margin-bottom:32px;
+  }
+  .forecast-strip::-webkit-scrollbar { height:4px; }
+  .forecast-strip::-webkit-scrollbar-track { background:transparent; }
+  .forecast-strip::-webkit-scrollbar-thumb { background:var(--card-border); border-radius:4px; }
+  .fc-card {
+    min-width:110px; background:var(--card); border:1px solid var(--card-border);
+    border-radius:16px; padding:16px 14px; text-align:center;
+    backdrop-filter:blur(20px); transition:all 0.25s; flex-shrink:0;
+  }
+  .fc-card:hover { border-color:var(--accent); transform:translateY(-4px); }
+  .fc-day { font-size:0.7rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; }
+  .fc-icon { font-size:1.8rem; margin-bottom:8px; }
+  .fc-temp { font-family:'Cormorant Garamond',serif; font-size:1.3rem; color:var(--accent); }
+  .fc-range { font-size:0.7rem; color:var(--muted); margin-top:2px; }
+
+  /* AQI bar */
+  .aqi-section { margin-bottom:32px; }
+  .aqi-bar-wrap { background:var(--card); border:1px solid var(--card-border); border-radius:16px; padding:24px; backdrop-filter:blur(20px); }
+  .aqi-row { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .aqi-num { font-family:'Cormorant Garamond',serif; font-size:3rem; font-weight:700; }
+  .aqi-label { font-size:0.75rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+  .aqi-status { font-size:1.1rem; font-weight:500; margin-top:2px; }
+  .aqi-gradient {
+    flex:1; height:12px; border-radius:8px; position:relative;
+    background:linear-gradient(90deg,#4caf50,#ffeb3b,#ff9800,#f44336,#9c27b0,#880e4f);
+    min-width:180px;
+  }
+  .aqi-needle {
+    position:absolute; top:-4px; width:20px; height:20px;
+    background:white; border-radius:50%; border:3px solid var(--bg);
+    transform:translateX(-50%); box-shadow:0 0 10px rgba(255,255,255,0.3);
+    transition:left 1s cubic-bezier(0.23,1,0.32,1);
+  }
+
+  /* Season indicator */
+  .season-bar {
+    display:flex; gap:10px; flex-wrap:wrap; margin-bottom:32px;
+  }
+  .season-tag {
+    padding:8px 18px; border-radius:30px; font-size:0.78rem; letter-spacing:0.5px;
+    border:1px solid var(--card-border); color:var(--muted); background:var(--card);
+    transition:all 0.3s;
+  }
+  .season-tag.active { background:var(--accent); color:#0a0e1a; border-color:var(--accent); font-weight:600; }
+
+  /* Humidity/Wind visual */
+  .vis-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:32px; }
+  .vis-card {
+    background:var(--card); border:1px solid var(--card-border);
+    border-radius:var(--radius); padding:24px; backdrop-filter:blur(20px);
+  }
+  .vis-title { font-size:0.7rem; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:16px; }
+  .ring-wrap { display:flex; justify-content:center; }
+  svg.ring { width:120px; height:120px; }
+  .ring-bg { fill:none; stroke:var(--card-border); stroke-width:10; }
+  .ring-fill { fill:none; stroke-width:10; stroke-linecap:round; transition:stroke-dasharray 1.5s cubic-bezier(0.23,1,0.32,1); }
+  .ring-text { font-family:'Cormorant Garamond',serif; font-size:1.4rem; fill:var(--accent); }
+  .ring-sub { font-size:0.45rem; fill:var(--muted); }
+
+  /* Wind compass */
+  .compass { width:120px; height:120px; position:relative; margin:0 auto; }
+  .compass-circle {
+    width:100%; height:100%; border-radius:50%;
+    border:2px solid var(--card-border);
+    position:relative; display:flex; align-items:center; justify-content:center;
+  }
+  .compass-n,.compass-s,.compass-e,.compass-w {
+    position:absolute; font-size:0.62rem; font-weight:600; color:var(--muted); letter-spacing:1px;
+  }
+  .compass-n{top:4px;left:50%;transform:translateX(-50%);color:var(--accent);}
+  .compass-s{bottom:4px;left:50%;transform:translateX(-50%);}
+  .compass-e{right:6px;top:50%;transform:translateY(-50%);}
+  .compass-w{left:6px;top:50%;transform:translateY(-50%);}
+  .compass-needle {
+    position:absolute; width:4px; height:48px; left:50%; top:50%;
+    transform-origin:bottom center; transform:translateX(-50%) translateY(-100%) rotate(0deg);
+    border-radius:4px 4px 0 0;
+    background:linear-gradient(to top,var(--accent),transparent);
+    transition:transform 1.5s cubic-bezier(0.23,1,0.32,1);
+  }
+
+  /* Loader */
+  .loader {
+    display:none; position:fixed; inset:0; z-index:999;
+    background:rgba(10,14,26,0.85); backdrop-filter:blur(10px);
+    align-items:center; justify-content:center; flex-direction:column; gap:16px;
+  }
+  .loader.active { display:flex; }
+  .spinner {
+    width:48px; height:48px; border-radius:50%;
+    border:3px solid var(--card-border);
+    border-top-color:var(--accent);
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loader-text { font-size:0.8rem; color:var(--muted); letter-spacing:2px; text-transform:uppercase; }
+
+  /* Toast */
+  .toast {
+    position:fixed; bottom:28px; right:28px; z-index:9999;
+    background:var(--card); border:1px solid var(--accent);
+    border-radius:14px; padding:14px 20px;
+    font-size:0.85rem; color:var(--text);
+    backdrop-filter:blur(20px); box-shadow:0 8px 32px rgba(0,0,0,0.5);
+    transform:translateY(100px); opacity:0; transition:all 0.4s cubic-bezier(0.23,1,0.32,1);
+    max-width:320px;
+  }
+  .toast.show { transform:translateY(0); opacity:1; }
+
+  /* Responsive */
+  @media(max-width:768px){
+    .hero-temp{font-size:4rem;}
+    .hero-city{font-size:2.2rem;}
+    .vis-grid{grid-template-columns:1fr;}
+    header{flex-wrap:wrap;gap:12px;}
+  }
+
+  /* Rain animation */
+  .rain-drop {
+    position:fixed; width:2px; background:linear-gradient(to bottom,transparent,var(--accent2));
+    border-radius:2px; pointer-events:none; z-index:0; opacity:0.3; animation:fall linear infinite;
+  }
+  @keyframes fall { to{transform:translateY(110vh);} }
+
+  /* Snow */
+  .snow-flake {
+    position:fixed; width:6px; height:6px; background:white; border-radius:50%;
+    pointer-events:none; z-index:0; opacity:0.4; animation:snowfall linear infinite;
+  }
+  @keyframes snowfall {
+    0%{transform:translateY(-10px) translateX(0) rotate(0);}
+    100%{transform:translateY(110vh) translateX(80px) rotate(360deg);}
+  }
+
+  .no-data { text-align:center; color:var(--muted); font-size:0.85rem; padding:40px; }
+
+  /* Scroll reveal */
+  .reveal { opacity:0; transform:translateY(30px); transition:all 0.7s cubic-bezier(0.23,1,0.32,1); }
+  .reveal.in { opacity:1; transform:translateY(0); }
+</style>
+</head>
+<body class="monsoon">
+
+<div class="bg-canvas">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+<canvas id="particles"></canvas>
+
+<div class="loader" id="loader">
+  <div class="spinner"></div>
+  <div class="loader-text">Fetching weather data...</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<div class="app">
+  <header>
+    <div>
+      <div class="logo">V<span>ayu</span></div>
+      <div class="live-badge" style="margin-top:4px">
+        <div class="live-dot"></div> Live India Weather
+      </div>
+    </div>
+    <div class="clock-widget">
+      <div id="live-time">--:--:--</div>
+      <div id="live-date">Loading...</div>
+    </div>
+  </header>
+
+  <div class="search-section reveal">
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search any Indian city..." autocomplete="off" />
+      <button class="search-btn" onclick="searchCity()">Search</button>
+    </div>
+    <div class="city-pills" id="quick-pills"></div>
+  </div>
+
+  <div class="season-bar reveal" id="season-bar"></div>
+
+  <!-- Hero card -->
+  <div class="hero-card reveal" id="hero-card">
+    <div class="hero-top">
+      <div>
+        <div class="hero-city" id="h-city">—</div>
+        <div class="hero-country">India · IST</div>
+      </div>
+      <div class="hero-temp-block">
+        <div class="hero-temp" id="h-temp">—°</div>
+        <div class="hero-feels" id="h-feels">Feels like —°C</div>
+      </div>
+    </div>
+    <span class="weather-icon-big" id="h-icon">🌤</span>
+    <div class="hero-desc" id="h-desc">Gathering data from the skies…</div>
+    <div class="hero-stats" id="h-stats"></div>
+  </div>
+
+  <!-- 5-day forecast -->
+  <div class="reveal">
+    <div class="sec-title">5-Day Forecast</div>
+    <div class="forecast-strip" id="forecast-strip">
+      <div class="no-data">Select a city to see forecast</div>
+    </div>
+  </div>
+
+  <!-- AQI -->
+  <div class="aqi-section reveal">
+    <div class="sec-title">Air Quality Index</div>
+    <div class="aqi-bar-wrap">
+      <div class="aqi-row">
+        <div>
+          <div class="aqi-label">AQI</div>
+          <div class="aqi-num" id="aqi-num">—</div>
+          <div class="aqi-status" id="aqi-status">—</div>
+        </div>
+        <div class="aqi-gradient">
+          <div class="aqi-needle" id="aqi-needle" style="left:0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Humidity + Wind -->
+  <div class="vis-grid reveal">
+    <div class="vis-card">
+      <div class="vis-title">Humidity</div>
+      <div class="ring-wrap">
+        <svg class="ring" viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="50"/>
+          <circle class="ring-fill" id="hum-ring" cx="60" cy="60" r="50"
+            stroke="url(#hgrad)"
+            stroke-dasharray="0 314"
+            stroke-dashoffset="-78"/>
+          <defs>
+            <linearGradient id="hgrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:var(--accent)"/>
+              <stop offset="100%" style="stop-color:var(--accent2)"/>
+            </linearGradient>
+          </defs>
+          <text class="ring-text" x="50%" y="48%" dominant-baseline="middle" text-anchor="middle" id="hum-pct">—%</text>
+          <text class="ring-sub" x="50%" y="62%" dominant-baseline="middle" text-anchor="middle">HUMIDITY</text>
+        </svg>
+      </div>
+    </div>
+    <div class="vis-card">
+      <div class="vis-title">Wind Direction</div>
+      <div class="compass" id="compass-wrap">
+        <div class="compass-circle">
+          <span class="compass-n">N</span>
+          <span class="compass-s">S</span>
+          <span class="compass-e">E</span>
+          <span class="compass-w">W</span>
+          <div class="compass-needle" id="compass-needle"></div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:12px;font-size:0.85rem;color:var(--accent);" id="wind-val">— km/h</div>
+    </div>
+  </div>
+
+  <!-- City grid -->
+  <div class="reveal">
+    <div class="sec-title">Major Indian Cities</div>
+    <div class="city-grid" id="city-grid">
+      <div class="no-data" style="grid-column:1/-1">Loading city data...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_KEY = 'bd5e378503939ddaee76f12ad7a97608'; // OpenWeatherMap free key
+
+const CITIES = [
+  {name:'Mumbai',state:'Maharashtra'},{name:'Delhi',state:'Delhi'},
+  {name:'Bengaluru',state:'Karnataka'},{name:'Hyderabad',state:'Telangana'},
+  {name:'Chennai',state:'Tamil Nadu'},{name:'Kolkata',state:'West Bengal'},
+  {name:'Pune',state:'Maharashtra'},{name:'Ahmedabad',state:'Gujarat'},
+  {name:'Jaipur',state:'Rajasthan'},{name:'Lucknow',state:'Uttar Pradesh'},
+  {name:'Chandigarh',state:'Punjab'},{name:'Bhopal',state:'Madhya Pradesh'},
+  {name:'Indore',state:'Madhya Pradesh'},{name:'Nagpur',state:'Maharashtra'},
+  {name:'Patna',state:'Bihar'},{name:'Kochi',state:'Kerala'},
+  {name:'Guwahati',state:'Assam'},{name:'Bhubaneswar',state:'Odisha'},
+  {name:'Vadodara',state:'Gujarat'},{name:'Surat',state:'Gujarat'},
+  {name:'Agra',state:'Uttar Pradesh'},{name:'Varanasi',state:'Uttar Pradesh'},
+  {name:'Amritsar',state:'Punjab'},{name:'Jodhpur',state:'Rajasthan'},
+];
+
+const QUICK = ['Mumbai','Delhi','Bengaluru','Chennai','Kolkata','Pune','Jaipur','Hyderabad'];
+const SEASONS = [
+  {name:'Winter',icon:'❄️',months:[11,0,1]},
+  {name:'Spring',icon:'🌸',months:[2,3]},
+  {name:'Summer',icon:'☀️',months:[4,5]},
+  {name:'Monsoon',icon:'🌧️',months:[6,7,8,9]},
+  {name:'Autumn',icon:'🍂',months:[10]},
+];
+
+const WEATHER_ICONS = {
+  '01d':'☀️','01n':'🌙','02d':'⛅','02n':'☁️',
+  '03d':'☁️','03n':'☁️','04d':'☁️','04n':'☁️',
+  '09d':'🌧️','09n':'🌧️','10d':'🌦️','10n':'🌧️',
+  '11d':'⛈️','11n':'⛈️','13d':'❄️','13n':'❄️',
+  '50d':'🌫️','50n':'🌫️',
+};
+
+const AQI_INFO = [
+  {max:50,status:'Good',color:'#4caf50'},
+  {max:100,status:'Moderate',color:'#ffeb3b'},
+  {max:150,status:'Unhealthy for Sensitive',color:'#ff9800'},
+  {max:200,status:'Unhealthy',color:'#f44336'},
+  {max:300,status:'Very Unhealthy',color:'#9c27b0'},
+  {max:500,status:'Hazardous',color:'#880e4f'},
+];
+
+let currentCity = 'Mumbai';
+let weatherCache = {};
+let forecastCache = {};
+let updateTimer;
+let weatherParticles = [];
+
+// Clock
+function updateClock(){
+  const now = new Date();
+  const t = now.toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour12:false});
+  const d = now.toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('live-time').textContent = t;
+  document.getElementById('live-date').textContent = d;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Season detection
+function getCurrentSeason(){
+  const m = new Date().getMonth();
+  return SEASONS.find(s => s.months.includes(m)) || SEASONS[2];
+}
+function applySeasonTheme(){
+  const s = getCurrentSeason();
+  const map = {Winter:'winter',Spring:'spring',Summer:'summer',Monsoon:'monsoon',Autumn:'spring'};
+  document.body.className = map[s.name] || 'monsoon';
+  clearWeatherEffects();
+  if(s.name==='Monsoon') startRain();
+  if(s.name==='Winter') startSnow();
+}
+function buildSeasonBar(){
+  const cur = getCurrentSeason();
+  document.getElementById('season-bar').innerHTML = SEASONS.map(s=>
+    `<div class="season-tag${s.name===cur.name?' active':''}">${s.icon} ${s.name}</div>`
+  ).join('');
+}
+
+// Quick pills
+function buildPills(){
+  document.getElementById('quick-pills').innerHTML = QUICK.map(c=>
+    `<div class="pill" onclick="loadCity('${c}')">${c}</div>`
+  ).join('');
+}
+
+// API fetch
+async function fetchWeather(city){
+  if(weatherCache[city] && (Date.now()-weatherCache[city].ts < 600000)) return weatherCache[city].data;
+  const r = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)},IN&appid=${API_KEY}&units=metric`);
+  if(!r.ok) throw new Error(`City not found: ${city}`);
+  const d = await r.json();
+  weatherCache[city] = {data:d, ts:Date.now()};
+  return d;
+}
+async function fetchForecast(city){
+  if(forecastCache[city] && (Date.now()-forecastCache[city].ts < 1200000)) return forecastCache[city].data;
+  const r = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)},IN&appid=${API_KEY}&units=metric&cnt=40`);
+  if(!r.ok) throw new Error('Forecast not available');
+  const d = await r.json();
+  forecastCache[city] = {data:d, ts:Date.now()};
+  return d;
+}
+async function fetchAQI(lat,lon){
+  const r = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`);
+  if(!r.ok) return null;
+  return await r.json();
+}
+
+function showLoader(v){ document.getElementById('loader').classList.toggle('active',v); }
+function showToast(msg, dur=3000){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+function getIcon(code){ return WEATHER_ICONS[code] || '🌤'; }
+
+// Hero card
+function renderHero(data){
+  document.getElementById('h-city').textContent = data.name;
+  document.getElementById('h-temp').textContent = `${Math.round(data.main.temp)}°`;
+  document.getElementById('h-feels').textContent = `Feels like ${Math.round(data.main.feels_like)}°C`;
+  document.getElementById('h-icon').textContent = getIcon(data.weather[0].icon);
+  document.getElementById('h-desc').textContent = data.weather[0].description.replace(/\b\w/g,c=>c.toUpperCase());
+  document.getElementById('h-stats').innerHTML = [
+    {l:'Humidity',v:`${data.main.humidity}%`},
+    {l:'Wind',v:`${Math.round(data.wind.speed * 3.6)} km/h`},
+    {l:'Pressure',v:`${data.main.pressure} hPa`},
+    {l:'Visibility',v:`${data.visibility ? (data.visibility/1000).toFixed(1)+'km' : '—'}`},
+    {l:'Min',v:`${Math.round(data.main.temp_min)}°C`},
+    {l:'Max',v:`${Math.round(data.main.temp_max)}°C`},
+  ].map(s=>`<div class="stat-box"><div class="stat-label">${s.l}</div><div class="stat-val">${s.v}</div></div>`).join('');
+
+  // Humidity ring
+  const hPct = data.main.humidity;
+  const circ = 2*Math.PI*50;
+  document.getElementById('hum-ring').style.strokeDasharray = `${hPct/100*circ} ${circ}`;
+  document.getElementById('hum-pct').textContent = `${hPct}%`;
+
+  // Wind compass
+  const deg = data.wind.deg || 0;
+  document.getElementById('compass-needle').style.transform = `translateX(-50%) translateY(-100%) rotate(${deg}deg)`;
+  document.getElementById('wind-val').textContent = `${Math.round(data.wind.speed*3.6)} km/h`;
+}
+
+// Forecast
+function renderForecast(data){
+  const daily = {};
+  data.list.forEach(i=>{
+    const day = i.dt_txt.split(' ')[0];
+    if(!daily[day]) daily[day] = [];
+    daily[day].push(i);
+  });
+  const days = Object.keys(daily).slice(0,5);
+  document.getElementById('forecast-strip').innerHTML = days.map(d=>{
+    const items = daily[d];
+    const temps = items.map(i=>i.main.temp);
+    const min = Math.min(...temps), max = Math.max(...temps);
+    const noon = items.find(i=>i.dt_txt.includes('12:00')) || items[0];
+    const dayName = new Date(d).toLocaleDateString('en-IN',{weekday:'short'});
+    return `<div class="fc-card">
+      <div class="fc-day">${dayName}</div>
+      <div class="fc-icon">${getIcon(noon.weather[0].icon)}</div>
+      <div class="fc-temp">${Math.round(noon.main.temp)}°C</div>
+      <div class="fc-range">${Math.round(min)}° – ${Math.round(max)}°</div>
+    </div>`;
+  }).join('');
+}
+
+// AQI
+function renderAQI(data){
+  if(!data || !data.list || !data.list[0]) return;
+  const aqi = data.list[0].main.aqi * 50;
+  const info = AQI_INFO.find(a=>aqi<=a.max) || AQI_INFO[5];
+  document.getElementById('aqi-num').textContent = aqi;
+  document.getElementById('aqi-num').style.color = info.color;
+  document.getElementById('aqi-status').textContent = info.status;
+  document.getElementById('aqi-status').style.color = info.color;
+  const pct = Math.min(aqi/500*100, 100);
+  setTimeout(()=>{ document.getElementById('aqi-needle').style.left = pct+'%'; }, 300);
+}
+
+// City grid
+async function renderCityGrid(){
+  document.getElementById('city-grid').innerHTML = '<div class="no-data" style="grid-column:1/-1">Loading all cities...</div>';
+  const cards = await Promise.allSettled(CITIES.map(c=>fetchWeather(c.name)));
+  document.getElementById('city-grid').innerHTML = cards.map((r,i)=>{
+    if(r.status==='rejected') return `<div class="city-card"><div class="city-card-name">${CITIES[i].name}</div><div class="city-card-state">${CITIES[i].state}</div><div style="font-size:0.75rem;color:var(--muted);margin-top:10px">Data unavailable</div></div>`;
+    const d = r.value;
+    return `<div class="city-card" onclick="loadCity('${d.name}')">
+      <div class="city-card-name">${d.name}</div>
+      <div class="city-card-state">${CITIES[i].state}</div>
+      <div class="city-card-row">
+        <div class="city-card-temp">${Math.round(d.main.temp)}°C</div>
+        <div class="city-card-icon">${getIcon(d.weather[0].icon)}</div>
+      </div>
+      <div class="city-card-desc">${d.weather[0].description}</div>
+      <div class="city-card-wind">💨 ${Math.round(d.wind.speed*3.6)} km/h · 💧 ${d.main.humidity}%</div>
+    </div>`;
+  }).join('');
+}
+
+async function loadCity(city){
+  showLoader(true);
+  try {
+    const [weather, forecast] = await Promise.all([fetchWeather(city), fetchForecast(city)]);
+    currentCity = city;
+    renderHero(weather);
+    renderForecast(forecast);
+    const aqi = await fetchAQI(weather.coord.lat, weather.coord.lon);
+    renderAQI(aqi);
+    // Update weather effects based on condition
+    updateWeatherEffects(weather.weather[0].main);
+    showToast(`✓ Updated: ${city}`);
+  } catch(e){
+    showToast(`⚠ ${e.message}`);
+  }
+  showLoader(false);
+}
+
+function updateWeatherEffects(main){
+  clearWeatherEffects();
+  const season = getCurrentSeason();
+  if(main === 'Rain' || main === 'Drizzle' || season.name === 'Monsoon') startRain();
+  else if(main === 'Snow' || season.name === 'Winter') startSnow();
+}
+
+function clearWeatherEffects(){
+  document.querySelectorAll('.rain-drop,.snow-flake').forEach(e=>e.remove());
+}
+function startRain(){
+  for(let i=0;i<40;i++) setTimeout(()=>{
+    const d = document.createElement('div');
+    d.className = 'rain-drop';
+    d.style.cssText = `left:${Math.random()*100}vw;top:${-Math.random()*100}px;
+      height:${20+Math.random()*40}px;
+      animation-duration:${0.6+Math.random()*0.8}s;
+      animation-delay:${Math.random()*2}s;opacity:${0.15+Math.random()*0.2}`;
+    document.body.appendChild(d);
+  }, i*50);
+}
+function startSnow(){
+  for(let i=0;i<60;i++) setTimeout(()=>{
+    const s = document.createElement('div');
+    s.className = 'snow-flake';
+    s.style.cssText = `left:${Math.random()*100}vw;
+      animation-duration:${4+Math.random()*6}s;
+      animation-delay:${Math.random()*5}s;
+      width:${3+Math.random()*5}px;height:${3+Math.random()*5}px;opacity:${0.3+Math.random()*0.4}`;
+    document.body.appendChild(s);
+  }, i*80);
+}
+
+// Particle system
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let pts = [];
+function resizeCanvas(){
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+}
+function initParticles(){
+  pts = Array.from({length:50},()=>({
+    x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+    vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3,
+    r:Math.random()*1.5+0.5, a:Math.random()*0.3+0.05
+  }));
+}
+function drawParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  pts.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0;
+    if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${p.a})`; ctx.fill();
+  });
+  requestAnimationFrame(drawParticles);
+}
+window.addEventListener('resize',()=>{resizeCanvas();initParticles();});
+resizeCanvas(); initParticles(); drawParticles();
+
+// Search
+function searchCity(){
+  const v = document.getElementById('search-input').value.trim();
+  if(v) loadCity(v);
+}
+document.getElementById('search-input').addEventListener('keydown',e=>{ if(e.key==='Enter') searchCity(); });
+
+// Scroll reveal
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// Auto refresh every 10 minutes
+function startAutoRefresh(){
+  clearInterval(updateTimer);
+  updateTimer = setInterval(async()=>{
+    weatherCache = {}; forecastCache = {};
+    await loadCity(currentCity);
+    renderCityGrid();
+  }, 600000);
+}
+
+// Init
+async function init(){
+  buildPills(); buildSeasonBar(); applySeasonTheme();
+  await loadCity('Mumbai');
+  renderCityGrid();
+  startAutoRefresh();
+  // Scroll reveal trigger
+  setTimeout(()=>document.querySelectorAll('.reveal').forEach(el=>el.classList.add('in')),100);
+}
+init();
+</script>
+</body>
+</html>
