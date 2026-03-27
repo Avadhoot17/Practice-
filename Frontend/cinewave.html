@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CineWave – Stream the World</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#07090d;--bg2:#0d1117;--sur:#131920;--sur2:#1a2230;
+  --acc:#e8b94a;--acc2:#c0392b;--txt:#edf1f6;--muted:#7a8fa8;
+  --r:10px;--nh:68px;--tr:.32s cubic-bezier(.4,0,.2,1);
+  --fh:'Bebas Neue',cursive;--fb:'DM Sans',sans-serif
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);min-height:100vh;overflow-x:hidden}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .7s,visibility .7s}
+#loader.hide{opacity:0;visibility:hidden}
+.ll{font-family:var(--fh);font-size:clamp(2.8rem,9vw,5.5rem);letter-spacing:5px;
+  background:linear-gradient(120deg,var(--acc),#fff 50%,var(--acc));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-size:200%;animation:shine 1.5s linear infinite}
+@keyframes shine{to{background-position:200%}}
+
+/* SCROLL TOP */
+#st{position:fixed;bottom:26px;right:26px;z-index:600;width:44px;height:44px;border-radius:50%;
+  background:var(--acc);color:#000;border:none;cursor:pointer;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:translateY(18px);transition:var(--tr);
+  box-shadow:0 4px 22px rgba(232,185,74,.45)}
+#st.on{opacity:1;transform:translateY(0)}
+#st:hover{transform:translateY(-3px)}
+
+/* NAVBAR */
+nav{position:fixed;top:0;width:100%;height:var(--nh);z-index:500;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(14px,4vw,56px);transition:background .4s,box-shadow .4s}
+nav.scrolled{background:rgba(7,9,13,.93);backdrop-filter:blur(16px);box-shadow:0 2px 28px rgba(0,0,0,.6)}
+.ngrad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(7,9,13,.88),transparent);pointer-events:none}
+.logo{font-family:var(--fh);font-size:1.85rem;letter-spacing:2px;text-decoration:none;position:relative;z-index:1;flex-shrink:0;
+  background:linear-gradient(130deg,var(--acc) 0%,#fff 65%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nlinks{display:flex;gap:6px;list-style:none;position:relative;z-index:1}
+.nlinks a{color:var(--muted);text-decoration:none;font-size:.86rem;font-weight:500;letter-spacing:.4px;padding:6px 13px;border-radius:6px;transition:color var(--tr),background var(--tr)}
+.nlinks a:hover,.nlinks a.act{color:var(--txt);background:rgba(255,255,255,.08)}
+.nright{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.swrap{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:6px 13px;transition:var(--tr);max-width:36px;overflow:hidden}
+.swrap.open{max-width:230px;background:rgba(255,255,255,.11);border-color:var(--acc)}
+.swrap input{background:transparent;border:none;outline:none;color:var(--txt);font-family:var(--fb);font-size:.86rem;width:0;transition:width var(--tr)}
+.swrap.open input{width:180px}
+.swrap i{color:var(--muted);cursor:pointer;font-size:.88rem;flex-shrink:0}
+.prof{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--acc2),var(--acc));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;cursor:pointer;border:2px solid transparent;transition:var(--tr)}
+.prof:hover{border-color:var(--acc);transform:scale(1.08)}
+.ham{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+.ham span{display:block;width:23px;height:2px;background:var(--txt);border-radius:2px;transition:var(--tr)}
+.ham.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.ham.open span:nth-child(2){opacity:0}
+.ham.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mmenu{position:fixed;top:var(--nh);left:0;right:0;background:rgba(7,9,13,.97);backdrop-filter:blur(22px);padding:18px;z-index:490;transform:translateY(-110%);transition:transform .4s cubic-bezier(.4,0,.2,1);border-bottom:1px solid rgba(255,255,255,.07)}
+.mmenu.open{transform:translateY(0)}
+.mmenu ul{list-style:none;display:flex;flex-direction:column;gap:3px}
+.mmenu a{color:var(--txt);text-decoration:none;font-size:1rem;display:block;padding:11px 15px;border-radius:8px;transition:background var(--tr)}
+.mmenu a:hover{background:rgba(255,255,255,.07)}
+
+/* HERO */
+.hero{position:relative;height:100vh;min-height:580px;display:flex;align-items:flex-end;padding-bottom:clamp(55px,8vh,95px);overflow:hidden}
+.hslide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.3s ease}
+.hslide.on{opacity:1}
+.hov{position:absolute;inset:0;background:linear-gradient(to right,rgba(7,9,13,.88) 0%,rgba(7,9,13,.45) 55%,transparent 100%),linear-gradient(to top,rgba(7,9,13,1) 0%,rgba(7,9,13,.5) 28%,transparent 55%)}
+.hcontent{position:relative;z-index:2;padding:0 clamp(18px,5vw,76px);max-width:660px;animation:heroin .9s ease .4s both}
+@keyframes heroin{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.hbadge{display:inline-flex;align-items:center;gap:7px;background:rgba(232,185,74,.13);border:1px solid rgba(232,185,74,.28);color:var(--acc);border-radius:20px;padding:4px 13px;font-size:.76rem;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:16px}
+.htitle{font-family:var(--fh);font-size:clamp(2.8rem,6.5vw,5.2rem);line-height:.94;letter-spacing:2px;margin-bottom:15px;text-shadow:0 4px 28px rgba(0,0,0,.55)}
+.htitle span{color:var(--acc)}
+.hmeta{display:flex;align-items:center;gap:12px;font-size:.8rem;color:var(--muted);margin-bottom:14px;flex-wrap:wrap}
+.hmeta .d{width:3px;height:3px;border-radius:50%;background:var(--muted)}
+.hrat{color:var(--acc)}
+.hdesc{font-size:clamp(.86rem,1.4vw,.98rem);line-height:1.72;color:rgba(237,241,246,.72);margin-bottom:28px;max-width:490px}
+.hbtns{display:flex;gap:13px;flex-wrap:wrap}
+.bplay{display:inline-flex;align-items:center;gap:9px;background:var(--acc);color:#0a0a0a;border:none;padding:13px 28px;border-radius:50px;font-family:var(--fb);font-size:.9rem;font-weight:700;cursor:pointer;transition:var(--tr);box-shadow:0 6px 28px rgba(232,185,74,.32);letter-spacing:.4px}
+.bplay:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 10px 38px rgba(232,185,74,.48)}
+.boutl{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);color:var(--txt);border:1px solid rgba(255,255,255,.2);padding:13px 26px;border-radius:50px;font-family:var(--fb);font-size:.9rem;font-weight:600;cursor:pointer;transition:var(--tr);letter-spacing:.4px}
+.boutl:hover{background:rgba(255,255,255,.17);border-color:rgba(255,255,255,.38);transform:translateY(-2px)}
+.hdots{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:3}
+.hdot{width:7px;height:7px;border-radius:3px;background:rgba(255,255,255,.28);transition:var(--tr);cursor:pointer;border:none}
+.hdot.on{width:24px;background:var(--acc)}
+
+/* SECTIONS */
+.sec{padding:clamp(28px,4vw,55px) 0 16px}
+.shead{display:flex;align-items:center;justify-content:space-between;padding:0 clamp(14px,4vw,56px);margin-bottom:18px}
+.stitle{font-family:var(--fh);font-size:clamp(1.35rem,2.2vw,1.8rem);letter-spacing:1.5px;display:flex;align-items:center;gap:11px}
+.stitle::before{content:'';display:block;width:3.5px;height:1.15em;background:var(--acc);border-radius:2px;flex-shrink:0}
+.seeall{color:var(--acc);font-size:.8rem;font-weight:600;text-decoration:none;letter-spacing:.4px;opacity:.75;transition:opacity var(--tr)}
+.seeall:hover{opacity:1}
+
+/* ROW */
+.rwrap{position:relative}
+.rscroll{overflow:hidden}
+.mrow{display:flex;gap:12px;padding:10px clamp(14px,4vw,56px) 18px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.mrow::-webkit-scrollbar{display:none}
+.sbtn{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:76px;border-radius:5px;background:rgba(7,9,13,.88);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);color:var(--txt);font-size:.95rem;cursor:pointer;z-index:10;transition:var(--tr);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none}
+.rwrap:hover .sbtn{opacity:1;pointer-events:all}
+.sbtn:hover{background:rgba(232,185,74,.18);border-color:var(--acc)}
+.sbtn.l{left:0;border-radius:0 5px 5px 0}.sbtn.r{right:0;border-radius:5px 0 0 5px}
+
+/* CARD */
+.card{flex-shrink:0;width:clamp(128px,15.5vw,196px);scroll-snap-align:start;border-radius:var(--r);position:relative;overflow:visible;cursor:pointer;transition:transform .32s cubic-bezier(.2,0,.1,1)}
+.card:hover{transform:scale(1.11) translateY(-8px);z-index:20}
+.cimgw{border-radius:var(--r);overflow:hidden;aspect-ratio:2/3;position:relative}
+.card img{width:100%;height:100%;object-fit:cover;display:block;transition:filter .32s}
+.card:hover img{filter:brightness(.5)}
+.cov{position:absolute;inset:0;background:linear-gradient(to top,rgba(7,9,13,.98) 0%,transparent 55%);border-radius:var(--r);display:flex;flex-direction:column;justify-content:flex-end;padding:12px 11px;opacity:0;transform:translateY(6px);transition:opacity .28s,transform .28s}
+.card:hover .cov{opacity:1;transform:translateY(0)}
+.ctitle{font-weight:700;font-size:.8rem;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmeta{font-size:.7rem;color:var(--muted);margin-bottom:8px}
+.crat{color:var(--acc);font-size:.7rem;font-weight:600}
+.cacts{display:flex;gap:7px;margin-top:5px}
+.cbtn{flex:1;border:none;border-radius:6px;font-family:var(--fb);font-size:.7rem;font-weight:600;cursor:pointer;padding:7px 4px;transition:var(--tr);display:flex;align-items:center;justify-content:center;gap:4px}
+.cbtn.play{background:var(--acc);color:#000}.cbtn.play:hover{background:#f0c55a}
+.cbtn.add{background:rgba(255,255,255,.11);color:var(--txt)}.cbtn.add:hover{background:rgba(255,255,255,.2)}
+.cbtn.add.saved{background:rgba(232,185,74,.18);color:var(--acc)}
+.crank{position:absolute;top:9px;left:9px;background:var(--acc2);color:#fff;font-size:.66rem;font-weight:700;letter-spacing:.4px;padding:3px 7px;border-radius:4px;z-index:2}
+
+/* FEATURED */
+.feat{margin:36px clamp(14px,4vw,56px);border-radius:14px;overflow:hidden;position:relative;min-height:370px;display:flex;align-items:flex-end;background:var(--sur)}
+.fbg{position:absolute;inset:0;background-size:cover;background-position:center top;filter:brightness(.42) saturate(1.25);transition:transform 6s ease}
+.feat:hover .fbg{transform:scale(1.04)}
+.fov{position:absolute;inset:0;background:linear-gradient(to right,rgba(7,9,13,.93) 0%,rgba(7,9,13,.55) 48%,transparent 100%),linear-gradient(to top,rgba(7,9,13,.9) 0%,transparent 58%)}
+.fcont{position:relative;z-index:2;padding:clamp(28px,5vw,56px);max-width:580px}
+.flabel{display:inline-flex;align-items:center;gap:6px;font-size:.73rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--acc);margin-bottom:12px}
+.flabel i{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.ftitle{font-family:var(--fh);font-size:clamp(1.9rem,3.8vw,3rem);letter-spacing:1.5px;line-height:1;margin-bottom:13px}
+.fdesc{font-size:.88rem;color:rgba(237,241,246,.68);line-height:1.7;margin-bottom:22px;max-width:430px}
+.ftags{display:flex;gap:7px;margin-bottom:22px;flex-wrap:wrap}
+.tag{font-size:.7rem;font-weight:600;letter-spacing:.4px;padding:4px 11px;border-radius:20px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);color:var(--muted)}
+
+/* MY LIST */
+.empty{text-align:center;padding:55px 20px;color:var(--muted)}
+.empty i{font-size:2.8rem;margin-bottom:14px;display:block;opacity:.35}
+.empty p{font-size:.92rem}
+
+/* MODAL */
+.mbk{position:fixed;inset:0;background:rgba(0,0,0,.9);backdrop-filter:blur(10px);z-index:800;display:none;align-items:center;justify-content:center;padding:18px}
+.mbk.open{display:flex}
+.modal{background:var(--sur);border-radius:13px;overflow:hidden;width:100%;max-width:840px;border:1px solid rgba(255,255,255,.09);animation:min .33s ease;position:relative}
+@keyframes min{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+.mclose{position:absolute;top:13px;right:13px;z-index:2;background:rgba(255,255,255,.11);border:none;color:var(--txt);width:35px;height:35px;border-radius:50%;font-size:.95rem;cursor:pointer;transition:var(--tr);display:flex;align-items:center;justify-content:center}
+.mclose:hover{background:var(--acc2)}
+.mvid{aspect-ratio:16/9;width:100%;background:#000}
+.mvid iframe{width:100%;height:100%;border:none}
+.minfo{padding:22px}
+.mtitle{font-family:var(--fh);font-size:1.55rem;letter-spacing:1px;margin-bottom:7px}
+.mdesc{font-size:.86rem;color:var(--muted);line-height:1.65}
+
+/* FOOTER */
+footer{margin-top:55px;background:var(--bg2);border-top:1px solid rgba(255,255,255,.055);padding:clamp(36px,5vw,65px) clamp(14px,4vw,56px) 28px}
+.ftop{display:grid;grid-template-columns:1fr repeat(3,auto);gap:38px;margin-bottom:46px}
+.fbrand .logo{display:inline-block;margin-bottom:13px}
+.fbrand p{font-size:.83rem;color:var(--muted);line-height:1.7;max-width:250px}
+.fcol h4{font-size:.77rem;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.fcol ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.fcol a{color:rgba(237,241,246,.55);text-decoration:none;font-size:.83rem;transition:color var(--tr)}
+.fcol a:hover{color:var(--acc)}
+.fbot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;padding-top:22px;border-top:1px solid rgba(255,255,255,.055)}
+.fcopy{font-size:.78rem;color:var(--muted)}
+.socials{display:flex;gap:9px}
+.socials a{width:36px;height:36px;border-radius:9px;background:var(--sur2);display:flex;align-items:center;justify-content:center;color:var(--muted);text-decoration:none;font-size:.88rem;transition:var(--tr);border:1px solid rgba(255,255,255,.055)}
+.socials a:hover{background:var(--acc);color:#000;border-color:var(--acc);transform:translateY(-2px)}
+
+/* TOAST */
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(18px);background:var(--sur2);border:1px solid rgba(255,255,255,.1);color:var(--txt);padding:11px 20px;border-radius:28px;font-size:.83rem;font-weight:500;z-index:700;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* DIVIDER */
+.divline{height:2px;background:linear-gradient(to right,var(--acc),var(--acc2),transparent);margin:0 clamp(14px,4vw,56px);border-radius:2px}
+
+@media(max-width:900px){.nlinks{display:none}.ham{display:flex}.ftop{grid-template-columns:1fr 1fr}}
+@media(max-width:580px){.ftop{grid-template-columns:1fr}.hmeta{gap:7px}.feat{min-height:280px}}
+</style>
+</head>
+<body>
+
+<div id="loader"><div class="ll">CineWave</div></div>
+<div class="toast" id="toast"></div>
+<button id="st" title="Back to top"><i class="fas fa-chevron-up"></i></button>
+
+<!-- NAVBAR -->
+<nav id="nav">
+  <div class="ngrad"></div>
+  <a href="#" class="logo">CineWave</a>
+  <ul class="nlinks">
+    <li><a href="#" class="act">Home</a></li>
+    <li><a href="#sec-movies">Movies</a></li>
+    <li><a href="#sec-tv">TV Shows</a></li>
+    <li><a href="#sec-mylist">My List</a></li>
+  </ul>
+  <div class="nright">
+    <div class="swrap" id="sw">
+      <i class="fas fa-search" id="stoggle"></i>
+      <input type="text" placeholder="Search titles…" id="sinput">
+    </div>
+    <div class="prof">CW</div>
+    <button class="ham" id="ham"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mmenu" id="mm">
+  <ul>
+    <li><a href="#">Home</a></li>
+    <li><a href="#sec-movies">Movies</a></li>
+    <li><a href="#sec-tv">TV Shows</a></li>
+    <li><a href="#sec-mylist">My List</a></li>
+  </ul>
+</div>
+
+<!-- HERO — cinematic space/night/city Unsplash backdrops -->
+<section class="hero">
+  <div class="hslide on" style="background-image:url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=1920&q=85&fit=crop')"></div>
+  <div class="hslide" style="background-image:url('https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1920&q=85&fit=crop')"></div>
+  <div class="hslide" style="background-image:url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=1920&q=85&fit=crop')"></div>
+  <div class="hov"></div>
+  <div class="hcontent" id="hcont">
+    <div class="hbadge"><i class="fas fa-fire"></i> #1 Trending Today</div>
+    <h1 class="htitle">The Last <span>Horizon</span></h1>
+    <div class="hmeta">
+      <span class="hrat"><i class="fas fa-star"></i> 9.1</span>
+      <span class="d"></span><span>2024</span>
+      <span class="d"></span><span>2h 28m</span>
+      <span class="d"></span><span>Sci-Fi · Thriller</span>
+    </div>
+    <p class="hdesc">A renegade astronaut discovers a signal from the edge of the known universe — one that will force humanity to choose between survival and evolution. A breathtaking odyssey into the unknown.</p>
+    <div class="hbtns">
+      <button class="bplay" onclick="openModal('The Last Horizon','dQw4w9WgXcQ','An astronaut discovers a signal from the edge of the universe. A breathtaking sci-fi epic.')"><i class="fas fa-play"></i> Watch Now</button>
+      <button class="boutl" onclick="heroAdd('h1','The Last Horizon','9.1','2024','Sci-Fi')"><i class="fas fa-plus" id="hi1"></i> My List</button>
+    </div>
+  </div>
+  <div class="hdots" id="hdots"></div>
+</section>
+
+<!-- TRENDING -->
+<section class="sec" id="sec-movies">
+  <div class="shead"><h2 class="stitle">Trending Now</h2><a href="#" class="seeall">See all →</a></div>
+  <div class="rwrap"><button class="sbtn l" onclick="scrollR('r0',-1)"><i class="fas fa-chevron-left"></i></button><div class="rscroll"><div class="mrow" id="r0"></div></div><button class="sbtn r" onclick="scrollR('r0',1)"><i class="fas fa-chevron-right"></i></button></div>
+</section>
+
+<!-- TOP RATED -->
+<section class="sec">
+  <div class="shead"><h2 class="stitle">Top Rated</h2><a href="#" class="seeall">See all →</a></div>
+  <div class="rwrap"><button class="sbtn l" onclick="scrollR('r1',-1)"><i class="fas fa-chevron-left"></i></button><div class="rscroll"><div class="mrow" id="r1"></div></div><button class="sbtn r" onclick="scrollR('r1',1)"><i class="fas fa-chevron-right"></i></button></div>
+</section>
+
+<!-- FEATURED -->
+<section class="sec">
+  <div class="shead"><h2 class="stitle">Featured Film</h2></div>
+  <div class="feat">
+    <div class="fbg" style="background-image:url('https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1400&q=85&fit=crop')"></div>
+    <div class="fov"></div>
+    <div class="fcont">
+      <div class="flabel"><i class="fas fa-circle"></i> Streaming Now</div>
+      <h2 class="ftitle">Echoes of Tomorrow</h2>
+      <p class="fdesc">An acclaimed director's magnum opus — a hauntingly beautiful time-loop thriller spanning continents and centuries. Winner of 4 Academy Awards including Best Picture.</p>
+      <div class="ftags"><span class="tag">Drama</span><span class="tag">Thriller</span><span class="tag">4K Ultra HD</span><span class="tag">Dolby Atmos</span></div>
+      <div class="hbtns">
+        <button class="bplay" onclick="openModal('Echoes of Tomorrow','dQw4w9WgXcQ','A haunting time-loop thriller. Winner of 4 Academy Awards.')"><i class="fas fa-play"></i> Play Film</button>
+        <button class="boutl" onclick="heroAdd('h2','Echoes of Tomorrow','9.3','2023','Drama')"><i class="fas fa-plus" id="hi2"></i> My List</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACTION -->
+<section class="sec">
+  <div class="shead"><h2 class="stitle">Action &amp; Adventure</h2><a href="#" class="seeall">See all →</a></div>
+  <div class="rwrap"><button class="sbtn l" onclick="scrollR('r2',-1)"><i class="fas fa-chevron-left"></i></button><div class="rscroll"><div class="mrow" id="r2"></div></div><button class="sbtn r" onclick="scrollR('r2',1)"><i class="fas fa-chevron-right"></i></button></div>
+</section>
+
+<!-- TV SHOWS -->
+<section class="sec" id="sec-tv">
+  <div class="divline"></div><div style="height:26px"></div>
+  <div class="shead"><h2 class="stitle">TV Shows</h2><a href="#" class="seeall">See all →</a></div>
+  <div class="rwrap"><button class="sbtn l" onclick="scrollR('r3',-1)"><i class="fas fa-chevron-left"></i></button><div class="rscroll"><div class="mrow" id="r3"></div></div><button class="sbtn r" onclick="scrollR('r3',1)"><i class="fas fa-chevron-right"></i></button></div>
+</section>
+
+<!-- COMEDY -->
+<section class="sec">
+  <div class="shead"><h2 class="stitle">Comedy &amp; Feel Good</h2><a href="#" class="seeall">See all →</a></div>
+  <div class="rwrap"><button class="sbtn l" onclick="scrollR('r4',-1)"><i class="fas fa-chevron-left"></i></button><div class="rscroll"><div class="mrow" id="r4"></div></div><button class="sbtn r" onclick="scrollR('r4',1)"><i class="fas fa-chevron-right"></i></button></div>
+</section>
+
+<!-- MY LIST -->
+<section class="sec" id="sec-mylist">
+  <div class="divline"></div><div style="height:26px"></div>
+  <div class="shead"><h2 class="stitle">My List</h2><span id="mlcount" style="color:var(--muted);font-size:.83rem"></span></div>
+  <div class="rwrap" id="mlwrap" style="display:none"><button class="sbtn l" onclick="scrollR('mlrow',-1)"><i class="fas fa-chevron-left"></i></button><div class="rscroll"><div class="mrow" id="mlrow"></div></div><button class="sbtn r" onclick="scrollR('mlrow',1)"><i class="fas fa-chevron-right"></i></button></div>
+  <div class="empty" id="mlempty"><i class="fas fa-bookmark"></i><p>Movies and shows you save will appear here.</p></div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ftop">
+    <div class="fbrand">
+      <a href="#" class="logo">CineWave</a>
+      <p>Stream thousands of movies &amp; shows in stunning 4K quality, anytime, anywhere.</p>
+    </div>
+    <div class="fcol"><h4>Company</h4><ul><li><a href="#">About Us</a></li><li><a href="#">Careers</a></li><li><a href="#">Press</a></li><li><a href="#">Blog</a></li></ul></div>
+    <div class="fcol"><h4>Support</h4><ul><li><a href="#">Help Center</a></li><li><a href="#">Contact</a></li><li><a href="#">Account</a></li><li><a href="#">Devices</a></li></ul></div>
+    <div class="fcol"><h4>Legal</h4><ul><li><a href="#">Privacy</a></li><li><a href="#">Terms</a></li><li><a href="#">Cookies</a></li><li><a href="#">DMCA</a></li></ul></div>
+  </div>
+  <div class="fbot">
+    <p class="fcopy">© 2024 CineWave. All rights reserved.</p>
+    <div class="socials">
+      <a href="#"><i class="fab fa-x-twitter"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-youtube"></i></a>
+      <a href="#"><i class="fab fa-discord"></i></a>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="mbk" id="modal">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    <div class="mvid"><iframe id="mframe" src="" allowfullscreen allow="autoplay;encrypted-media"></iframe></div>
+    <div class="minfo"><h3 class="mtitle" id="mtitle"></h3><p class="mdesc" id="mdesc"></p></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  ALL IMAGES FROM UNSPLASH — guaranteed to load in browser
+//  Using portrait-friendly crops from cinematic photos
+// ═══════════════════════════════════════════════════════
+const DB = {
+  r0: [ // Trending
+    {title:'Interstellar',          year:2014,genre:'Sci-Fi',  rating:'9.1',img:'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=600&fit=crop&q=80'},
+    {title:'Inception',             year:2010,genre:'Thriller',rating:'8.8',img:'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=600&fit=crop&q=80'},
+    {title:'Oppenheimer',           year:2023,genre:'Drama',   rating:'8.9',img:'https://images.unsplash.com/photo-1536152470836-b943b246224c?w=400&h=600&fit=crop&q=80'},
+    {title:'Dune: Part Two',        year:2024,genre:'Sci-Fi',  rating:'8.5',img:'https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=400&h=600&fit=crop&q=80'},
+    {title:'The Dark Knight',       year:2008,genre:'Action',  rating:'9.0',img:'https://images.unsplash.com/photo-1531259683007-016a7b628fc3?w=400&h=600&fit=crop&q=80'},
+    {title:'Parasite',              year:2019,genre:'Thriller',rating:'8.6',img:'https://images.unsplash.com/photo-1512070679279-8988d32161be?w=400&h=600&fit=crop&q=80'},
+    {title:'Avatar 2',              year:2022,genre:'Sci-Fi',  rating:'7.6',img:'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=400&h=600&fit=crop&q=80'},
+    {title:'The Batman',            year:2022,genre:'Crime',   rating:'7.8',img:'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400&h=600&fit=crop&q=80'},
+    {title:'John Wick 4',           year:2023,genre:'Action',  rating:'7.7',img:'https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=400&h=600&fit=crop&q=80'},
+    {title:'Joker',                 year:2019,genre:'Drama',   rating:'8.4',img:'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&h=600&fit=crop&q=80'},
+  ],
+  r1: [ // Top Rated
+    {title:'Shawshank Redemption',  year:1994,genre:'Drama',   rating:'9.3',img:'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=600&fit=crop&q=80'},
+    {title:'The Godfather',         year:1972,genre:'Crime',   rating:'9.2',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=600&fit=crop&q=80'},
+    {title:'Pulp Fiction',          year:1994,genre:'Crime',   rating:'8.9',img:'https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?w=400&h=600&fit=crop&q=80'},
+    {title:'Schindler\'s List',     year:1993,genre:'War',     rating:'9.0',img:'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=400&h=600&fit=crop&q=80'},
+    {title:'Forrest Gump',          year:1994,genre:'Drama',   rating:'8.8',img:'https://images.unsplash.com/photo-1473621038790-b778b4750efe?w=400&h=600&fit=crop&q=80'},
+    {title:'GoodFellas',            year:1990,genre:'Crime',   rating:'8.7',img:'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&h=600&fit=crop&q=80'},
+    {title:'Fight Club',            year:1999,genre:'Drama',   rating:'8.8',img:'https://images.unsplash.com/photo-1502239608882-93b729c6af43?w=400&h=600&fit=crop&q=80'},
+    {title:'Whiplash',              year:2014,genre:'Drama',   rating:'8.5',img:'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=600&fit=crop&q=80'},
+    {title:'La La Land',            year:2016,genre:'Romance', rating:'8.0',img:'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400&h=600&fit=crop&q=80'},
+    {title:'Everything Everywhere', year:2022,genre:'Sci-Fi',  rating:'7.8',img:'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400&h=600&fit=crop&q=80'},
+  ],
+  r2: [ // Action
+    {title:'Top Gun: Maverick',     year:2022,genre:'Action',  rating:'8.3',img:'https://images.unsplash.com/photo-1484910292437-025e5d13ce87?w=400&h=600&fit=crop&q=80'},
+    {title:'Mission Impossible 7',  year:2023,genre:'Thriller',rating:'7.7',img:'https://images.unsplash.com/photo-1467533003447-e295ff1b0435?w=400&h=600&fit=crop&q=80'},
+    {title:'Mad Max: Fury Road',    year:2015,genre:'Action',  rating:'8.1',img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=600&fit=crop&q=80'},
+    {title:'Gladiator II',          year:2024,genre:'Epic',    rating:'7.4',img:'https://images.unsplash.com/photo-1531512073830-ba890ca4eba2?w=400&h=600&fit=crop&q=80'},
+    {title:'The Martian',           year:2015,genre:'Sci-Fi',  rating:'8.0',img:'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=400&h=600&fit=crop&q=80'},
+    {title:'Dunkirk',               year:2017,genre:'War',     rating:'7.9',img:'https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=400&h=600&fit=crop&q=80'},
+    {title:'Black Panther',         year:2018,genre:'Action',  rating:'7.3',img:'https://images.unsplash.com/photo-1477346611705-65d1883cee1e?w=400&h=600&fit=crop&q=80'},
+    {title:'Avengers: Endgame',     year:2019,genre:'Action',  rating:'8.4',img:'https://images.unsplash.com/photo-1604537466608-109fa2f16c3b?w=400&h=600&fit=crop&q=80'},
+    {title:'Spider-Man: NWH',       year:2021,genre:'Action',  rating:'8.3',img:'https://images.unsplash.com/photo-1608889825205-eebdb9fc5806?w=400&h=600&fit=crop&q=80'},
+    {title:'No Time to Die',        year:2021,genre:'Spy',     rating:'7.3',img:'https://images.unsplash.com/photo-1551269901-5c5e14c25df7?w=400&h=600&fit=crop&q=80'},
+  ],
+  r3: [ // TV Shows
+    {title:'Breaking Bad',          year:2008,genre:'Crime',   rating:'9.5',img:'https://images.unsplash.com/photo-1489824904134-891ab64532f1?w=400&h=600&fit=crop&q=80'},
+    {title:'The Last of Us',        year:2023,genre:'Drama',   rating:'8.8',img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop&q=80'},
+    {title:'House of the Dragon',   year:2022,genre:'Fantasy', rating:'8.5',img:'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=400&h=600&fit=crop&q=80'},
+    {title:'Stranger Things',       year:2016,genre:'Sci-Fi',  rating:'8.7',img:'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400&h=600&fit=crop&q=80'},
+    {title:'Wednesday',             year:2022,genre:'Mystery', rating:'8.1',img:'https://images.unsplash.com/photo-1543007630-9359815b61af?w=400&h=600&fit=crop&q=80'},
+    {title:'The Bear',              year:2022,genre:'Drama',   rating:'8.7',img:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=600&fit=crop&q=80'},
+    {title:'Succession',            year:2018,genre:'Drama',   rating:'8.9',img:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=600&fit=crop&q=80'},
+    {title:'Peaky Blinders',        year:2013,genre:'Crime',   rating:'8.8',img:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&h=600&fit=crop&q=80'},
+    {title:'Ozark',                 year:2017,genre:'Thriller',rating:'8.5',img:'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=600&fit=crop&q=80'},
+    {title:'The Crown',             year:2016,genre:'History', rating:'8.6',img:'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=600&fit=crop&q=80'},
+  ],
+  r4: [ // Comedy
+    {title:'Barbie',                year:2023,genre:'Comedy',  rating:'6.9',img:'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=400&h=600&fit=crop&q=80'},
+    {title:'Grand Budapest Hotel',  year:2014,genre:'Comedy',  rating:'8.1',img:'https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=400&h=600&fit=crop&q=80'},
+    {title:'Knives Out',            year:2019,genre:'Mystery', rating:'7.9',img:'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=600&fit=crop&q=80'},
+    {title:'The Nice Guys',         year:2016,genre:'Comedy',  rating:'7.4',img:'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=400&h=600&fit=crop&q=80'},
+    {title:'Game Night',            year:2018,genre:'Comedy',  rating:'7.0',img:'https://images.unsplash.com/photo-1543007630-9359815b61af?w=400&h=600&fit=crop&q=80'},
+    {title:'Superbad',              year:2007,genre:'Comedy',  rating:'7.6',img:'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=400&h=600&fit=crop&q=80'},
+    {title:'The Hangover',          year:2009,genre:'Comedy',  rating:'7.7',img:'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=400&h=600&fit=crop&q=80'},
+    {title:'Palm Springs',          year:2020,genre:'Romance', rating:'7.4',img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop&q=80'},
+    {title:'Get Out',               year:2017,genre:'Horror',  rating:'7.7',img:'https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=400&h=600&fit=crop&q=80'},
+    {title:'Free Guy',              year:2021,genre:'Comedy',  rating:'7.1',img:'https://images.unsplash.com/photo-1502810365585-56ffa361fdde?w=400&h=600&fit=crop&q=80'},
+  ],
+};
+
+const TRAILERS=['dQw4w9WgXcQ','L_jWHffIx5E','9bZkp7q19f0','kffacxfA7G4','fJ9rUzIMcZQ'];
+const FB='https://images.unsplash.com/photo-1489824904134-891ab64532f1?w=400&h=600&fit=crop&q=80';
+let myList=JSON.parse(localStorage.getItem('cw4')||'[]');
+const saveML=()=>localStorage.setItem('cw4',JSON.stringify(myList));
+
+// ── Build card ──────────────────────────────
+function buildCard(m,idx,rowId,showRank){
+  const id=`${rowId}_${idx}`;
+  const inList=myList.some(x=>x.id===id);
+  const trl=TRAILERS[Math.floor(Math.random()*TRAILERS.length)];
+  const ts=m.title.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  const gs=m.genre;
+  const ds=`${gs} · ${m.year} · ★${m.rating}`;
+  const c=document.createElement('div');
+  c.className='card';c.dataset.id=id;
+  c.innerHTML=`
+    ${showRank?`<div class="crank">#${idx+1}</div>`:''}
+    <div class="cimgw">
+      <img src="${m.img}" alt="${ts}" loading="lazy" onerror="this.onerror=null;this.src='${FB}'">
+      <div class="cov">
+        <div class="ctitle">${m.title}</div>
+        <div class="cmeta">${m.year} · ${gs}</div>
+        <div class="crat"><i class="fas fa-star"></i> ${m.rating}</div>
+        <div class="cacts">
+          <button class="cbtn play" onclick="openModal('${ts}','${trl}','${ds}')"><i class="fas fa-play"></i> Play</button>
+          <button class="cbtn add ${inList?'saved':''}" id="cb_${id}" onclick="toggleML('${id}','${ts}','${m.rating}','${m.year}','${gs}','${m.img}')">
+            <i class="fas ${inList?'fa-check':'fa-plus'}"></i> ${inList?'Saved':'Save'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  return c;
+}
+
+function populateRow(id,rank=false){
+  const el=document.getElementById(id);
+  if(!el)return;
+  DB[id].forEach((m,i)=>el.appendChild(buildCard(m,i,id,rank)));
+}
+
+// ── My List ─────────────────────────────────
+function toggleML(id,title,rating,year,genre,img){
+  const i=myList.findIndex(x=>x.id===id);
+  if(i>-1){myList.splice(i,1);showToast(`Removed "${title}"`);}
+  else{myList.push({id,title,rating,year,genre,img});showToast(`Added "${title}" to My List`);}
+  saveML();refreshBtn(id,myList.some(x=>x.id===id));renderML();
+}
+function heroAdd(hid,title,rating,year,genre){
+  const i=myList.findIndex(x=>x.id===hid);
+  const ic=document.getElementById('hi'+hid.slice(-1));
+  if(i>-1){myList.splice(i,1);if(ic)ic.className='fas fa-plus';showToast(`Removed "${title}"`);}
+  else{myList.push({id:hid,title,rating,year,genre,img:''});if(ic)ic.className='fas fa-check';showToast(`Added "${title}" to My List`);}
+  saveML();renderML();
+}
+function refreshBtn(id,saved){
+  const b=document.getElementById('cb_'+id);if(!b)return;
+  b.className=`cbtn add ${saved?'saved':''}`;
+  b.innerHTML=`<i class="fas ${saved?'fa-check':'fa-plus'}"></i> ${saved?'Saved':'Save'}`;
+}
+function removeML(id){
+  const m=myList.find(x=>x.id===id);
+  myList=myList.filter(x=>x.id!==id);
+  saveML();showToast(`Removed "${m?m.title:'item'}"`);refreshBtn(id,false);renderML();
+}
+function renderML(){
+  const row=document.getElementById('mlrow');
+  const empty=document.getElementById('mlempty');
+  const wrap=document.getElementById('mlwrap');
+  const cnt=document.getElementById('mlcount');
+  row.innerHTML='';
+  if(!myList.length){empty.style.display='block';wrap.style.display='none';cnt.textContent='';return;}
+  empty.style.display='none';wrap.style.display='block';
+  cnt.textContent=`${myList.length} title${myList.length>1?'s':''}`;
+  myList.forEach(m=>{
+    const ps=m.img||FB;
+    const ts=(m.title||'').replace(/'/g,"\\'");
+    const c=document.createElement('div');c.className='card';c.dataset.id=m.id;
+    c.innerHTML=`
+      <div class="cimgw">
+        <img src="${ps}" alt="${ts}" loading="lazy" onerror="this.onerror=null;this.src='${FB}'">
+        <div class="cov">
+          <div class="ctitle">${m.title}</div>
+          <div class="cmeta">${m.year} · ${m.genre}</div>
+          <div class="crat"><i class="fas fa-star"></i> ${m.rating}</div>
+          <div class="cacts">
+            <button class="cbtn play" onclick="openModal('${ts}','${TRAILERS[0]}','${m.genre} · ${m.year}')"><i class="fas fa-play"></i> Play</button>
+            <button class="cbtn add saved" onclick="removeML('${m.id}')"><i class="fas fa-times"></i> Remove</button>
+          </div>
+        </div>
+      </div>`;
+    row.appendChild(c);
+  });
+}
+
+// ── Modal ───────────────────────────────────
+function openModal(title,vid,desc){
+  document.getElementById('mtitle').textContent=title;
+  document.getElementById('mdesc').textContent=desc;
+  document.getElementById('mframe').src=`https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`;
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  document.getElementById('mframe').src='';
+  document.body.style.overflow='';
+}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+// ── Scroll row ──────────────────────────────
+function scrollR(id,dir){
+  const el=document.getElementById(id);if(!el)return;
+  el.scrollBy({left:dir*el.parentElement.offsetWidth*.8,behavior:'smooth'});
+}
+
+// ── Hero slideshow ──────────────────────────
+const heroData=[
+  {title:'The Last <span>Horizon</span>',badge:'🔥 #1 Trending Today',desc:'A renegade astronaut discovers a signal from the edge of the known universe — one that will force humanity to choose between survival and evolution.'},
+  {title:'Neon <span>Protocol</span>',   badge:'⚡ New Release',       desc:'In a city where reality is engineered by algorithms, one detective digs for the truth buried beneath a billion lines of code.'},
+  {title:'Crimson <span>Atlas</span>',   badge:'🏆 Award Winner',      desc:'A sweeping epic about war, love, and the maps we draw to find our way home. Critics call it the defining film of the decade.'},
+];
+let cur=0;
+const slides=document.querySelectorAll('.hslide');
+const dotsEl=document.getElementById('hdots');
+const hcont=document.getElementById('hcont');
+heroData.forEach((_,i)=>{
+  const d=document.createElement('button');d.className=`hdot ${i===0?'on':''}`;d.onclick=()=>goSlide(i);dotsEl.appendChild(d);
+});
+function goSlide(n){
+  slides[cur].classList.remove('on');dotsEl.children[cur].classList.remove('on');
+  cur=n%slides.length;slides[cur].classList.add('on');dotsEl.children[cur].classList.add('on');
+  const s=heroData[cur];hcont.style.opacity=0;
+  setTimeout(()=>{
+    hcont.querySelector('.hbadge').textContent=s.badge;
+    hcont.querySelector('.htitle').innerHTML=s.title;
+    hcont.querySelector('.hdesc').textContent=s.desc;
+    hcont.style.opacity=1;hcont.style.transition='opacity .55s ease';
+  },320);
+}
+let ai=setInterval(()=>goSlide((cur+1)%slides.length),6000);
+document.querySelector('.hero').addEventListener('mouseenter',()=>clearInterval(ai));
+document.querySelector('.hero').addEventListener('mouseleave',()=>{clearInterval(ai);ai=setInterval(()=>goSlide((cur+1)%slides.length),6000);});
+
+// ── Navbar ──────────────────────────────────
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',scrollY>35);
+  document.getElementById('st').classList.toggle('on',scrollY>380);
+});
+document.getElementById('st').onclick=()=>scrollTo({top:0,behavior:'smooth'});
+const ham=document.getElementById('ham');
+ham.addEventListener('click',()=>{ham.classList.toggle('open');document.getElementById('mm').classList.toggle('open');});
+const sw=document.getElementById('sw'),stog=document.getElementById('stoggle'),sinp=document.getElementById('sinput');
+stog.addEventListener('click',()=>{sw.classList.toggle('open');if(sw.classList.contains('open'))sinp.focus();else sinp.value='';});
+document.addEventListener('click',e=>{if(!sw.contains(e.target)){sw.classList.remove('open');sinp.value='';}});
+
+// ── Toast ───────────────────────────────────
+let tt;
+function showToast(msg){
+  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
+  clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+// ── INIT ────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  populateRow('r0',true);
+  populateRow('r1');
+  populateRow('r2');
+  populateRow('r3');
+  populateRow('r4');
+  renderML();
+  if(myList.some(x=>x.id==='h1')){const i=document.getElementById('hi1');if(i)i.className='fas fa-check';}
+  if(myList.some(x=>x.id==='h2')){const i=document.getElementById('hi2');if(i)i.className='fas fa-check';}
+  setTimeout(()=>document.getElementById('loader').classList.add('hide'),1300);
+});
+</script>
+</body>
+</html>
