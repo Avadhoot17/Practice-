@@ -1,7 +1,7 @@
 import java.lang.annotation.*;
 import java.lang.reflect.*;
 
-// ---------- Custom Annotation ----------aaaaaaaa
+// ---------- Custom Annotation ----------aaaaaaaaa
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 @interface AutoRun {
