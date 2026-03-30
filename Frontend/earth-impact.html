@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EarthTrace — Human Impact Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e0a;
+    --surface: #111811;
+    --card: #161e16;
+    --border: #1e2e1e;
+    --green: #4ade80;
+    --lime: #a3e635;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --orange: #fb923c;
+    --blue: #60a5fa;
+    --text: #e8f5e8;
+    --muted: #6b7f6b;
+    --accent: #22c55e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated bg grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(74,222,128,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74,222,128,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 24px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,14,10,0.8);
+    backdrop-filter: blur(20px);
+    position: sticky;
+    top: 0;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-dot {
+    width: 10px; height: 10px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .header-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 80px 40px 60px;
+  }
+
+  .hero-label {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--green);
+    border: 1px solid var(--green);
+    padding: 6px 16px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 10vw, 110px);
+    line-height: 0.9;
+    letter-spacing: 4px;
+    animation: fadeUp 0.6s 0.1s ease both;
+    background: linear-gradient(135deg, #e8f5e8, #4ade80 50%, #a3e635);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    margin-top: 24px;
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.7;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* CATEGORY FILTER */
+  .category-strip {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 10px;
+    padding: 0 40px 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cat-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+  }
+
+  .cat-btn:hover, .cat-btn.active {
+    border-color: var(--green);
+    color: var(--green);
+    background: rgba(74,222,128,0.06);
+  }
+
+  /* ITEM GRID */
+  .grid-container {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    padding: 0 40px 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  .item-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 18px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: fadeUp 0.5s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .item-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(74,222,128,0.04));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .item-card:hover {
+    border-color: rgba(74,222,128,0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+
+  .item-card:hover::before { opacity: 1; }
+
+  .item-card.selected {
+    border-color: var(--green);
+    background: rgba(74,222,128,0.07);
+  }
+
+  .item-icon { font-size: 28px; }
+
+  .item-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .item-cat {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .severity-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    position: absolute;
+    top: 14px; right: 14px;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    backdrop-filter: blur(6px);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-overlay.open {
+    display: flex;
+    animation: overlayIn 0.3s ease;
+  }
+
+  @keyframes overlayIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    max-width: 780px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalIn 0.3s ease;
+    position: relative;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.93) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-header {
+    padding: 32px 36px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .modal-icon { font-size: 48px; }
+
+  .modal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 2px;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .modal-subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .close-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 18px;
+    width: 36px; height: 36px;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .close-btn:hover { border-color: var(--red); color: var(--red); }
+
+  .modal-body { padding: 32px 36px; }
+
+  /* IMPACT METERS */
+  .impact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .impact-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+
+  .impact-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .impact-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 1px;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  .bar-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* DEGRADATION TIMELINE */
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .timeline {
+    display: flex;
+    gap: 0;
+    margin-bottom: 32px;
+    position: relative;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 20px; left: 20px; right: 20px;
+    height: 2px;
+    background: var(--border);
+  }
+
+  .t-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+  }
+
+  .t-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin: 0 auto 12px;
+    position: relative;
+    z-index: 1;
+    border: 2px solid var(--bg);
+  }
+
+  .t-year {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    color: var(--green);
+  }
+
+  .t-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  /* IMPACT AREAS */
+  .impact-areas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .area-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .area-icon { font-size: 20px; }
+
+  .area-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .area-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* FACTS */
+  .facts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .fact-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    background: var(--surface);
+    border-left: 3px solid var(--green);
+    border-radius: 0 6px 6px 0;
+  }
+
+  .fact-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: var(--green);
+    min-width: 28px;
+    line-height: 1;
+  }
+
+  .fact-text {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    padding-top: 2px;
+  }
+
+  /* ALTERNATIVES */
+  .alternatives {
+    background: rgba(74,222,128,0.05);
+    border: 1px solid rgba(74,222,128,0.2);
+    border-radius: 8px;
+    padding: 20px 24px;
+  }
+
+  .alternatives h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    color: var(--green);
+    margin-bottom: 12px;
+  }
+
+  .alt-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .alt-pill {
+    font-size: 12px;
+    padding: 5px 12px;
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.3);
+    border-radius: 20px;
+    color: var(--green);
+  }
+
+  /* SEARCH */
+  .search-wrap {
+    position: relative;
+    z-index: 1;
+    padding: 0 40px 24px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .search-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 14px 20px 14px 46px;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input::placeholder { color: var(--muted); }
+  .search-input:focus { border-color: rgba(74,222,128,0.4); }
+
+  .search-icon {
+    position: absolute;
+    left: 56px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 16px;
+  }
+
+  /* FOOTER STATS */
+  .stats-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .stat-item {
+    flex: 1;
+    padding: 24px 30px;
+    border-right: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .stat-item:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 2px;
+    color: var(--green);
+  }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    header { padding: 16px 20px; }
+    .grid-container { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); padding: 0 20px 20px; }
+    .category-strip { padding: 0 20px 24px; }
+    .search-wrap { padding: 0 20px 20px; }
+    .hero { padding: 50px 20px 40px; }
+    .impact-grid { grid-template-columns: 1fr; }
+    .impact-areas { grid-template-columns: 1fr 1fr; }
+    .modal-body { padding: 20px; }
+    .modal-header { padding: 20px; }
+    .stats-bar { flex-wrap: wrap; }
+    .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    EARTHTRACE
+  </div>
+  <div class="header-tag">// Human Impact Explorer v1.0</div>
+</header>
+
+<section class="hero">
+  <div class="hero-label">🌍 Know Your Footprint</div>
+  <h1>HOW HUMANS<br>HURT EARTH</h1>
+  <p>Select any everyday item to discover its environmental cost — from production to disposal. Every choice leaves a mark.</p>
+</section>
+
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-num" id="totalItems">62</div>
+    <div class="stat-label">Items Tracked</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">8B+</div>
+    <div class="stat-label">Humans Impacting</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">6°C</div>
+    <div class="stat-label">Warming Risk</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">1M+</div>
+    <div class="stat-label">Species Threatened</div>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <span class="search-icon">🔍</span>
+  <input class="search-input" id="searchInput" type="text" placeholder="Search items... e.g. plastic bottle, leather, diesel">
+</div>
+
+<div class="category-strip" id="categoryStrip">
+  <button class="cat-btn active" data-cat="all">All Items</button>
+  <button class="cat-btn" data-cat="plastic">Plastic</button>
+  <button class="cat-btn" data-cat="paper">Paper & Wood</button>
+  <button class="cat-btn" data-cat="fabric">Fabric & Clothing</button>
+  <button class="cat-btn" data-cat="food">Food & Farming</button>
+  <button class="cat-btn" data-cat="electronic">Electronics</button>
+  <button class="cat-btn" data-cat="transport">Transport & Fuel</button>
+  <button class="cat-btn" data-cat="chemical">Chemicals</button>
+  <button class="cat-btn" data-cat="animal">Animal Products</button>
+  <button class="cat-btn" data-cat="energy">Energy</button>
+  <button class="cat-btn" data-cat="waste">Waste</button>
+  <button class="cat-btn" data-cat="water">Water Use</button>
+</div>
+
+<div class="grid-container" id="itemGrid"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-icon" id="mIcon"></div>
+        <div class="modal-title" id="mTitle"></div>
+        <div class="modal-subtitle" id="mSubtitle"></div>
+      </div>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const ITEMS = [
+  // PLASTIC
+  { id:1, icon:'🧴', name:'Plastic Bottle', cat:'plastic', severity:'critical',
+    nature:92, human:78, animal:85, social:45, co2:'82g', degradation:'450 years',
+    timeline:['1 day','10 yrs','50 yrs','100 yrs','450 yrs'],
+    tEvents:['Litter visible','Micro breakdown','Fragments in soil','Microplastics spread','Full disintegration'],
+    impacts:[
+      {icon:'🌊', name:'Ocean Pollution', desc:'Enters waterways, harms marine life, creates ocean garbage patches'},
+      {icon:'🐠', name:'Marine Animals', desc:'Fish, turtles, whales ingest plastic fragments, causing death'},
+      {icon:'🧬', name:'Human Health', desc:'Microplastics found in human blood, lungs, and placentas'},
+      {icon:'🌱', name:'Soil Toxins', desc:'Leaches BPA and phthalates into soil, disrupting plant growth'},
+      {icon:'☁️', name:'CO₂ Release', desc:'Production burns fossil fuels; incineration releases toxic gases'},
+      {icon:'🌡️', name:'Climate', desc:'Contributes to greenhouse gas accumulation in atmosphere'},
+    ],
+    facts:[
+      {n:'8M', t:'tonnes of plastic enter the ocean every year — equivalent to a truckload every minute'},
+      {n:'91%', t:'of all plastic ever produced has never been recycled'},
+      {n:'500yr', t:'is how long a single plastic bottle can persist in the environment'},
+    ],
+    alternatives:['Glass bottles','Stainless steel flasks','Bamboo bottles','Clay pots','Compostable bioplastic'],
+  },
+
+  { id:2, icon:'🛍️', name:'Plastic Bag', cat:'plastic', severity:'high',
+    nature:88, human:55, animal:80, social:35, co2:'33g', degradation:'20 years',
+    timeline:['1 day','2 yrs','5 yrs','10 yrs','20 yrs'],
+    tEvents:['Released in wind','Enters waterway','Seabird ingestion','Breaks to fragments','Microplastics remain'],
+    impacts:[
+      {icon:'🐦', name:'Bird Life', desc:'Seabirds mistake bags for jellyfish and feed them to chicks'},
+      {icon:'🐄', name:'Livestock', desc:'Cattle and goats consume bags in fields, causing intestinal blockages'},
+      {icon:'🌿', name:'Vegetation', desc:'Wraps around trees and plants, preventing photosynthesis'},
+      {icon:'🏙️', name:'Urban Drain', desc:'Clogs drainage systems, causing urban flooding'},
+      {icon:'🌊', name:'Sea Turtles', desc:'Mistaken for jellyfish and consumed, leading to starvation'},
+      {icon:'♻️', name:'Landfill', desc:'Takes 20 years minimum to break down, fills landfills rapidly'},
+    ],
+    facts:[
+      {n:'5T', t:'plastic bags are used globally every year — nearly 10 million per minute'},
+      {n:'12min', t:'is the average use time of a single-use plastic bag'},
+      {n:'100K', t:'marine animals die annually from plastic bag ingestion or entanglement'},
+    ],
+    alternatives:['Cloth tote bags','Jute bags','Paper bags','Woven baskets','Reusable mesh produce bags'],
+  },
+
+  { id:3, icon:'🧩', name:'Styrofoam / EPS', cat:'plastic', severity:'critical',
+    nature:95, human:70, animal:75, social:40, co2:'220g', degradation:'500 years',
+    timeline:['1 day','20 yrs','100 yrs','200 yrs','500 yrs'],
+    tEvents:['Breaks to beads','Pellets spread','Enters food chain','Soil saturation','Never fully gone'],
+    impacts:[
+      {icon:'🌊', name:'Waterways', desc:'Lightweight beads travel vast distances into rivers and oceans'},
+      {icon:'🐟', name:'Fish', desc:'Mistaken for fish eggs; enters the food chain at every level'},
+      {icon:'🔥', name:'Air Quality', desc:'When burned releases benzene and styrene, potent carcinogens'},
+      {icon:'🌿', name:'Ecosystem', desc:'Cannot be composted; remains in soil permanently'},
+      {icon:'🧬', name:'Carcinogens', desc:'Styrene leaches into food and drinks stored in containers'},
+      {icon:'♻️', name:'Non-recyclable', desc:'Most recycling facilities refuse it due to low value and contamination'},
+    ],
+    facts:[
+      {n:'107B', t:'styrofoam cups are discarded every year in the US alone'},
+      {n:'0%', t:'of styrofoam is biodegradable under normal environmental conditions'},
+      {n:'25%', t:'of landfill space globally is taken up by polystyrene foam'},
+    ],
+    alternatives:['Cardboard','Mushroom packaging','Cork','Molded pulp','Seaweed-based packaging'],
+  },
+
+  // PAPER
+  { id:4, icon:'📰', name:'Newspaper / Paper', cat:'paper', severity:'medium',
+    nature:55, human:30, animal:40, social:25, co2:'4.7g', degradation:'6 weeks',
+    timeline:['2 days','2 wks','6 wks','3 months','1 year'],
+    tEvents:['Ink bleeds','Pulp softens','Partial compost','Full compost','Nutrients released'],
+    impacts:[
+      {icon:'🌳', name:'Deforestation', desc:'Millions of trees cut annually to meet paper demand globally'},
+      {icon:'💧', name:'Water Usage', desc:'10 litres of water needed to produce a single sheet of A4 paper'},
+      {icon:'🏭', name:'Chemical Runoff', desc:'Pulping process uses chlorine and bleach, polluting waterways'},
+      {icon:'🦅', name:'Habitat Loss', desc:'Forest clearing destroys habitat for birds, insects, mammals'},
+      {icon:'☁️', name:'Carbon Sink', desc:'Each tree removed reduces CO₂ absorption capacity of the planet'},
+      {icon:'🌊', name:'River Toxins', desc:'Paper mills discharge dioxins into rivers, harming aquatic life'},
+    ],
+    facts:[
+      {n:'17', t:'trees are cut per tonne of paper produced for printing and writing'},
+      {n:'40%', t:'of global industrial wood harvest goes directly to paper production'},
+      {n:'26%', t:'of landfill content is paper and cardboard in developed nations'},
+    ],
+    alternatives:['Digital reading','Recycled paper','Seed paper','Bamboo paper','Sugarcane paper'],
+  },
+
+  { id:5, icon:'📦', name:'Cardboard Box', cat:'paper', severity:'low',
+    nature:35, human:20, animal:22, social:15, co2:'10g', degradation:'2 months',
+    timeline:['1 wk','1 month','2 months','3 months','6 months'],
+    tEvents:['Structure weakens','Absorbs moisture','Breaks down','Composted','Soil enriched'],
+    impacts:[
+      {icon:'🌳', name:'Tree Cutting', desc:'Requires virgin pulp from forests if not made from recycled content'},
+      {icon:'🚚', name:'Transport', desc:'Adds weight and bulk, increasing shipping fuel consumption'},
+      {icon:'💧', name:'Ink Runoff', desc:'Printed inks can leach toxins if cardboard enters waterways'},
+      {icon:'♻️', name:'Recyclable', desc:'One of the most recyclable materials but often contaminated'},
+      {icon:'🏭', name:'Production', desc:'Manufacturing process still requires significant energy and water'},
+      {icon:'🌿', name:'Decomposition', desc:'Breaks down relatively fast compared to most packaging materials'},
+    ],
+    facts:[
+      {n:'90%', t:'of products in the US are shipped in cardboard boxes — over 100 billion annually'},
+      {n:'80%', t:'of cardboard boxes are successfully recycled in developed countries'},
+      {n:'17', t:'trees saved for every tonne of recycled cardboard used instead of virgin pulp'},
+    ],
+    alternatives:['Reusable shipping containers','Recycled cardboard','Fabric wrap','Mushroom foam','Returnable crates'],
+  },
+
+  // FABRIC / CLOTHING
+  { id:6, icon:'👕', name:'Fast Fashion T-Shirt', cat:'fabric', severity:'high',
+    nature:80, human:75, animal:55, social:85, co2:'6kg', degradation:'200 years',
+    timeline:['6 months','5 yrs','20 yrs','100 yrs','200 yrs'],
+    tEvents:['Dye bleeds','Microfibers shed','Degrades slowly','Still visible','Fragments persist'],
+    impacts:[
+      {icon:'💧', name:'Water Crisis', desc:'2,700 litres of water used to produce a single cotton T-shirt'},
+      {icon:'🌾', name:'Pesticides', desc:'Cotton farming uses 24% of global insecticides on 2.5% of farmland'},
+      {icon:'🧬', name:'Dye Toxins', desc:'Synthetic dyes contaminate rivers — 17-20% of industrial water pollution'},
+      {icon:'👷', name:'Worker Rights', desc:'Made in sweatshops with exploitative wages and dangerous conditions'},
+      {icon:'🌊', name:'Microplastics', desc:'Each wash releases 700,000 microfibers into water systems'},
+      {icon:'♻️', name:'Landfill', desc:'92 million tonnes of textile waste generated annually worldwide'},
+    ],
+    facts:[
+      {n:'10%', t:'of global carbon emissions comes from the fashion industry — more than flights and shipping combined'},
+      {n:'85%', t:'of all textiles produced end up in a landfill or incinerator each year'},
+      {n:'2700L', t:'of water is required to produce a single cotton T-shirt — one person\'s drinking water for 2.5 years'},
+    ],
+    alternatives:['Second-hand clothing','Organic cotton','Hemp fabric','Bamboo textiles','Clothing rental'],
+  },
+
+  { id:7, icon:'👟', name:'Synthetic Sneakers', cat:'fabric', severity:'high',
+    nature:82, human:60, animal:50, social:70, co2:'14kg', degradation:'1000 years',
+    timeline:['1 yr','10 yrs','50 yrs','200 yrs','1000 yrs'],
+    tEvents:['Rubber soles wear','Glue breaks','Nylon fades','Partial decay','Microplastics remain'],
+    impacts:[
+      {icon:'⛽', name:'Fossil Fuel', desc:'Soles made from petroleum-based rubber and synthetic polymers'},
+      {icon:'🌊', name:'Microplastics', desc:'Rubber wear particles from shoes are a major urban microplastic source'},
+      {icon:'🏭', name:'Manufacturing', desc:'Assembly across multiple countries multiplies transportation emissions'},
+      {icon:'☠️', name:'Glue Toxins', desc:'Industrial adhesives release volatile organic compounds during production'},
+      {icon:'🐄', name:'Leather Toe', desc:'Leather components involve cattle farming and toxic tanning chemicals'},
+      {icon:'♻️', name:'Non-recyclable', desc:'Mixed materials make shoes nearly impossible to recycle'},
+    ],
+    facts:[
+      {n:'24B', t:'pairs of shoes are produced globally every year'},
+      {n:'14kg', t:'CO₂ equivalent is emitted to produce a single pair of running shoes'},
+      {n:'1000yr', t:'is the estimated time for synthetic shoe materials to fully break down'},
+    ],
+    alternatives:['Natural rubber shoes','Hemp canvas sneakers','Mycelium leather','Second-hand shoes','Shoe repair'],
+  },
+
+  // FOOD & FARMING
+  { id:8, icon:'🥩', name:'Beef / Red Meat', cat:'food', severity:'critical',
+    nature:97, human:65, animal:99, social:55, co2:'27kg/kg', degradation:'N/A',
+    timeline:['Farm birth','6–18 months','Slaughter','Processing','Consumption'],
+    tEvents:['Methane from cattle','Land clearing for feed','Water consumption peaks','Waste lagoons form','CO₂ from transport'],
+    impacts:[
+      {icon:'🌡️', name:'Methane Bomb', desc:'Cattle produce methane 80x more potent than CO₂ over 20 years'},
+      {icon:'🌳', name:'Amazon Loss', desc:'70% of Amazon deforestation is driven by cattle ranching'},
+      {icon:'💧', name:'Water Drain', desc:'15,000 litres of water to produce 1 kg of beef'},
+      {icon:'🐄', name:'Animal Welfare', desc:'Factory farming causes immense suffering to billions of animals'},
+      {icon:'🌍', name:'Land Use', desc:'77% of agricultural land used for livestock, producing 18% of calories'},
+      {icon:'💊', name:'Antibiotic Res.', desc:'Overuse of antibiotics in livestock drives human antibiotic resistance'},
+    ],
+    facts:[
+      {n:'14.5%', t:'of all global greenhouse gas emissions come from livestock farming'},
+      {n:'15,000L', t:'of water are consumed to produce just one kilogram of beef'},
+      {n:'77%', t:'of all agricultural land on Earth is used to raise livestock or grow their feed'},
+    ],
+    alternatives:['Plant-based protein','Lentils & legumes','Insect protein','Lab-grown meat','Tofu & tempeh'],
+  },
+
+  { id:9, icon:'🐓', name:'Poultry Farming', cat:'food', severity:'high',
+    nature:78, human:55, animal:90, social:45, co2:'6.9kg/kg', degradation:'N/A',
+    timeline:['Chick hatching','6 wks','Slaughter','Processing','Waste disposal'],
+    tEvents:['Ammonia build-up','Manure runoff begins','Water pollution','Antibiotics used','CO₂ transport'],
+    impacts:[
+      {icon:'💨', name:'Air Pollution', desc:'Ammonia from chicken waste contaminates local air and water'},
+      {icon:'🌊', name:'Waterway Runoff', desc:'Nutrient runoff causes algae blooms, killing aquatic life'},
+      {icon:'🐔', name:'Animal Welfare', desc:'Factory chickens live in densities of 19 birds per square metre'},
+      {icon:'🦠', name:'Disease Risk', desc:'Dense farming creates conditions for pandemic-level pathogens'},
+      {icon:'🌾', name:'Feed Crops', desc:'Large monocultures of soy and corn grown for chicken feed'},
+      {icon:'💧', name:'Water Use', desc:'4,300 litres of water needed to produce 1 kg of chicken'},
+    ],
+    facts:[
+      {n:'70B', t:'chickens are raised and slaughtered for food every single year globally'},
+      {n:'73%', t:'of all antibiotics sold globally are used in livestock farming'},
+      {n:'4300L', t:'of water is needed to produce just 1 kg of poultry meat'},
+    ],
+    alternatives:['Plant proteins','Eggs from free-range','Mushrooms','Legume stews','Jackfruit'],
+  },
+
+  // ELECTRONICS
+  { id:10, icon:'📱', name:'Smartphone', cat:'electronic', severity:'high',
+    nature:75, human:70, animal:55, social:80, co2:'70kg', degradation:'100s yrs',
+    timeline:['Mining','Assembly','2–3 yr use','Discard','E-waste site'],
+    tEvents:['Rare earth mining','Factory emissions','Battery degradation','Toxic landfill','Leaching chemicals'],
+    impacts:[
+      {icon:'⛏️', name:'Rare Earth Mining', desc:'Cobalt, lithium mining destroys landscapes and exploits child labour'},
+      {icon:'💧', name:'Water Pollution', desc:'Lithium extraction depletes and poisons water in arid regions'},
+      {icon:'☠️', name:'E-Waste Toxins', desc:'Lead, mercury, cadmium leach into soil at informal dump sites'},
+      {icon:'👶', name:'Child Labour', desc:'Cobalt mines in DRC use children as young as 7 years old'},
+      {icon:'🏭', name:'Carbon Intensive', desc:'Manufacturing a single phone emits ~70 kg CO₂ equivalent'},
+      {icon:'♻️', name:'Unrecycled', desc:'Only 20% of e-waste is formally recycled worldwide'},
+    ],
+    facts:[
+      {n:'50MT', t:'of e-waste is generated globally per year — growing 21% every 5 years'},
+      {n:'70kg', t:'CO₂ equivalent is produced making one average smartphone'},
+      {n:'1000+', t:'toxic chemicals are found in a single smartphone\'s components'},
+    ],
+    alternatives:['Repaired old phones','Refurbished devices','Fairphone','Extended use cycles','Device sharing'],
+  },
+
+  { id:11, icon:'💻', name:'Laptop Computer', cat:'electronic', severity:'high',
+    nature:72, human:65, animal:50, social:72, co2:'300kg', degradation:'100s yrs',
+    timeline:['Mining','Production','5 yr use','Discard','Leaching'],
+    tEvents:['Forest cleared for mining','Factory power draw','Components age','Battery dead','Toxic runoff'],
+    impacts:[
+      {icon:'⛏️', name:'Resource Mining', desc:'Gold, palladium, tantalum mined destructively in conflict zones'},
+      {icon:'⚡', name:'Energy Use', desc:'Data centres and charging contribute significantly to emissions'},
+      {icon:'☠️', name:'Battery Waste', desc:'Lithium-ion batteries degrade and leak into groundwater'},
+      {icon:'🌡️', name:'Heat Islands', desc:'Server infrastructure contributes to urban heat island effects'},
+      {icon:'🌍', name:'Global Shipping', desc:'Components manufactured across 30+ countries before assembly'},
+      {icon:'♻️', name:'E-Waste', desc:'Less than 20% of laptops are properly recycled at end of life'},
+    ],
+    facts:[
+      {n:'300kg', t:'CO₂ equivalent is emitted to produce a single laptop computer'},
+      {n:'30+', t:'countries are involved in the supply chain of one average laptop'},
+      {n:'80%', t:'of a laptop\'s lifetime carbon footprint occurs during manufacturing, not use'},
+    ],
+    alternatives:['Refurbished laptops','Cloud terminals','Device repair programs','Longer use cycles','Green-certified laptops'],
+  },
+
+  // TRANSPORT
+  { id:12, icon:'🚗', name:'Petrol / Diesel Car', cat:'transport', severity:'critical',
+    nature:90, human:80, animal:70, social:75, co2:'4.6T/yr', degradation:'Ongoing',
+    timeline:['Manufacturing','1st year','10 yrs','End of life','Parts decay'],
+    tEvents:['Production emissions','Daily exhaust','Oil changes & leaks','Junkyard toxins','Metal leaching'],
+    impacts:[
+      {icon:'☁️', name:'Air Pollution', desc:'Exhaust releases NOx, PM2.5, CO — major urban health crisis'},
+      {icon:'🌡️', name:'Climate Change', desc:'Transport is the largest source of CO₂ in many developed nations'},
+      {icon:'🛢️', name:'Oil Spills', desc:'Fuel extraction and transport cause devastating oil spills worldwide'},
+      {icon:'🌊', name:'Road Runoff', desc:'Brake dust, oil, rubber particles wash into rivers with rainfall'},
+      {icon:'🏙️', name:'Urban Heat', desc:'Asphalt roads absorb heat and vehicle engines raise city temperatures'},
+      {icon:'🦎', name:'Habitat Loss', desc:'Roads fragment wildlife habitats and cause millions of animal deaths'},
+    ],
+    facts:[
+      {n:'4.6T', t:'of CO₂ is emitted per year by an average petrol car — equal to burning 500 gallons of gas'},
+      {n:'1.35M', t:'people die in road accidents every year, many linked to pollution-induced health issues'},
+      {n:'29%', t:'of US greenhouse gas emissions come from the transportation sector'},
+    ],
+    alternatives:['Electric vehicles','Bicycles','Public transport','Walking','Carpooling'],
+  },
+
+  { id:13, icon:'✈️', name:'Air Travel', cat:'transport', severity:'critical',
+    nature:88, human:72, animal:60, social:65, co2:'255kg/hr', degradation:'Ongoing',
+    timeline:['Pre-flight','Takeoff','Cruise','Landing','Ground ops'],
+    tEvents:['Fuel burn','Contrail formation','NOx at altitude','Carbon released','Noise pollution'],
+    impacts:[
+      {icon:'☁️', name:'Contrails', desc:'Contrail cirrus clouds trap heat 2–4x more than CO₂ alone at altitude'},
+      {icon:'🌡️', name:'High Altitude CO₂', desc:'Emissions at altitude have greater warming effect than at ground level'},
+      {icon:'🔊', name:'Noise Pollution', desc:'Aircraft noise disrupts sleep, raises stress and blood pressure in communities'},
+      {icon:'🐦', name:'Bird Strikes', desc:'Airports destroy wildlife habitats and cause millions of bird deaths'},
+      {icon:'🏭', name:'Fuel Refining', desc:'Jet fuel refining is one of the most carbon-intensive industrial processes'},
+      {icon:'🌍', name:'Tourism Pressure', desc:'Mass air tourism overwhelms fragile ecosystems and natural sites'},
+    ],
+    facts:[
+      {n:'2.5%', t:'of global CO₂ emissions come from aviation, but its total warming effect is 2–4x higher'},
+      {n:'255kg', t:'of CO₂ is emitted per passenger-hour of flight in an economy seat'},
+      {n:'1%', t:'of the world\'s population accounts for 50% of all aviation emissions'},
+    ],
+    alternatives:['Train travel','Video conferencing','Slow travel','Offsetting programs','Sustainable aviation fuel'],
+  },
+
+  // CHEMICAL
+  { id:14, icon:'🧴', name:'Chemical Fertiliser', cat:'chemical', severity:'high',
+    nature:85, human:65, animal:80, social:55, co2:'Variable', degradation:'Ongoing',
+    timeline:['Application','1 wk','1 month','Season','Decades'],
+    tEvents:['Soil absorption','Runoff begins','Waterway entry','Dead zone forms','Soil microbe death'],
+    impacts:[
+      {icon:'🌊', name:'Dead Zones', desc:'Nitrogen runoff creates oxygen-depleted ocean dead zones worldwide'},
+      {icon:'💧', name:'Groundwater', desc:'Nitrates contaminate drinking water, causing blue baby syndrome in infants'},
+      {icon:'🐟', name:'Aquatic Death', desc:'Algal blooms from fertiliser runoff kill fish and aquatic ecosystems'},
+      {icon:'🌱', name:'Soil Degradation', desc:'Kills beneficial soil microbes and earthworms that sustain fertility'},
+      {icon:'🌡️', name:'Nitrous Oxide', desc:'Fertiliser produces N₂O, a greenhouse gas 265x more potent than CO₂'},
+      {icon:'🏭', name:'Haber-Bosch', desc:'Manufacturing process alone consumes 1–2% of global energy annually'},
+    ],
+    facts:[
+      {n:'400+', t:'ocean dead zones exist globally — all linked to agricultural nutrient runoff'},
+      {n:'265x', t:'more potent than CO₂ is nitrous oxide, a fertilizer byproduct, over 100 years'},
+      {n:'1-2%', t:'of global energy is consumed just to produce synthetic nitrogen fertilisers'},
+    ],
+    alternatives:['Organic compost','Vermicompost','Cover cropping','Biochar','Seaweed extract'],
+  },
+
+  { id:15, icon:'🧹', name:'Household Chemicals', cat:'chemical', severity:'medium',
+    nature:70, human:60, animal:65, social:40, co2:'Variable', degradation:'Days–100s yrs',
+    timeline:['Use','Drain','Treatment plant','Waterway','Ecosystem'],
+    tEvents:['VOC release','Drain contamination','Partial treatment','Residual in rivers','Bioaccumulation'],
+    impacts:[
+      {icon:'🌊', name:'Water Toxins', desc:'Many cleaning chemicals pass through treatment plants untreated'},
+      {icon:'🐠', name:'Aquatic Life', desc:'Surfactants and phosphates disrupt hormones in fish and amphibians'},
+      {icon:'👃', name:'Indoor Air', desc:'VOCs from sprays worsen indoor air quality and cause respiratory harm'},
+      {icon:'🧬', name:'Endocrine Disrupt', desc:'Chemicals like triclosan interfere with thyroid and reproductive hormones'},
+      {icon:'🌱', name:'Soil Toxicity', desc:'Bleach and strong acids sterilise soil when improperly disposed'},
+      {icon:'♻️', name:'Packaging', desc:'Chemical bottles are often hard to recycle and contaminate streams'},
+    ],
+    facts:[
+      {n:'80K+', t:'synthetic chemicals are in commercial use, fewer than 1% have been fully tested for safety'},
+      {n:'40%', t:'of US waterways are too polluted for fishing or swimming, largely due to chemical runoff'},
+      {n:'62', t:'synthetic chemicals are found in the average human body at any given time'},
+    ],
+    alternatives:['Vinegar + baking soda','Plant-based cleaners','Soap nuts','Castile soap','Lemon & salt'],
+  },
+
+  // ANIMAL PRODUCTS
+  { id:16, icon:'🐄', name:'Leather Goods', cat:'animal', severity:'high',
+    nature:82, human:65, animal:92, social:60, co2:'17kg/m²', degradation:'50 yrs',
+    timeline:['Cattle birth','Farming','Slaughter','Tanning','Disposal'],
+    tEvents:['Methane from cattle','Deforestation','Chemical tanning','Chromium runoff','Landfill slow decay'],
+    impacts:[
+      {icon:'🏭', name:'Chrome Tanning', desc:'90% of leather is tanned with chromium, causing cancer in tannery workers'},
+      {icon:'💧', name:'River Pollution', desc:'Tannery wastewater is among the most toxic industrial discharge streams'},
+      {icon:'🌳', name:'Deforestation', desc:'Cattle ranching for leather drives Amazon and grassland deforestation'},
+      {icon:'🐄', name:'Animal Lives', desc:'Multiple cattle required for a single sofa set or jacket'},
+      {icon:'☠️', name:'Worker Health', desc:'Tannery workers face severe chemical exposure with no protection'},
+      {icon:'🌡️', name:'Methane', desc:'Cattle raised for leather emit significant methane throughout life'},
+    ],
+    facts:[
+      {n:'1B', t:'animals are slaughtered globally each year for the leather industry'},
+      {n:'90%', t:'of the world\'s leather is chrome-tanned, producing carcinogenic hexavalent chromium'},
+      {n:'17kg', t:'CO₂ equivalent is emitted per square metre of cowhide leather produced'},
+    ],
+    alternatives:['Cork leather','Mushroom leather (Mylo)','Pineapple leather (Piñatex)','Recycled plastic leather','Apple peel leather'],
+  },
+
+  { id:17, icon:'🎣', name:'Commercial Fishing', cat:'animal', severity:'critical',
+    nature:94, human:60, animal:99, social:70, co2:'Variable', degradation:'Ongoing',
+    timeline:['Trawling','Net dragging','Bycatch','Processing','Overfishing'],
+    tEvents:['Ocean floor destroyed','Bycatch killed','Ghost nets left','CO₂ from vessels','Stock collapse'],
+    impacts:[
+      {icon:'🌊', name:'Trawling', desc:'Bottom trawling destroys ocean floor ecosystems equivalent to deforestation'},
+      {icon:'🐬', name:'Bycatch', desc:'40% of catch is bycatch — dolphins, turtles, seabirds discarded dead'},
+      {icon:'👻', name:'Ghost Nets', desc:'Lost fishing nets entangle and kill marine life for decades'},
+      {icon:'🐟', name:'Stock Collapse', desc:'93% of fish stocks are fully or over-exploited — heading to collapse'},
+      {icon:'☁️', name:'Vessel Emissions', desc:'Diesel-powered fleets emit millions of tonnes of CO₂ annually'},
+      {icon:'🧂', name:'Ocean Chemistry', desc:'Overfishing disrupts food chains that regulate ocean carbon cycles'},
+    ],
+    facts:[
+      {n:'40%', t:'of all sea creatures caught globally are bycatch — unintended and mostly wasted'},
+      {n:'90%', t:'of the world\'s large fish populations have been eliminated since industrial fishing began'},
+      {n:'640K', t:'tonnes of ghost gear — abandoned fishing nets — are added to oceans every year'},
+    ],
+    alternatives:['Plant-based seafood','Sustainable aquaculture','MSC-certified fish','Reduced consumption','Freshwater fish farming'],
+  },
+
+  // ENERGY
+  { id:18, icon:'💡', name:'Coal / Fossil Electricity', cat:'energy', severity:'critical',
+    nature:96, human:88, animal:75, social:80, co2:'820g/kWh', degradation:'Atmospheric centuries',
+    timeline:['Mining','Combustion','Acid rain','CO₂ build-up','Climate destabilise'],
+    tEvents:['Mountaintop removal','SO₂ and NOx release','Acid rain forms','CO₂ accumulates','Tipping points reached'],
+    impacts:[
+      {icon:'🌬️', name:'Particulate Matter', desc:'Coal plants release PM2.5 linked to 800,000 premature deaths annually'},
+      {icon:'🌧️', name:'Acid Rain', desc:'Sulphur dioxide from coal creates acid rain destroying forests and lakes'},
+      {icon:'⛰️', name:'Mountain Removal', desc:'Surface coal mining removes entire mountain ecosystems'},
+      {icon:'🌡️', name:'Climate Tipping', desc:'CO₂ accumulation risks triggering irreversible climate tipping points'},
+      {icon:'💧', name:'Water Use', desc:'Coal plants consume vast water resources, stressing local watersheds'},
+      {icon:'☢️', name:'Mercury', desc:'Coal combustion releases mercury, contaminating fish and water supplies'},
+    ],
+    facts:[
+      {n:'820g', t:'of CO₂ is emitted per kilowatt-hour from coal power — the dirtiest energy source'},
+      {n:'800K', t:'people die prematurely every year from particulate matter released by coal burning'},
+      {n:'40%', t:'of global CO₂ emissions from energy come from coal power generation'},
+    ],
+    alternatives:['Solar panels','Wind energy','Hydropower','Geothermal','Nuclear energy'],
+  },
+
+  { id:19, icon:'🛢️', name:'Petroleum / Crude Oil', cat:'energy', severity:'critical',
+    nature:95, human:85, animal:80, social:75, co2:'Massive', degradation:'Ongoing',
+    timeline:['Extraction','Refining','Use','Spill risk','CO₂ lifespan'],
+    tEvents:['Habitat drilling','Refinery VOCs','Combustion emissions','Spill ecosystem death','Atmospheric CO₂ build'],
+    impacts:[
+      {icon:'🌊', name:'Oil Spills', desc:'Major spills coat oceans, killing birds, fish, corals and shoreline life'},
+      {icon:'☁️', name:'Refinery Pollution', desc:'Oil refining emits massive VOCs, benzene, and sulphur compounds'},
+      {icon:'🐦', name:'Seabird Deaths', desc:'Oil on feathers destroys insulation — birds die of hypothermia and poison'},
+      {icon:'🌡️', name:'Global Warming', desc:'Burning oil is the primary driver of human-caused climate change'},
+      {icon:'🏘️', name:'Community Health', desc:'Oilfields in Nigeria, Ecuador devastate Indigenous communities\' health'},
+      {icon:'⛏️', name:'Land Destruction', desc:'Tar sands mining destroys vast boreal forests and wetland ecosystems'},
+    ],
+    facts:[
+      {n:'4B', t:'tonnes of CO₂ are released annually from burning oil globally'},
+      {n:'700K', t:'barrels of oil are spilled into the ocean every year from accidents and routine operations'},
+      {n:'3°C', t:'of warming is projected by 2100 if current fossil fuel use continues unchanged'},
+    ],
+    alternatives:['Solar energy','Wind power','Green hydrogen','Biomass energy','Energy efficiency'],
+  },
+
+  // WASTE
+  { id:20, icon:'🗑️', name:'General Landfill Waste', cat:'waste', severity:'high',
+    nature:80, human:70, animal:65, social:60, co2:'Variable', degradation:'1–1000 yrs',
+    timeline:['Disposal','1 month','1 year','10 years','100 years'],
+    tEvents:['Methane begins','Leachate forms','Groundwater risk','Subsidence','Persistent toxins'],
+    impacts:[
+      {icon:'💨', name:'Methane Emission', desc:'Landfills produce methane 80x more potent than CO₂ from organic decay'},
+      {icon:'💧', name:'Leachate', desc:'Toxic liquid leaches through soil into groundwater and rivers'},
+      {icon:'🐀', name:'Vermin', desc:'Landfills attract rats and flies that spread disease to nearby communities'},
+      {icon:'🌱', name:'Land Use', desc:'Valuable land permanently converted to waste sites for centuries'},
+      {icon:'💊', name:'Community Health', desc:'Communities near landfills experience higher rates of cancer and disease'},
+      {icon:'🌍', name:'Resource Loss', desc:'Valuable materials like metal and glass buried instead of reclaimed'},
+    ],
+    facts:[
+      {n:'2.1B', t:'tonnes of solid waste are generated globally every year — a figure rising rapidly'},
+      {n:'91%', t:'of plastic waste has never been recycled in the history of plastic production'},
+      {n:'1/3', t:'of all food produced globally is lost or wasted — amounting to 1.3 billion tonnes annually'},
+    ],
+    alternatives:['Zero-waste lifestyle','Composting','Recycling loops','Repair culture','Bulk shopping'],
+  },
+
+  // WATER
+  { id:21, icon:'🚿', name:'Excessive Water Use', cat:'water', severity:'medium',
+    nature:75, human:70, animal:65, social:60, co2:'0.4g/L', degradation:'Ongoing',
+    timeline:['Usage','Treatment','Discharge','Aquifer draw','Depletion'],
+    tEvents:['Aquifer drops','River flow reduced','Wetland drying','Ecosystem stress','Regional water crisis'],
+    impacts:[
+      {icon:'💧', name:'Aquifer Depletion', desc:'Groundwater aquifers are being drawn down 3x faster than they recharge'},
+      {icon:'🌊', name:'River Die-off', desc:'Dams and over-extraction cause rivers to run dry before reaching sea'},
+      {icon:'🦩', name:'Wetland Loss', desc:'50% of global wetlands have disappeared since 1900, destroying habitat'},
+      {icon:'🌾', name:'Agriculture Use', desc:'70% of global freshwater is used by agriculture, often inefficiently'},
+      {icon:'🏙️', name:'Urban Waste', desc:'Leaky city infrastructure wastes 20–30% of treated drinking water'},
+      {icon:'🌡️', name:'Climate Impact', desc:'Climate change reduces snowpack and glaciers that feed rivers globally'},
+    ],
+    facts:[
+      {n:'70%', t:'of global freshwater is used in agriculture, much of it wasted through inefficient irrigation'},
+      {n:'2B', t:'people currently live in water-stressed regions with inadequate clean water access'},
+      {n:'50%', t:'of the world\'s wetlands have been destroyed since the start of the industrial age'},
+    ],
+    alternatives:['Rainwater harvesting','Drip irrigation','Low-flow fixtures','Greywater recycling','Native landscaping'],
+  },
+
+  // Additional items
+  { id:22, icon:'🚬', name:'Cigarettes', cat:'chemical', severity:'high',
+    nature:78, human:95, animal:55, social:75, co2:'14g each', degradation:'10 years',
+    timeline:['Lighting','Daily','10 yrs','Butt littered','Filter decay'],
+    tEvents:['Tar deposits','Nicotine runoff','Soil contamination','Toxic filter','Microplastics'],
+    impacts:[
+      {icon:'🌿', name:'Tobacco Farming', desc:'Tobacco farming uses heavy pesticides and causes significant deforestation'},
+      {icon:'🚬', name:'Butt Pollution', desc:'Cigarette filters are the most littered item on Earth — toxic microplastics'},
+      {icon:'💧', name:'Water Toxins', desc:'Single butt contaminates up to 1,000 litres of water with nicotine and arsenic'},
+      {icon:'🫁', name:'Human Health', desc:'Smoking kills 8 million people per year — leading preventable cause of death'},
+      {icon:'🌳', name:'Deforestation', desc:'600 million trees cut annually for tobacco curing and processing'},
+      {icon:'🐟', name:'Aquatic Toxins', desc:'Nicotine and heavy metals in butts are acutely toxic to fish and insects'},
+    ],
+    facts:[
+      {n:'4.5T', t:'cigarette butts are littered globally every year — the single most collected beach litter item'},
+      {n:'600M', t:'trees are cut annually to cure tobacco and produce cigarette paper and packaging'},
+      {n:'8M', t:'people die from tobacco-related illness each year globally'},
+    ],
+    alternatives:['Quit smoking apps','Nicotine patches','Vaping (harm reduction)','Herbal tea rituals','Exercise'],
+  },
+
+  { id:23, icon:'🧻', name:'Toilet Paper', cat:'paper', severity:'medium',
+    nature:58, human:25, animal:42, social:20, co2:'140g/roll', degradation:'1 month',
+    timeline:['Tree felling','Pulping','Bleaching','Use','Sewage'],
+    tEvents:['Forest cleared','Chemical processing','Chlorine bleach','Short use','Waterway treatment'],
+    impacts:[
+      {icon:'🌳', name:'Ancient Forests', desc:'27,000 trees are cut daily just for toilet paper globally'},
+      {icon:'💧', name:'Water Use', desc:'140 litres of water consumed per roll during manufacturing process'},
+      {icon:'🧪', name:'Bleach Chemicals', desc:'Chlorine bleaching produces dioxins that persist in the environment'},
+      {icon:'♻️', name:'Non-recyclable', desc:'Toilet paper cannot be recycled and adds to sewage treatment burden'},
+      {icon:'🌿', name:'Forest Loss', desc:'Old-growth forests cleared in Canada, Indonesia for tissue products'},
+      {icon:'💩', name:'Sewage System', desc:'Combined with wet wipes causes sewage infrastructure blockages'},
+    ],
+    facts:[
+      {n:'27K', t:'trees are cut every day globally to supply humanity\'s demand for toilet paper'},
+      {n:'140L', t:'of water is consumed in the production of a single roll of toilet paper'},
+      {n:'30%', t:'of the world\'s forests have been destroyed, partly driven by paper product demand'},
+    ],
+    alternatives:['Bidet systems','Bamboo toilet paper','Recycled-content TP','Reusable cloths','Water wash'],
+  },
+
+  { id:24, icon:'🥤', name:'Disposable Coffee Cup', cat:'plastic', severity:'medium',
+    nature:65, human:35, animal:50, social:28, co2:'11g', degradation:'30 years',
+    timeline:['2 min use','Littered','5 yrs','10 yrs','30 yrs'],
+    tEvents:['Waterproof liner intact','Cardboard degrades','Plastic liner persists','Fragments','Microplastics'],
+    impacts:[
+      {icon:'🧴', name:'Plastic Lining', desc:'Polyethylene lining makes cups non-recyclable and non-compostable'},
+      {icon:'🌊', name:'Ocean Entry', desc:'Lightweight cups easily blown into waterways and oceans'},
+      {icon:'🌳', name:'Wood Pulp', desc:'Virgin paper from cardboard sleeve contributes to forest clearing'},
+      {icon:'♻️', name:'Recycling Failure', desc:'Less than 1% of disposable coffee cups are actually recycled'},
+      {icon:'🏙️', name:'Urban Litter', desc:'Cups are among top 10 littered items found on city streets globally'},
+      {icon:'🐦', name:'Wildlife', desc:'Birds incorporate cup fragments into nests; plastic harms chicks'},
+    ],
+    facts:[
+      {n:'500B', t:'disposable cups are used globally every year — most end up in landfill or nature'},
+      {n:'1%', t:'of disposable coffee cups globally are successfully recycled due to plastic lining'},
+      {n:'30yr', t:'is the minimum time for a disposable cup\'s plastic lining to break down'},
+    ],
+    alternatives:['Reusable travel mug','Café ceramic cup','Bamboo cup','Glass jar','Home-brewed coffee'],
+  },
+
+  { id:25, icon:'🚀', name:'Space Launches', cat:'transport', severity:'high',
+    nature:70, human:45, animal:40, social:30, co2:'200T/launch', degradation:'Stratospheric',
+    timeline:['Pre-launch','Ascent','Orbit','Re-entry','Black carbon'],
+    tEvents:['Propellant burning','Stratospheric soot','Ozone depletion','Black carbon deposit','Multi-decade effect'],
+    impacts:[
+      {icon:'🌍', name:'Ozone Layer', desc:'Rocket soot deposits black carbon in the stratosphere, damaging the ozone'},
+      {icon:'☁️', name:'Stratosphere', desc:'Black carbon in the stratosphere has 500x greater warming impact than at ground'},
+      {icon:'🔊', name:'Noise & Blast', desc:'Launch sites impact local wildlife with intense noise and pressure waves'},
+      {icon:'🌌', name:'Light Pollution', desc:'Satellite constellations cause growing light pollution affecting astronomy'},
+      {icon:'🛸', name:'Space Debris', desc:'Over 27,000 pieces of orbital debris threaten future space operations'},
+      {icon:'⛽', name:'Fuel Burning', desc:'A single launch burns more fuel than thousands of transatlantic flights'},
+    ],
+    facts:[
+      {n:'200T', t:'of CO₂ equivalent is emitted by a single rocket launch into orbit'},
+      {n:'27K', t:'pieces of trackable orbital debris currently circle Earth at lethal speeds'},
+      {n:'500x', t:'greater warming impact does black carbon have in the stratosphere versus at ground level'},
+    ],
+    alternatives:['Satellite consolidation','Reusable rockets','Green propellants','Virtual technology','Data compression'],
+  },
+
+  { id:26, icon:'🌾', name:'Palm Oil Products', cat:'food', severity:'critical',
+    nature:95, human:55, animal:90, social:70, co2:'Variable', degradation:'Ongoing',
+    timeline:['Forest cleared','Plantation','Harvest','Processing','Global supply'],
+    tEvents:['Peatland drained','Orangutan habitat lost','Fire season','CO₂ released','Monoculture persists'],
+    impacts:[
+      {icon:'🦧', name:'Orangutans', desc:'Palm oil expansion is the primary driver of Sumatran orangutan extinction'},
+      {icon:'🌳', name:'Rainforest', desc:'Rainforests and peatlands cleared at catastrophic rates for plantations'},
+      {icon:'🔥', name:'Peatland Fires', desc:'Burning peat for palm clearance releases centuries of stored carbon'},
+      {icon:'🐯', name:'Tigers & Rhinos', desc:'Habitat loss pushes Sumatran tigers and rhinos to extinction brink'},
+      {icon:'💧', name:'Water Pollution', desc:'Palm oil processing effluent is one of the most polluting industrial wastes'},
+      {icon:'👷', name:'Labour Abuse', desc:'Plantation workers face exploitation, child labour, and forced labour'},
+    ],
+    facts:[
+      {n:'85%', t:'of global palm oil comes from Indonesia and Malaysia, where vast rainforests have been cleared'},
+      {n:'50%', t:'of packaged products in supermarkets contain palm oil as an ingredient'},
+      {n:'300', t:'football fields of tropical forest are cleared every hour for palm oil expansion globally'},
+    ],
+    alternatives:['RSPO-certified palm oil','Sunflower oil','Coconut oil','Olive oil','Avocado oil'],
+  },
+
+  { id:27, icon:'💊', name:'Pharmaceutical Waste', cat:'chemical', severity:'medium',
+    nature:72, human:50, animal:78, social:45, co2:'Variable', degradation:'Days–decades',
+    timeline:['Prescription','Use','Flushing/disposal','Waterway entry','Ecosystem'],
+    tEvents:['Excretion','Treatment bypass','River contamination','Hormone disruption','Antibiotic resistance'],
+    impacts:[
+      {icon:'🐟', name:'Fish Feminisation', desc:'Oestrogen from contraceptives causes male fish to produce eggs in rivers'},
+      {icon:'🦠', name:'Antibiotic Resistance', desc:'Antibiotic residues in water accelerate resistance in bacteria globally'},
+      {icon:'💧', name:'Water Supply', desc:'Trace pharmaceuticals detected in drinking water worldwide'},
+      {icon:'🐦', name:'Vultures Crisis', desc:'Diclofenac in livestock carcasses killed 95% of Indian vultures'},
+      {icon:'🌿', name:'Soil Disruption', desc:'Veterinary medicines in manure alter soil microbial communities'},
+      {icon:'🏥', name:'Production', desc:'Pharmaceutical manufacturing generates significant toxic chemical waste'},
+    ],
+    facts:[
+      {n:'95%', t:'of South Asian vultures were wiped out by diclofenac — a single anti-inflammatory drug'},
+      {n:'700K', t:'people die per year from antibiotic-resistant infections, worsened by environmental antibiotic exposure'},
+      {n:'80%', t:'of US rivers sampled contain detectable levels of pharmaceutical compounds'},
+    ],
+    alternatives:['Proper drug disposal','Take-back programs','Natural remedies','Minimum dosing','Drug reform'],
+  },
+
+  { id:28, icon:'🌱', name:'Pesticides', cat:'chemical', severity:'critical',
+    nature:92, human:68, animal:95, social:62, co2:'Variable', degradation:'Weeks–decades',
+    timeline:['Spraying','Rain','Soil absorption','Water runoff','Food chain'],
+    tEvents:['Insect exposure','Bee colony collapse','Soil biodiversity loss','Bioaccumulation','Human exposure'],
+    impacts:[
+      {icon:'🐝', name:'Bee Collapse', desc:'Neonicotinoids are responsible for widespread bee colony collapse disorder'},
+      {icon:'🐦', name:'Bird Deaths', desc:'Pesticide-killed insects reduce food for birds, crashing populations'},
+      {icon:'🐸', name:'Amphibians', desc:'Atrazine causes sex reversal in frogs at concentrations legal in many countries'},
+      {icon:'🧬', name:'Human Cancer', desc:'Long-term exposure to glyphosate linked to non-Hodgkin lymphoma'},
+      {icon:'💧', name:'Water Toxins', desc:'Pesticides found in rainwater, snow, and remote wilderness far from farms'},
+      {icon:'🌿', name:'Soil Death', desc:'Pesticides kill the complex soil microbiome that sustains plant life'},
+    ],
+    facts:[
+      {n:'4.6B', t:'pounds of pesticides are used globally every year — and rising'},
+      {n:'75%', t:'of flying insect biomass has been lost in Germany over 27 years, linked to pesticides'},
+      {n:'3M', t:'people suffer acute pesticide poisoning each year, mostly farmworkers in developing nations'},
+    ],
+    alternatives:['Integrated pest management','Companion planting','Biological control','Organic farming','Crop rotation'],
+  },
+
+  { id:29, icon:'🏗️', name:'Cement & Concrete', cat:'chemical', severity:'high',
+    nature:80, human:65, animal:55, social:55, co2:'0.9T/T cement', degradation:'Permanent',
+    timeline:['Limestone mining','Kiln firing','Construction','Urban sprawl','Infrastructure'],
+    tEvents:['Quarry habitat loss','CO₂ kilns','Heat islands','Flood surfaces','Perpetual emissions'],
+    impacts:[
+      {icon:'☁️', name:'CO₂ Giant', desc:'Cement production accounts for 8% of global CO₂ emissions annually'},
+      {icon:'🌡️', name:'Urban Heat', desc:'Concrete and asphalt create urban heat islands raising city temperatures'},
+      {icon:'🌊', name:'Flooding', desc:'Impermeable surfaces prevent water absorption, worsening urban floods'},
+      {icon:'⛰️', name:'Quarrying', desc:'Limestone quarrying destroys ecosystems and entire hills and mountains'},
+      {icon:'💧', name:'River Sand', desc:'Sand mining for concrete depletes riverbeds, killing aquatic ecosystems'},
+      {icon:'🐦', name:'Habitat Seal', desc:'Urbanisation with concrete seals soil, eliminating ground-nesting birds'},
+    ],
+    facts:[
+      {n:'8%', t:'of global CO₂ emissions come from cement manufacturing — more than aviation'},
+      {n:'4B', t:'tonnes of cement are produced annually — the world\'s most used construction material'},
+      {n:'50B', t:'tonnes of sand are extracted globally per year, mostly for concrete production'},
+    ],
+    alternatives:['Green cement','Hempcrete','Bamboo construction','Rammed earth','Recycled aggregate concrete'],
+  },
+
+  { id:30, icon:'🎮', name:'Gaming Console', cat:'electronic', severity:'medium',
+    nature:65, human:60, animal:42, social:55, co2:'89kg', degradation:'100s yrs',
+    timeline:['Mining','Manufacture','5–10 yr use','Discard','E-waste dump'],
+    tEvents:['Conflict mineral mining','Factory assembly','Energy consumption','Battery waste','Toxic leaching'],
+    impacts:[
+      {icon:'⛏️', name:'Conflict Minerals', desc:'Tantalum from conflict zones in DRC funds armed groups and exploitation'},
+      {icon:'⚡', name:'Energy Drain', desc:'US gaming uses 34 billion kWh per year — equivalent to a whole state\'s use'},
+      {icon:'☠️', name:'E-Waste', desc:'Toxic metals in discarded consoles leach into soil at informal dump sites'},
+      {icon:'📦', name:'Packaging Waste', desc:'Extensive plastic and cardboard packaging for games and accessories'},
+      {icon:'🌊', name:'Cooling Systems', desc:'Data centres for cloud gaming require massive water for cooling towers'},
+      {icon:'🏭', name:'Supply Chain', desc:'Components sourced across 50+ countries, each adding transportation emissions'},
+    ],
+    facts:[
+      {n:'34B', t:'kWh of electricity is consumed by gaming in the US annually — a staggering energy footprint'},
+      {n:'89kg', t:'CO₂ equivalent is emitted to produce one average gaming console'},
+      {n:'20%', t:'of e-waste is formally recycled — the rest poisons communities in developing nations'},
+    ],
+    alternatives:['PC gaming (longer life)','Second-hand consoles','Cloud gaming','Mobile gaming','Board games'],
+  },
+];
+
+// COLOR HELPERS
+function severityColor(pct) {
+  if (pct >= 80) return '#f87171';
+  if (pct >= 60) return '#fb923c';
+  if (pct >= 40) return '#fbbf24';
+  return '#4ade80';
+}
+
+function severityDotColor(s) {
+  const map = { critical:'#f87171', high:'#fb923c', medium:'#fbbf24', low:'#4ade80' };
+  return map[s] || '#6b7f6b';
+}
+
+// RENDER GRID
+function renderGrid(items) {
+  const grid = document.getElementById('itemGrid');
+  grid.innerHTML = '';
+  if (items.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted);font-family:DM Mono,monospace;letter-spacing:2px;font-size:12px;">// NO ITEMS FOUND</div>';
+    return;
+  }
+  items.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.style.animationDelay = (i * 0.04) + 's';
+    card.innerHTML = `
+      <div class="severity-dot" style="background:${severityDotColor(item.severity)}"></div>
+      <div class="item-icon">${item.icon}</div>
+      <div class="item-name">${item.name}</div>
+      <div class="item-cat">${item.cat.toUpperCase()}</div>
+    `;
+    card.addEventListener('click', () => openModal(item));
+    grid.appendChild(card);
+  });
+}
+
+// MODAL
+function openModal(item) {
+  document.getElementById('mIcon').textContent = item.icon;
+  document.getElementById('mTitle').textContent = item.name.toUpperCase();
+  document.getElementById('mSubtitle').textContent = `${item.cat.toUpperCase()} · SEVERITY: ${item.severity.toUpperCase()}`;
+
+  const impactData = [
+    { label:'Nature Impact', value: item.nature, color: severityColor(item.nature) },
+    { label:'Human Health', value: item.human, color: severityColor(item.human) },
+    { label:'Animal Impact', value: item.animal, color: severityColor(item.animal) },
+    { label:'Social Impact', value: item.social, color: severityColor(item.social) },
+  ];
+
+  const impactCards = impactData.map(d => `
+    <div class="impact-card">
+      <div class="impact-label">${d.label}</div>
+      <div class="impact-value" style="color:${d.color}">${d.value}%</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:0%;background:${d.color}" data-target="${d.value}"></div>
+      </div>
+    </div>
+  `).join('');
+
+  const timelineSteps = item.timeline.map((yr, i) => `
+    <div class="t-step">
+      <div class="t-dot" style="background:${['#4ade80','#a3e635','#fbbf24','#fb923c','#f87171'][i] || '#4ade80'}"></div>
+      <div class="t-year">${yr}</div>
+      <div class="t-label">${item.tEvents[i] || ''}</div>
+    </div>
+  `).join('');
+
+  const areasHTML = item.impacts.map(a => `
+    <div class="area-chip">
+      <div class="area-icon">${a.icon}</div>
+      <div class="area-name">${a.name}</div>
+      <div class="area-desc">${a.desc}</div>
+    </div>
+  `).join('');
+
+  const factsHTML = item.facts.map((f, i) => `
+    <div class="fact-item">
+      <div class="fact-num">${f.n}</div>
+      <div class="fact-text">${f.t}</div>
+    </div>
+  `).join('');
+
+  const altPills = item.alternatives.map(a => `<div class="alt-pill">✓ ${a}</div>`).join('');
+
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display:flex;gap:20px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 20px">
+      <div style="flex:1;text-align:center"><div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">CO₂ Footprint</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--orange);letter-spacing:1px">${item.co2}</div></div>
+      <div style="width:1px;background:var(--border)"></div>
+      <div style="flex:1;text-align:center"><div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">Time to Degrade</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--red);letter-spacing:1px">${item.degradation}</div></div>
+    </div>
+
+    <div class="section-title">IMPACT SCORES</div>
+    <div class="impact-grid">${impactCards}</div>
+
+    <div class="section-title">DEGRADATION JOURNEY</div>
+    <div class="timeline">${timelineSteps}</div>
+
+    <div class="section-title">IMPACT AREAS</div>
+    <div class="impact-areas">${areasHTML}</div>
+
+    <div class="section-title">CRITICAL FACTS</div>
+    <div class="facts-list">${factsHTML}</div>
+
+    <div class="alternatives">
+      <h3>♻ BETTER ALTERNATIVES</h3>
+      <div class="alt-pills">${altPills}</div>
+    </div>
+  `;
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Animate bars after render
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill[data-target]').forEach(bar => {
+      bar.style.width = bar.dataset.target + '%';
+    });
+  }, 100);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// FILTER LOGIC
+let activeCategory = 'all';
+let searchTerm = '';
+
+function filterItems() {
+  let result = ITEMS;
+  if (activeCategory !== 'all') result = result.filter(i => i.cat === activeCategory);
+  if (searchTerm) result = result.filter(i =>
+    i.name.toLowerCase().includes(searchTerm) ||
+    i.cat.toLowerCase().includes(searchTerm) ||
+    i.severity.toLowerCase().includes(searchTerm)
+  );
+  renderGrid(result);
+}
+
+document.getElementById('categoryStrip').addEventListener('click', e => {
+  if (!e.target.matches('.cat-btn')) return;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  activeCategory = e.target.dataset.cat;
+  filterItems();
+});
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchTerm = e.target.value.toLowerCase().trim();
+  filterItems();
+});
+
+// INIT
+renderGrid(ITEMS);
+document.getElementById('totalItems').textContent = ITEMS.length;
+</script>
+</body>
+</html>
