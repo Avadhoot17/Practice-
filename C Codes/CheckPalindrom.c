@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-// Function to check palindrome  123456789101112
+// Function to check palindrome  12345678910111213
 int isPalindrome(int num) {
     int temp = num, rev = 0;
 
