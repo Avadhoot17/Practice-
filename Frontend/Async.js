@@ -1,4 +1,4 @@
-// ===== Thunk Middleware =====
+// ===== Thunk Middleware ======
 function thunkMiddleware({ dispatch, getState }) {
     return next => action => {
         if (typeof action === "function") {
