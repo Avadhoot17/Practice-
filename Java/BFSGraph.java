@@ -1,5 +1,5 @@
 import java.util.*;
-x x x x x x x x x x
+
 public class BFSGraph {
 
     public static void main(String[] args) {
