@@ -6,7 +6,7 @@ public class AdvancedCycleDetector {
 
         int[] arr = {1, 3, 4, 2, 2};
 
-        System.out.println("Array: " + Arrays.toString(arr));   1  1  1  1  1
+        System.out.println("Array: " + Arrays.toString(arr));   1  1  1  1
 
         Result result = detectCycle(arr);
 
