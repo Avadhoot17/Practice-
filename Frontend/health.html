@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prominance — Unleash Your True Strength</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --black:#050505;--deep:#080808;--surface:#111;--card:#141414;
+      --border:rgba(255,255,255,0.07);--white:#f2f2f2;--muted:#6b6b6b;
+      --accent:#c8f500;--glow:rgba(200,245,0,0.18);--glow-hard:rgba(200,245,0,0.35);
+      --font-h:'Barlow Condensed',sans-serif;--font-b:'Montserrat',sans-serif;
+      --r:12px;--t:0.35s cubic-bezier(.4,0,.2,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--black);color:var(--white);font-family:var(--font-b);line-height:1.65;overflow-x:hidden}
+    a{text-decoration:none;color:inherit}
+    ul{list-style:none}
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:var(--black)}
+    ::-webkit-scrollbar-thumb{background:var(--accent);border-radius:99px}
+    body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.5}
+
+    /* LOADER */
+    #loader{position:fixed;inset:0;z-index:9999;background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:opacity .6s ease,visibility .6s ease}
+    #loader.hidden{opacity:0;visibility:hidden}
+    .loader-svg{animation:loaderPulse 1.3s ease-in-out infinite}
+    .loader-bar{width:150px;height:2px;background:#1a1a1a;border-radius:99px;overflow:hidden}
+    .loader-fill{height:100%;width:0;background:var(--accent);box-shadow:0 0 10px var(--accent);border-radius:99px;animation:loadFill 2s ease forwards}
+    @keyframes loadFill{to{width:100%}}
+    @keyframes loaderPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+
+    /* UTILS */
+    .container{max-width:1160px;margin:0 auto;padding:0 24px}
+    section{position:relative;z-index:1}
+    .section-label{font-family:var(--font-h);font-size:.75rem;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);display:inline-block;margin-bottom:10px}
+    .section-title{font-family:var(--font-h);font-size:clamp(2.2rem,5vw,3.6rem);font-weight:900;text-transform:uppercase;line-height:1.02;letter-spacing:.01em}
+    .section-title span{color:var(--accent)}
+    .section-sub{color:var(--muted);font-size:.93rem;max-width:500px;margin-top:12px}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;gap:9px;padding:13px 32px;font-family:var(--font-h);font-size:.95rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border-radius:var(--r);cursor:pointer;border:none;transition:var(--t);position:relative;overflow:hidden}
+    .btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.06);transform:translateX(-110%) skewX(-15deg);transition:transform .45s ease}
+    .btn:hover::after{transform:translateX(110%) skewX(-15deg)}
+    .btn-primary{background:var(--accent);color:var(--black);box-shadow:0 0 28px var(--glow)}
+    .btn-primary:hover{background:#d8ff20;box-shadow:0 0 52px var(--glow-hard),0 0 90px rgba(200,245,0,.12);transform:translateY(-2px)}
+    .btn-outline{background:transparent;color:var(--white);border:1.5px solid var(--border)}
+    .btn-outline:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 0 24px var(--glow);transform:translateY(-2px)}
+
+    /* FADE-UP */
+    .fade-up{opacity:0;transform:translateY(34px);transition:opacity .7s ease,transform .7s ease}
+    .fade-up.visible{opacity:1;transform:none}
+
+    /* NAVBAR */
+    #navbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 24px;background:rgba(5,5,5,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid transparent;transition:var(--t)}
+    #navbar.scrolled{border-bottom-color:var(--border)}
+    .nav-inner{max-width:1160px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:66px}
+    .nav-logo{display:flex;align-items:center;gap:11px;font-family:var(--font-h);font-size:1.4rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+    .nav-logo svg{width:34px;height:34px}
+    .nav-links{display:flex;align-items:center;gap:34px}
+    .nav-links a{font-size:.75rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);transition:color .25s}
+    .nav-links a:hover{color:var(--white)}
+    .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px}
+    .hamburger span{display:block;width:24px;height:2px;background:var(--white);border-radius:2px;transition:var(--t)}
+    .hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+    .hamburger.open span:nth-child(2){opacity:0}
+    .hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+    .mobile-menu{display:none;position:fixed;top:66px;left:0;right:0;background:rgba(6,6,6,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:26px 24px;z-index:999;flex-direction:column;gap:22px}
+    .mobile-menu.open{display:flex}
+    .mobile-menu a{font-family:var(--font-h);font-size:1.3rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color .25s}
+    .mobile-menu a:hover{color:var(--accent)}
+
+    /* HERO */
+    #hero{min-height:100vh;display:flex;align-items:center;overflow:hidden;background:radial-gradient(ellipse 80% 55% at 50% -5%,rgba(200,245,0,.07) 0%,transparent 68%),var(--black)}
+    .hero-grid{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:60px;padding:118px 0 80px}
+    .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:99px;background:rgba(200,245,0,.07);border:1px solid rgba(200,245,0,.2);font-family:var(--font-h);font-size:.72rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:26px}
+    .hero-eyebrow::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);animation:blink 1.5s ease-in-out infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+    .hero-title{font-family:var(--font-h);font-size:clamp(4rem,9vw,7.5rem);font-weight:900;text-transform:uppercase;line-height:.9;letter-spacing:-.01em;margin-bottom:18px}
+    .hero-title .ac{color:var(--accent);text-shadow:0 0 44px rgba(200,245,0,.4)}
+    .hero-tagline{color:var(--muted);font-size:1rem;font-weight:500;letter-spacing:.03em;max-width:400px;margin-bottom:38px}
+    .hero-actions{display:flex;gap:14px;flex-wrap:wrap}
+    .hero-stats{display:flex;gap:36px;margin-top:50px}
+    .stat-num{font-family:var(--font-h);font-size:2.4rem;font-weight:900;color:var(--accent);line-height:1}
+    .stat-lbl{font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+    .hero-visual{display:flex;justify-content:center;align-items:center;position:relative}
+    .ring{position:absolute;border-radius:50%;border:1px solid rgba(200,245,0,.1);animation:spin 20s linear infinite}
+    .ring:nth-child(1){width:400px;height:400px}
+    .ring:nth-child(2){width:300px;height:300px;animation-duration:15s;animation-direction:reverse;border-style:dashed}
+    .ring:nth-child(3){width:200px;height:200px;animation-duration:10s}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .hero-logo-wrap{position:relative;z-index:2;filter:drop-shadow(0 0 40px rgba(200,245,0,.28))}
+    .hero-logo-wrap svg{width:150px;height:150px}
+
+    /* ABOUT */
+    #about{padding:110px 0;background:var(--deep)}
+    .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+    .about-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;position:relative;overflow:hidden}
+    .about-card::before{content:'';position:absolute;top:-70px;right:-70px;width:220px;height:220px;background:radial-gradient(circle,rgba(200,245,0,.1) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+    .about-badge{display:inline-flex;align-items:center;gap:10px;padding:9px 18px;background:rgba(200,245,0,.05);border:1px solid rgba(200,245,0,.14);border-radius:var(--r);margin-bottom:22px}
+    .about-badge span{font-family:var(--font-h);font-size:.88rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+    .about-pillars{display:flex;flex-direction:column;gap:12px;margin-top:26px}
+    .pillar{display:flex;align-items:center;gap:14px;padding:13px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;transition:var(--t)}
+    .pillar:hover{border-color:rgba(200,245,0,.22);background:rgba(200,245,0,.03)}
+    .pillar-icon{width:38px;height:38px;flex-shrink:0;background:rgba(200,245,0,.08);border:1px solid rgba(200,245,0,.14);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .pillar-name{font-family:var(--font-h);font-weight:800;font-size:.98rem;text-transform:uppercase;letter-spacing:.04em}
+    .pillar-desc{font-size:.76rem;color:var(--muted);margin-top:2px}
+    .about-text p{color:var(--muted);font-size:.95rem;margin-top:18px}
+
+    /* PRODUCT */
+    #product{padding:110px 0;background:var(--black)}
+    .product-wrap{display:grid;grid-template-columns:1fr 1fr;gap:66px;align-items:center}
+    .product-visual{display:flex;justify-content:center}
+    .product-mock-outer{position:relative;display:inline-block}
+    .product-mock{width:272px;height:370px;background:linear-gradient(155deg,#1c1c1c 0%,#0d0d0d 100%);border:1px solid rgba(200,245,0,.18);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;position:relative;overflow:hidden;box-shadow:0 0 60px rgba(200,245,0,.07),inset 0 1px 0 rgba(255,255,255,.04)}
+    .product-mock::before{content:'';position:absolute;top:-90px;left:50%;transform:translateX(-50%);width:240px;height:240px;background:radial-gradient(circle,rgba(200,245,0,.12) 0%,transparent 68%);border-radius:50%}
+    .product-new{position:absolute;top:16px;right:16px;background:var(--accent);color:var(--black);font-family:var(--font-h);font-size:.68rem;font-weight:900;letter-spacing:.15em;text-transform:uppercase;padding:4px 11px;border-radius:99px}
+    .product-mock svg{position:relative;z-index:1}
+    .product-mock-name{font-family:var(--font-h);font-size:1rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;text-align:center;padding:0 20px;position:relative;z-index:1}
+    .product-mock-sub{font-size:.76rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;position:relative;z-index:1}
+    .product-mock-weight{font-family:var(--font-h);font-size:3rem;font-weight:900;color:var(--accent);line-height:1;text-shadow:0 0 30px rgba(200,245,0,.45);position:relative;z-index:1}
+    .product-badge-wrap{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%)}
+    .product-badge{background:var(--card);border:1px solid rgba(200,245,0,.22);border-radius:99px;padding:7px 22px;font-family:var(--font-h);font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;color:var(--accent)}
+    .product-price-row{display:flex;align-items:flex-end;gap:16px;margin:26px 0 20px}
+    .price-main{font-family:var(--font-h);font-size:2.9rem;font-weight:900;color:var(--accent);line-height:1}
+    .price-old{font-family:var(--font-h);font-size:1.35rem;color:var(--muted);text-decoration:line-through;margin-bottom:5px}
+    .price-save{display:inline-block;background:rgba(200,245,0,.08);border:1px solid rgba(200,245,0,.2);color:var(--accent);font-size:.74rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 11px;border-radius:99px}
+    .benefits-list{display:flex;flex-direction:column;gap:11px;margin-bottom:30px}
+    .benefit{display:flex;align-items:flex-start;gap:12px;font-size:.89rem}
+    .chk{width:21px;height:21px;flex-shrink:0;background:rgba(200,245,0,.1);border:1px solid rgba(200,245,0,.28);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--accent);margin-top:1px}
+
+    /* FEATURES */
+    #features{padding:110px 0;background:var(--deep)}
+    .features-head{text-align:center;margin-bottom:60px}
+    .features-head .section-sub{margin:12px auto 0;text-align:center}
+    .features-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+    .feat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:30px 22px;text-align:center;transition:var(--t);position:relative;overflow:hidden;cursor:default}
+    .feat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2.5px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .4s ease}
+    .feat-card:hover{border-color:rgba(200,245,0,.18);transform:translateY(-6px);box-shadow:0 20px 48px rgba(0,0,0,.5),0 0 28px rgba(200,245,0,.05)}
+    .feat-card:hover::after{transform:scaleX(1)}
+    .feat-icon{width:54px;height:54px;margin:0 auto 16px;background:rgba(200,245,0,.07);border:1px solid rgba(200,245,0,.14);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.45rem;transition:var(--t)}
+    .feat-card:hover .feat-icon{background:rgba(200,245,0,.13);box-shadow:0 0 18px rgba(200,245,0,.18)}
+    .feat-name{font-family:var(--font-h);font-size:1rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
+    .feat-desc{font-size:.76rem;color:var(--muted);line-height:1.56}
+
+    /* TESTIMONIALS */
+    #testimonials{padding:110px 0;background:var(--black)}
+    .testi-head{text-align:center;margin-bottom:60px}
+    .testi-head .section-sub{margin:12px auto 0;text-align:center}
+    .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+    .testi-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:34px 28px;position:relative;overflow:hidden;transition:var(--t)}
+    .testi-card::after{content:'"';position:absolute;top:8px;right:20px;font-family:Georgia,serif;font-size:7rem;color:rgba(200,245,0,.055);line-height:1;pointer-events:none}
+    .testi-card:hover{border-color:rgba(200,245,0,.16);transform:translateY(-4px);box-shadow:0 20px 48px rgba(0,0,0,.4)}
+    .stars{display:flex;gap:3px;margin-bottom:14px}
+    .stars span{color:var(--accent);font-size:.88rem}
+    .testi-text{font-size:.91rem;color:var(--muted);line-height:1.72;margin-bottom:22px}
+    .testi-author{display:flex;align-items:center;gap:13px}
+    .avatar{width:42px;height:42px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-h);font-size:1.1rem;font-weight:900;color:var(--black)}
+    .av1{background:linear-gradient(135deg,#c8f500,#8bc34a)}
+    .av2{background:linear-gradient(135deg,#39ff14,#c8f500)}
+    .av3{background:linear-gradient(135deg,#c8f500,#c6ff00)}
+    .author-name{font-family:var(--font-h);font-weight:800;font-size:.97rem;text-transform:uppercase;letter-spacing:.05em}
+    .author-role{font-size:.73rem;color:var(--muted)}
+
+    /* CONTACT */
+    #contact{padding:110px 0;background:var(--deep)}
+    .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:68px;align-items:start}
+    .contact-info .section-sub{margin-top:0}
+    .contact-detail{display:flex;align-items:center;gap:13px;margin-bottom:14px}
+    .contact-detail-icon{width:40px;height:40px;flex-shrink:0;background:rgba(200,245,0,.07);border:1px solid rgba(200,245,0,.13);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.05rem}
+    .contact-detail-label{font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+    .contact-detail-value{font-size:.88rem}
+    .social-links{display:flex;gap:13px;margin-top:34px}
+    .soc{width:48px;height:48px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:1.15rem;transition:var(--t);color:var(--white)}
+    .soc:hover{border-color:var(--accent);background:rgba(200,245,0,.05);box-shadow:0 0 18px var(--glow);transform:translateY(-3px)}
+    .contact-form{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:38px}
+    .form-group{margin-bottom:18px}
+    .form-group label{display:block;font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+    .form-group input,.form-group textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px;color:var(--white);font-family:var(--font-b);font-size:.91rem;transition:border-color .25s,box-shadow .25s;outline:none;resize:vertical}
+    .form-group input::placeholder,.form-group textarea::placeholder{color:#3a3a3a}
+    .form-group input:focus,.form-group textarea:focus{border-color:rgba(200,245,0,.38);box-shadow:0 0 0 3px rgba(200,245,0,.055)}
+    .form-group textarea{min-height:105px}
+    .form-err{font-size:.73rem;color:#ff5555;margin-top:4px;display:none}
+    .form-success{display:none;text-align:center;padding:18px;background:rgba(200,245,0,.06);border:1px solid rgba(200,245,0,.2);border-radius:12px;color:var(--accent);font-family:var(--font-h);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+
+    /* FOOTER */
+    footer{background:var(--black);border-top:1px solid var(--border);padding:60px 0 30px}
+    .footer-grid{display:grid;grid-template-columns:1.7fr 1fr 1fr;gap:56px;margin-bottom:48px}
+    .footer-logo{display:flex;align-items:center;gap:10px;font-family:var(--font-h);font-size:1.45rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+    .footer-logo svg{width:30px;height:30px}
+    .footer-bio{font-size:.83rem;color:var(--muted);line-height:1.7;max-width:275px}
+    .footer-col-title{font-family:var(--font-h);font-size:.76rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+    .footer-links{display:flex;flex-direction:column;gap:9px}
+    .footer-links a{font-size:.85rem;color:var(--muted);transition:color .25s}
+    .footer-links a:hover{color:var(--white)}
+    .footer-bottom{padding-top:26px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+    .footer-copy{font-size:.76rem;color:var(--muted)}
+    .footer-copy b{color:var(--accent)}
+    .footer-tagline{font-family:var(--font-h);font-size:.76rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+
+    /* RESPONSIVE */
+    @media(max-width:1024px){.features-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:860px){
+      .nav-links,#navbar .btn{display:none}
+      .hamburger{display:flex}
+      .hero-grid{grid-template-columns:1fr;padding:100px 0 60px;gap:40px}
+      .hero-visual{order:-1}
+      .ring:nth-child(1){width:270px;height:270px}
+      .ring:nth-child(2){width:200px;height:200px}
+      .ring:nth-child(3){width:130px;height:130px}
+      .hero-logo-wrap svg{width:100px;height:100px}
+      .about-grid,.product-wrap,.contact-grid{grid-template-columns:1fr}
+      .testi-grid{grid-template-columns:1fr}
+      .footer-grid{grid-template-columns:1fr 1fr}
+      .features-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:540px){
+      .hero-title{font-size:clamp(3.2rem,14vw,5rem)}
+      .hero-stats{gap:18px}
+      .footer-grid{grid-template-columns:1fr;gap:34px}
+      .footer-bottom{flex-direction:column;text-align:center}
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-svg">
+    <svg width="100" height="100" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M70 18C70 18 54 8 42 14C36 17 34 24 38 28C32 24 24 26 22 32C20 38 26 44 32 42C26 48 28 56 34 56C28 60 28 68 34 68" stroke="#c8f500" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <path d="M70 18C70 18 86 8 98 14C104 17 106 24 102 28C108 24 116 26 118 32C120 38 114 44 108 42C114 48 112 56 106 56C112 60 112 68 106 68" stroke="#c8f500" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <path d="M38 28C34 22 30 22 28 26" stroke="#c8f500" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <path d="M34 56C28 54 26 58 28 62" stroke="#c8f500" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <path d="M102 28C106 22 110 22 112 26" stroke="#c8f500" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <path d="M106 56C112 54 114 58 112 62" stroke="#c8f500" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <polygon points="70,58 100,108 40,108" fill="none" stroke="#c8f500" stroke-width="2.5"/>
+      <polygon points="70,68 90,102 50,102" fill="rgba(200,245,0,0.08)" stroke="#c8f500" stroke-width="2"/>
+      <polygon points="70,78 82,96 58,96" fill="rgba(200,245,0,0.26)" stroke="#c8f500" stroke-width="1.8"/>
+      <circle cx="70" cy="87" r="4" fill="#c8f500"/>
+      <line x1="36" y1="112" x2="104" y2="112" stroke="rgba(200,245,0,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo">
+      <svg viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M70 18C70 18 54 8 42 14C36 17 34 24 38 28C32 24 24 26 22 32C20 38 26 44 32 42C26 48 28 56 34 56C28 60 28 68 34 68" stroke="#c8f500" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <path d="M70 18C70 18 86 8 98 14C104 17 106 24 102 28C108 24 116 26 118 32C120 38 114 44 108 42C114 48 112 56 106 56C112 60 112 68 106 68" stroke="#c8f500" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <polygon points="70,58 100,108 40,108" fill="none" stroke="#c8f500" stroke-width="3"/>
+        <polygon points="70,68 90,102 50,102" fill="rgba(200,245,0,0.08)" stroke="#c8f500" stroke-width="2.5"/>
+        <polygon points="70,78 82,96 58,96" fill="rgba(200,245,0,0.28)" stroke="#c8f500" stroke-width="2"/>
+        <circle cx="70" cy="87" r="4.5" fill="#c8f500"/>
+      </svg>
+      Prominance
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#product">Products</a></li>
+      <li><a href="#features">Benefits</a></li>
+      <li><a href="#testimonials">Reviews</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#product" class="btn btn-primary" style="padding:10px 24px;font-size:.82rem;">Shop Now</a>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about">About</a>
+  <a href="#product">Products</a>
+  <a href="#features">Benefits</a>
+  <a href="#testimonials">Reviews</a>
+  <a href="#contact">Contact</a>
+  <a href="#product" class="btn btn-primary" style="width:fit-content;margin-top:6px">Shop Now</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eyebrow fade-up">Elite Performance Supplement</div>
+        <h1 class="hero-title fade-up">Promi<br><span class="ac">nance</span></h1>
+        <p class="hero-tagline fade-up">Unleash Your True Strength. Forged for the elite. Built for those who refuse limits.</p>
+        <div class="hero-actions fade-up">
+          <a href="#product" class="btn btn-primary">Shop Now &rarr;</a>
+          <a href="#about" class="btn btn-outline">Our Story</a>
+        </div>
+        <div class="hero-stats fade-up">
+          <div><div class="stat-num">100%</div><div class="stat-lbl">Pure Creatine</div></div>
+          <div><div class="stat-num">Lab</div><div class="stat-lbl">Tested</div></div>
+          <div><div class="stat-num">0</div><div class="stat-lbl">Fillers</div></div>
+        </div>
+      </div>
+      <div class="hero-visual fade-up">
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="hero-logo-wrap">
+          <svg viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M70 18C70 18 54 8 42 14C36 17 34 24 38 28C32 24 24 26 22 32C20 38 26 44 32 42C26 48 28 56 34 56C28 60 28 68 34 68" stroke="#c8f500" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M70 18C70 18 86 8 98 14C104 17 106 24 102 28C108 24 116 26 118 32C120 38 114 44 108 42C114 48 112 56 106 56C112 60 112 68 106 68" stroke="#c8f500" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M38 28C34 22 30 22 28 26" stroke="#c8f500" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <path d="M34 56C28 54 26 58 28 62" stroke="#c8f500" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <path d="M102 28C106 22 110 22 112 26" stroke="#c8f500" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <path d="M106 56C112 54 114 58 112 62" stroke="#c8f500" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <polygon points="70,58 100,108 40,108" fill="none" stroke="#c8f500" stroke-width="2.2"/>
+            <polygon points="70,68 90,102 50,102" fill="rgba(200,245,0,0.08)" stroke="#c8f500" stroke-width="1.8"/>
+            <polygon points="70,78 82,96 58,96" fill="rgba(200,245,0,0.26)" stroke="#c8f500" stroke-width="1.5"/>
+            <circle cx="70" cy="87" r="3.5" fill="#c8f500"/>
+            <line x1="36" y1="112" x2="104" y2="112" stroke="rgba(200,245,0,0.38)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="fade-up">
+        <div class="about-card">
+          <div class="about-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#c8f500"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <span>Premium Brand</span>
+          </div>
+          <div class="section-label">Est. 2024</div>
+          <div style="font-family:var(--font-h);font-size:1.65rem;font-weight:900;text-transform:uppercase;line-height:1.1">
+            Born from <span style="color:var(--accent)">Passion,</span><br>Built on <span style="color:var(--accent)">Science</span>
+          </div>
+          <div class="about-pillars">
+            <div class="pillar"><div class="pillar-icon">&#9879;&#65039;</div><div><div class="pillar-name">Science-Backed</div><div class="pillar-desc">Every formula is evidence-based, not hype-based</div></div></div>
+            <div class="pillar"><div class="pillar-icon">&#127942;</div><div><div class="pillar-name">Elite Standard</div><div class="pillar-desc">Manufactured in GMP-certified facilities</div></div></div>
+            <div class="pillar"><div class="pillar-icon">&#128737;&#65039;</div><div><div class="pillar-name">Zero Compromise</div><div class="pillar-desc">No fillers. No shortcuts. Pure performance.</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="about-text fade-up">
+        <div class="section-label">Our Story</div>
+        <h2 class="section-title">Where <span>Dominance</span> Begins</h2>
+        <p>Prominance was built for one kind of person — someone who treats every rep, every set, and every meal as a step toward mastery. We aren't just a supplement brand. We are a declaration of intent.</p>
+        <p style="margin-top:16px">Our products are born from rigorous science, crafted in world-class facilities, and designed to deliver measurable results. No hype. No empty promises. Just performance you can feel from day one.</p>
+        <p style="margin-top:16px">Whether you're stepping into the gym for the first time or competing at the highest level, Prominance is your unfair advantage.</p>
+        <a href="#product" class="btn btn-primary" style="margin-top:34px">Explore Products &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCT -->
+<section id="product">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:58px" class="fade-up">
+      <div class="section-label">Our Products</div>
+      <h2 class="section-title">The <span>Weapon</span> of Champions</h2>
+      <p class="section-sub" style="margin:12px auto 0">One product. Proven by science. Trusted by athletes across India.</p>
+    </div>
+    <div class="product-wrap">
+      <div class="product-visual fade-up">
+        <div class="product-mock-outer">
+          <div class="product-mock">
+            <div class="product-new">NEW</div>
+            <svg width="58" height="58" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M70 18C70 18 54 8 42 14C36 17 34 24 38 28C32 24 24 26 22 32C20 38 26 44 32 42C26 48 28 56 34 56C28 60 28 68 34 68" stroke="#c8f500" stroke-width="4" stroke-linecap="round" fill="none"/>
+              <path d="M70 18C70 18 86 8 98 14C104 17 106 24 102 28C108 24 116 26 118 32C120 38 114 44 108 42C114 48 112 56 106 56C112 60 112 68 106 68" stroke="#c8f500" stroke-width="4" stroke-linecap="round" fill="none"/>
+              <polygon points="70,58 100,108 40,108" fill="none" stroke="#c8f500" stroke-width="3"/>
+              <polygon points="70,68 90,102 50,102" fill="rgba(200,245,0,0.1)" stroke="#c8f500" stroke-width="2.5"/>
+              <polygon points="70,78 82,96 58,96" fill="rgba(200,245,0,0.3)" stroke="#c8f500" stroke-width="2"/>
+              <circle cx="70" cy="87" r="5" fill="#c8f500"/>
+            </svg>
+            <div class="product-mock-name">Micronized Creatine<br>Monohydrate</div>
+            <div class="product-mock-sub">by Prominance</div>
+            <div class="product-mock-weight">300g</div>
+          </div>
+          <div class="product-badge-wrap"><div class="product-badge">100% Pure Creatine</div></div>
+        </div>
+      </div>
+      <div class="fade-up">
+        <div class="section-label">Flagship Product</div>
+        <h2 class="section-title" style="font-size:clamp(2rem,4vw,3rem)">Micronized<br>Creatine <span>Mono</span></h2>
+        <div class="product-price-row">
+          <div class="price-main">&#8377;699</div>
+          <div>
+            <div class="price-old">&#8377;999</div>
+            <div class="price-save">Save 30%</div>
+          </div>
+        </div>
+        <ul class="benefits-list">
+          <li class="benefit"><div class="chk">&#10003;</div><span><strong>Improves Strength</strong> &mdash; Increases phosphocreatine stores for maximum power output</span></li>
+          <li class="benefit"><div class="chk">&#10003;</div><span><strong>Enhances Performance</strong> &mdash; Clinically proven to boost high-intensity athletic output</span></li>
+          <li class="benefit"><div class="chk">&#10003;</div><span><strong>Faster Muscle Recovery</strong> &mdash; Reduces soreness and shortens recovery window</span></li>
+          <li class="benefit"><div class="chk">&#10003;</div><span><strong>100% Pure Creatine</strong> &mdash; No additives, no fillers, no compromise whatsoever</span></li>
+          <li class="benefit"><div class="chk">&#10003;</div><span><strong>Micronized Formula</strong> &mdash; Ultra-fine particles for superior mixability &amp; absorption</span></li>
+        </ul>
+        <div style="display:flex;gap:13px;flex-wrap:wrap">
+          <a href="#contact" class="btn btn-primary">Buy Now &rarr;</a>
+          <button class="btn btn-outline" id="cartBtn">Add to Cart</button>
+        </div>
+        <p style="font-size:.76rem;color:var(--muted);margin-top:15px">&#128666; Free shipping above &#8377;999 &nbsp;&bull;&nbsp; &#128274; Secure checkout</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="features-head fade-up">
+      <div class="section-label">Why Prominance</div>
+      <h2 class="section-title">The <span>Standard</span> of Excellence</h2>
+      <p class="section-sub">Every ingredient, every batch, every bottle held to the highest standard.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card fade-up">
+        <div class="feat-icon">&#9879;&#65039;</div>
+        <div class="feat-name">100% Pure</div>
+        <div class="feat-desc">Nothing but pharmaceutical-grade creatine monohydrate. Zero compromise.</div>
+      </div>
+      <div class="feat-card fade-up">
+        <div class="feat-icon">&#129516;</div>
+        <div class="feat-name">Lab Tested</div>
+        <div class="feat-desc">Independently tested for potency, purity, and safety &mdash; every single batch.</div>
+      </div>
+      <div class="feat-card fade-up">
+        <div class="feat-icon">&#128683;</div>
+        <div class="feat-name">No Fillers</div>
+        <div class="feat-desc">We never pad our formulas with cheap fillers or artificial ingredients.</div>
+      </div>
+      <div class="feat-card fade-up">
+        <div class="feat-icon">&#9889;</div>
+        <div class="feat-name">Fast Absorption</div>
+        <div class="feat-desc">Micronized particles dissolve instantly for rapid delivery to your muscles.</div>
+      </div>
+      <div class="feat-card fade-up">
+        <div class="feat-icon">&#127941;</div>
+        <div class="feat-name">Trusted Quality</div>
+        <div class="feat-desc">GMP-certified production. Trusted by thousands of athletes across India.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="container">
+    <div class="testi-head fade-up">
+      <div class="section-label">Testimonials</div>
+      <h2 class="section-title">Real <span>Results,</span> Real People</h2>
+      <p class="section-sub">Thousands of athletes trust Prominance to fuel their performance every day.</p>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card fade-up">
+        <div class="stars"><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span></div>
+        <p class="testi-text">"I've tried creatine from multiple brands, but Prominance hits different. My strength went up noticeably in the first two weeks &mdash; no bloating, no issues, just pure performance. This is the only creatine I'll ever buy."</p>
+        <div class="testi-author"><div class="avatar av1">R</div><div><div class="author-name">Rahul Sharma</div><div class="author-role">Powerlifter &middot; Mumbai</div></div></div>
+      </div>
+      <div class="testi-card fade-up">
+        <div class="stars"><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span></div>
+        <p class="testi-text">"The mixability is insane &mdash; dissolves completely with zero grit. I stack it with my pre-workout and the endurance improvement is night and day. Prominance is a genuine game-changer for serious athletes."</p>
+        <div class="testi-author"><div class="avatar av2">A</div><div><div class="author-name">Arjun Mehta</div><div class="author-role">Bodybuilder &middot; Delhi</div></div></div>
+      </div>
+      <div class="testi-card fade-up">
+        <div class="stars"><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span></div>
+        <p class="testi-text">"As a woman who lifts seriously, I was skeptical. Within 3 weeks my recovery improved dramatically and I was pushing heavier weights than ever. The quality is unmatched and completely worth the price."</p>
+        <div class="testi-author"><div class="avatar av3">P</div><div><div class="author-name">Priya Kulkarni</div><div class="author-role">CrossFit Athlete &middot; Pune</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="fade-up">
+        <div class="section-label">Get In Touch</div>
+        <h2 class="section-title" style="margin-bottom:16px">Let's <span>Connect</span></h2>
+        <p class="section-sub">Questions about our products? Want to become a distributor? We respond within 24 hours &mdash; real people, no bots.</p>
+        <div style="margin-top:28px">
+          <div class="contact-detail"><div class="contact-detail-icon">&#128231;</div><div><div class="contact-detail-label">Email</div><div class="contact-detail-value">hello@prominance.in</div></div></div>
+          <div class="contact-detail"><div class="contact-detail-icon">&#128205;</div><div><div class="contact-detail-label">Location</div><div class="contact-detail-value">Maharashtra, India</div></div></div>
+          <div class="contact-detail"><div class="contact-detail-icon">&#128222;</div><div><div class="contact-detail-label">Phone / WhatsApp</div><div class="contact-detail-value">+91 98765 43210</div></div></div>
+        </div>
+        <div class="social-links">
+          <a href="#" class="soc" aria-label="Instagram">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <a href="#" class="soc" aria-label="WhatsApp">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+          </a>
+          <a href="#" class="soc" aria-label="YouTube">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="contact-form fade-up">
+        <div id="formSuccess" class="form-success">&#10003; Message sent! We'll get back to you within 24 hours.</div>
+        <form id="contactForm" novalidate>
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" placeholder="John Doe"/>
+            <div class="form-err" id="nameErr">Please enter your name.</div>
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="you@example.com"/>
+            <div class="form-err" id="emailErr">Please enter a valid email.</div>
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" placeholder="Tell us what's on your mind..."></textarea>
+            <div class="form-err" id="msgErr">Please enter a message.</div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">Send Message &rarr;</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">
+          <svg viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M70 18C70 18 54 8 42 14C36 17 34 24 38 28C32 24 24 26 22 32C20 38 26 44 32 42C26 48 28 56 34 56C28 60 28 68 34 68" stroke="#c8f500" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+            <path d="M70 18C70 18 86 8 98 14C104 17 106 24 102 28C108 24 116 26 118 32C120 38 114 44 108 42C114 48 112 56 106 56C112 60 112 68 106 68" stroke="#c8f500" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+            <polygon points="70,58 100,108 40,108" fill="none" stroke="#c8f500" stroke-width="3"/>
+            <polygon points="70,68 90,102 50,102" fill="rgba(200,245,0,0.08)" stroke="#c8f500" stroke-width="2.5"/>
+            <polygon points="70,78 82,96 58,96" fill="rgba(200,245,0,0.28)" stroke="#c8f500" stroke-width="2"/>
+            <circle cx="70" cy="87" r="4.5" fill="#c8f500"/>
+          </svg>
+          Prominance
+        </div>
+        <p class="footer-bio">Elite performance supplements crafted for those who refuse to be average. Strength. Purity. Dominance.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#product">Products</a></li>
+          <li><a href="#features">Benefits</a></li>
+          <li><a href="#testimonials">Reviews</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Support</div>
+        <ul class="footer-links">
+          <li><a href="#">Shipping Policy</a></li>
+          <li><a href="#">Return Policy</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Use</a></li>
+          <li><a href="#">Track Order</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">&copy; 2024 <b>Prominance</b> &mdash; All rights reserved. Made with &#10084;&#65039; in India.</div>
+      <div class="footer-tagline">Unleash Your True Strength</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* LOADER */
+  window.addEventListener('load', () => {
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 2100);
+  });
+
+  /* NAVBAR SCROLL */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 40));
+
+  /* HAMBURGER */
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+  document.querySelectorAll('.mobile-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+    });
+  });
+
+  /* FADE-UP SCROLL ANIMATIONS */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const siblings = [...entry.target.parentElement.querySelectorAll('.fade-up')];
+        const idx = siblings.indexOf(entry.target);
+        setTimeout(() => entry.target.classList.add('visible'), idx * 85);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  /* ADD TO CART */
+  const cartBtn = document.getElementById('cartBtn');
+  cartBtn && cartBtn.addEventListener('click', () => {
+    cartBtn.textContent = '\u2713 Added!';
+    cartBtn.style.borderColor = 'var(--accent)';
+    cartBtn.style.color = 'var(--accent)';
+    setTimeout(() => {
+      cartBtn.textContent = 'Add to Cart';
+      cartBtn.style.borderColor = '';
+      cartBtn.style.color = '';
+    }, 2200);
+  });
+
+  /* CONTACT FORM VALIDATION */
+  document.getElementById('contactForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    let valid = true;
+    const n = document.getElementById('name');
+    const em = document.getElementById('email');
+    const msg = document.getElementById('message');
+    const ne = document.getElementById('nameErr');
+    const ee = document.getElementById('emailErr');
+    const me = document.getElementById('msgErr');
+    [ne, ee, me].forEach(el => el.style.display = 'none');
+    [n, em, msg].forEach(el => el.style.borderColor = '');
+    if (!n.value.trim()) { ne.style.display = 'block'; n.style.borderColor = '#ff5555'; valid = false; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value.trim())) { ee.style.display = 'block'; em.style.borderColor = '#ff5555'; valid = false; }
+    if (!msg.value.trim()) { me.style.display = 'block'; msg.style.borderColor = '#ff5555'; valid = false; }
+    if (valid) {
+      document.getElementById('contactForm').style.display = 'none';
+      document.getElementById('formSuccess').style.display = 'block';
+    }
+  });
+
+  /* ACTIVE NAV */
+  const navLinks = document.querySelectorAll('.nav-links a');
+  new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => {
+          l.style.color = l.getAttribute('href') === '#' + entry.target.id ? 'var(--white)' : '';
+        });
+      }
+    });
+  }, { threshold: 0.4 }).observe && document.querySelectorAll('section[id]').forEach(s => {
+    new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) navLinks.forEach(l => { l.style.color = l.getAttribute('href') === '#' + entry.target.id ? 'var(--white)' : ''; });
+      });
+    }, { threshold: 0.4 }).observe(s);
+  });
+</script>
+</body>
+</html>
