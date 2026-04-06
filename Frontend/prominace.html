@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Prominance — Micronized Creatine Monohydrate</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ============================================================
+   ROOT & RESET
+============================================================ */
+:root {
+  --black:       #050505;
+  --dark:        #0d0d0d;
+  --card:        #111111;
+  --border:      rgba(255,255,255,0.07);
+  --white:       #ffffff;
+  --grey:        #9a9a9a;
+  --light-grey:  #cccccc;
+  --accent:      #00e5ff;
+  --accent2:     #00ff88;
+  --glow:        rgba(0,229,255,0.35);
+  --glow2:       rgba(0,255,136,0.25);
+  --font-head:   'Montserrat', sans-serif;
+  --font-body:   'Poppins', sans-serif;
+  --nav-h:       72px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:var(--font-body);
+  overflow-x:hidden;
+  line-height:1.6;
+}
+a{text-decoration:none;color:inherit;}
+ul{list-style:none;}
+img{max-width:100%;display:block;}
+
+/* ============================================================
+   LOADER
+============================================================ */
+#loader{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--black);
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:20px;
+  transition:opacity .5s ease, visibility .5s ease;
+}
+#loader.hide{opacity:0;visibility:hidden;}
+.loader-logo{
+  width:70px;height:70px;
+  animation:loaderSpin 1.2s linear infinite;
+}
+.loader-bar{
+  width:180px;height:2px;
+  background:rgba(255,255,255,0.1);
+  border-radius:999px;overflow:hidden;
+}
+.loader-bar-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:999px;
+  animation:loaderFill 1.8s ease forwards;
+}
+@keyframes loaderSpin{to{transform:rotate(360deg);}}
+@keyframes loaderFill{to{width:100%;}}
+
+/* ============================================================
+   SCROLLBAR
+============================================================ */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--black);}
+::-webkit-scrollbar-thumb{background:var(--accent);border-radius:4px;}
+
+/* ============================================================
+   PARTICLES CANVAS
+============================================================ */
+#particles-canvas{
+  position:fixed;inset:0;z-index:0;
+  pointer-events:none;opacity:.45;
+}
+
+/* ============================================================
+   NAVBAR
+============================================================ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  height:var(--nav-h);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 5%;
+  background:rgba(5,5,5,0.7);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  transition:background .3s;
+}
+nav.scrolled{background:rgba(5,5,5,0.95);}
+.nav-logo{display:flex;align-items:center;gap:12px;cursor:pointer;}
+.nav-logo-text{
+  font-family:var(--font-head);
+  font-size:1.3rem;font-weight:900;
+  letter-spacing:.15em;text-transform:uppercase;
+  background:linear-gradient(90deg,var(--white),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.nav-links{
+  display:flex;align-items:center;gap:36px;
+}
+.nav-links a{
+  font-size:.8rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--grey);
+  transition:color .25s;
+  position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;
+  background:var(--accent);transition:width .3s;
+}
+.nav-links a:hover{color:var(--white);}
+.nav-links a:hover::after{width:100%;}
+.nav-cta{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:var(--black)!important;
+  padding:8px 20px;border-radius:6px;
+  font-weight:700;letter-spacing:.1em;
+  transition:box-shadow .3s,transform .2s!important;
+}
+.nav-cta:hover{
+  box-shadow:0 0 20px var(--glow);
+  transform:translateY(-1px)!important;
+}
+.nav-cta::after{display:none!important;}
+.hamburger{
+  display:none;flex-direction:column;gap:5px;cursor:pointer;
+  background:none;border:none;padding:4px;
+}
+.hamburger span{
+  width:24px;height:2px;background:var(--white);
+  border-radius:2px;transition:all .3s;
+  display:block;
+}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.mobile-menu{
+  display:none;
+  position:fixed;top:var(--nav-h);left:0;right:0;
+  background:rgba(8,8,8,0.97);
+  backdrop-filter:blur(20px);
+  flex-direction:column;align-items:center;
+  gap:0;z-index:999;
+  border-bottom:1px solid var(--border);
+  transform:translateY(-10px);opacity:0;
+  transition:transform .3s,opacity .3s;
+  pointer-events:none;
+}
+.mobile-menu.open{
+  display:flex;transform:translateY(0);
+  opacity:1;pointer-events:all;
+}
+.mobile-menu a{
+  width:100%;text-align:center;
+  padding:18px;font-size:.9rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--grey);border-bottom:1px solid var(--border);
+  transition:color .25s,background .25s;
+}
+.mobile-menu a:hover{color:var(--white);background:rgba(0,229,255,.05);}
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 32px;border-radius:8px;
+  font-family:var(--font-head);font-size:.8rem;font-weight:700;
+  letter-spacing:.15em;text-transform:uppercase;
+  cursor:pointer;border:none;transition:all .3s;
+  position:relative;overflow:hidden;
+}
+.btn::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(255,255,255,0.08);
+  transform:translateX(-100%);transition:transform .4s;
+}
+.btn:hover::before{transform:translateX(0);}
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:var(--black);
+  box-shadow:0 0 24px var(--glow);
+}
+.btn-primary:hover{
+  box-shadow:0 0 40px var(--glow),0 0 80px var(--glow2);
+  transform:translateY(-2px);
+}
+.btn-outline{
+  background:transparent;
+  color:var(--white);
+  border:1px solid rgba(255,255,255,0.25);
+}
+.btn-outline:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+  box-shadow:0 0 20px var(--glow);
+  transform:translateY(-2px);
+}
+
+/* ============================================================
+   SECTION COMMON
+============================================================ */
+section{position:relative;z-index:1;}
+.section-label{
+  font-size:.7rem;font-weight:700;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--accent);
+  margin-bottom:12px;
+}
+.section-title{
+  font-family:var(--font-head);font-size:clamp(2rem,4vw,3.2rem);
+  font-weight:900;line-height:1.1;
+  letter-spacing:-.01em;
+}
+.section-title span{
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.section-subtitle{
+  font-size:.95rem;color:var(--grey);
+  max-width:520px;margin-top:14px;line-height:1.7;
+}
+.reveal{
+  opacity:0;transform:translateY(40px);
+  transition:opacity .7s ease, transform .7s ease;
+}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* ============================================================
+   HERO
+============================================================ */
+#hero{
+  min-height:100vh;
+  display:flex;align-items:center;
+  padding:calc(var(--nav-h) + 40px) 5% 80px;
+  overflow:hidden;
+  position:relative;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 70% 50%, rgba(0,229,255,.08) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 20% 80%, rgba(0,255,136,.06) 0%, transparent 60%),
+    linear-gradient(180deg,#050505 0%,#0a0f0d 100%);
+}
+.hero-bg-lines{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,.04) 1px,transparent 1px);
+  background-size:60px 60px;
+  animation:gridMove 20s linear infinite;
+}
+@keyframes gridMove{to{background-position:60px 60px;}}
+.hero-inner{
+  position:relative;z-index:1;
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  gap:60px;
+  max-width:1200px;margin:0 auto;
+}
+/* ---- left ---- */
+.hero-left{animation:heroFadeUp .9s ease .2s both;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(0,229,255,.08);
+  border:1px solid rgba(0,229,255,.2);
+  border-radius:999px;padding:6px 16px;
+  font-size:.7rem;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--accent);
+  margin-bottom:24px;
+}
+.hero-badge span{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(1.4);}}
+.hero-product-name{
+  font-family:var(--font-head);
+  font-size:clamp(1rem,1.6vw,1.2rem);
+  font-weight:600;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:10px;
+}
+.hero-title{
+  font-family:var(--font-head);
+  font-size:clamp(2.8rem,5vw,5rem);
+  font-weight:900;line-height:1;
+  letter-spacing:-.02em;
+  text-transform:uppercase;
+  margin-bottom:22px;
+}
+.hero-title .line2{
+  display:block;
+  background:linear-gradient(90deg,var(--accent) 0%,var(--accent2) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-tagline{
+  font-size:1rem;color:var(--grey);
+  line-height:1.7;margin-bottom:36px;
+  max-width:420px;
+}
+.hero-price-row{
+  display:flex;align-items:center;gap:16px;
+  margin-bottom:36px;
+}
+.hero-price{
+  font-family:var(--font-head);font-size:2.2rem;font-weight:900;
+  color:var(--white);
+}
+.hero-price-old{
+  font-size:.9rem;color:var(--grey);text-decoration:line-through;
+}
+.hero-price-badge{
+  background:rgba(0,255,136,.15);
+  border:1px solid rgba(0,255,136,.3);
+  color:var(--accent2);
+  font-size:.65rem;font-weight:700;letter-spacing:.15em;
+  padding:4px 10px;border-radius:4px;
+}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap;}
+.hero-stats{
+  display:flex;gap:32px;margin-top:44px;
+  padding-top:32px;border-top:1px solid var(--border);
+}
+.hero-stat-num{
+  font-family:var(--font-head);font-size:1.6rem;font-weight:900;
+  color:var(--white);
+}
+.hero-stat-num span{color:var(--accent);}
+.hero-stat-label{font-size:.7rem;color:var(--grey);letter-spacing:.1em;text-transform:uppercase;margin-top:2px;}
+
+/* ---- right / product ---- */
+.hero-right{
+  display:flex;align-items:center;justify-content:center;
+  animation:heroFadeUp .9s ease .5s both;
+}
+.product-stage{
+  position:relative;width:340px;height:420px;
+}
+.product-glow-ring{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:300px;height:300px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(0,229,255,.2) 0%, transparent 70%);
+  animation:glowPulse 3s ease-in-out infinite;
+}
+@keyframes glowPulse{
+  0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.7;}
+  50%{transform:translate(-50%,-50%) scale(1.15);opacity:1;}
+}
+.product-orbit{
+  position:absolute;top:50%;left:50%;
+  width:350px;height:350px;
+  border:1px solid rgba(0,229,255,.12);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  animation:orbitSpin 12s linear infinite;
+}
+.product-orbit-dot{
+  position:absolute;top:-5px;left:50%;
+  width:10px;height:10px;
+  background:var(--accent);border-radius:50%;
+  box-shadow:0 0 10px var(--accent);
+  transform:translateX(-50%);
+}
+@keyframes orbitSpin{to{transform:translate(-50%,-50%) rotate(360deg);}}
+.product-container{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:200px;height:280px;
+  background:linear-gradient(145deg,#1a1a1a,#0d0d0d);
+  border-radius:20px;
+  border:1px solid rgba(0,229,255,.2);
+  box-shadow:
+    0 0 40px rgba(0,229,255,.15),
+    0 0 80px rgba(0,229,255,.08),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:10px;
+  animation:productFloat 4s ease-in-out infinite;
+}
+@keyframes productFloat{
+  0%,100%{transform:translate(-50%,-50%) translateY(0) rotate(0deg);}
+  25%{transform:translate(-50%,-50%) translateY(-14px) rotate(.8deg);}
+  75%{transform:translate(-50%,-50%) translateY(8px) rotate(-.5deg);}
+}
+.product-lid{
+  width:120px;height:20px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:6px 6px 2px 2px;
+  box-shadow:0 0 16px var(--glow);
+}
+.product-body-svg{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.product-brand-label{
+  font-family:var(--font-head);font-size:.55rem;
+  font-weight:900;letter-spacing:.4em;text-transform:uppercase;
+  color:var(--accent);opacity:.7;
+}
+.product-name-label{
+  font-family:var(--font-head);font-size:.75rem;
+  font-weight:900;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--white);text-align:center;line-height:1.2;
+}
+.product-icon-wrap svg{
+  filter:drop-shadow(0 0 8px var(--accent));
+}
+.product-weight-label{
+  font-size:.6rem;color:var(--grey);letter-spacing:.15em;
+}
+.product-shine{
+  position:absolute;top:0;left:0;right:0;bottom:0;border-radius:20px;
+  background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,transparent 50%,rgba(255,255,255,.02) 100%);
+  pointer-events:none;
+}
+/* floating chips */
+.float-chip{
+  position:absolute;
+  background:rgba(13,13,13,.85);
+  border:1px solid rgba(0,229,255,.2);
+  backdrop-filter:blur(8px);
+  border-radius:10px;
+  padding:10px 14px;
+  font-size:.7rem;color:var(--white);font-weight:600;
+  letter-spacing:.05em;
+  animation:chipFloat 5s ease-in-out infinite;
+}
+.chip1{top:30px;left:-50px;animation-delay:0s;}
+.chip2{bottom:60px;left:-60px;animation-delay:1.5s;}
+.chip3{top:50px;right:-40px;animation-delay:.8s;}
+@keyframes chipFloat{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-8px);}
+}
+.chip-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent2);margin-right:6px;box-shadow:0 0 6px var(--accent2);}
+
+@keyframes heroFadeUp{
+  from{opacity:0;transform:translateY(40px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ============================================================
+   ABOUT
+============================================================ */
+#about{
+  padding:120px 5%;
+  background:linear-gradient(180deg,var(--black) 0%, #080c0b 100%);
+}
+.about-inner{
+  max-width:1100px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;
+  align-items:center;
+}
+.about-visual{
+  position:relative;display:flex;align-items:center;justify-content:center;
+}
+.about-geo{
+  width:280px;height:280px;
+  background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(0,255,136,.05));
+  border:1px solid rgba(0,229,255,.15);
+  border-radius:30px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+  box-shadow:0 0 60px rgba(0,229,255,.1);
+}
+.about-geo::before{
+  content:'';position:absolute;inset:-50%;
+  background:conic-gradient(from 0deg, transparent 0deg, rgba(0,229,255,.08) 60deg, transparent 120deg);
+  animation:conicrRot 8s linear infinite;
+}
+@keyframes conicrRot{to{transform:rotate(360deg);}}
+.about-logo-big{position:relative;z-index:1;}
+.about-pillars{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:12px;margin-top:16px;
+}
+.about-pillar{
+  text-align:center;
+  background:rgba(0,229,255,.04);
+  border:1px solid rgba(0,229,255,.1);
+  border-radius:10px;padding:14px 8px;
+  transition:all .3s;
+}
+.about-pillar:hover{
+  background:rgba(0,229,255,.08);
+  border-color:rgba(0,229,255,.3);
+  transform:translateY(-3px);
+}
+.about-pillar-icon{font-size:1.4rem;margin-bottom:4px;}
+.about-pillar-text{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);}
+.about-text .section-label{margin-bottom:6px;}
+.about-text p{color:var(--grey);font-size:.95rem;line-height:1.8;margin-top:20px;}
+.about-text p strong{color:var(--white);}
+.about-text .highlight-bar{
+  display:flex;align-items:center;gap:14px;
+  background:rgba(0,229,255,.05);
+  border-left:3px solid var(--accent);
+  border-radius:0 8px 8px 0;
+  padding:14px 18px;margin-top:28px;
+  font-size:.85rem;color:var(--light-grey);
+  font-style:italic;
+}
+
+/* ============================================================
+   PRODUCT SECTION
+============================================================ */
+#product{
+  padding:120px 5%;
+  background:var(--black);
+}
+.product-sec-inner{max-width:1100px;margin:0 auto;}
+.product-sec-header{text-align:center;margin-bottom:70px;}
+.product-card{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:60px;align-items:center;
+  background:rgba(255,255,255,.02);
+  border:1px solid var(--border);
+  border-radius:24px;padding:60px;
+  position:relative;overflow:hidden;
+}
+.product-card::before{
+  content:'';position:absolute;
+  top:-100px;right:-100px;
+  width:300px;height:300px;
+  background:radial-gradient(circle, rgba(0,229,255,.08) 0%, transparent 70%);
+  pointer-events:none;
+}
+.product-card-visual{
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.product-card-container{
+  width:180px;height:240px;
+  background:linear-gradient(145deg,#1c1c1c,#101010);
+  border-radius:16px;
+  border:1px solid rgba(0,229,255,.2);
+  box-shadow:0 0 50px rgba(0,229,255,.15), inset 0 1px 0 rgba(255,255,255,.04);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  animation:productFloat 4s ease-in-out infinite;
+}
+.product-card-lid{
+  width:110px;height:16px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:4px 4px 2px 2px;
+  box-shadow:0 0 12px var(--glow);
+  margin-bottom:4px;
+}
+.product-card-info{padding:10px 0;}
+.product-card-name{
+  font-family:var(--font-head);font-size:1.5rem;font-weight:900;
+  line-height:1.2;margin-bottom:6px;
+}
+.product-card-sub{font-size:.8rem;color:var(--accent);letter-spacing:.2em;text-transform:uppercase;margin-bottom:22px;}
+.benefits-list{display:flex;flex-direction:column;gap:12px;margin-bottom:32px;}
+.benefit-item{
+  display:flex;align-items:center;gap:12px;
+  font-size:.88rem;color:var(--light-grey);
+}
+.benefit-check{
+  width:22px;height:22px;flex-shrink:0;
+  background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+}
+.benefit-check svg{width:10px;height:10px;}
+.product-price-row{
+  display:flex;align-items:center;gap:14px;margin-bottom:28px;
+}
+.product-price{
+  font-family:var(--font-head);font-size:2rem;font-weight:900;color:var(--white);
+}
+.product-price-old{font-size:.85rem;color:var(--grey);text-decoration:line-through;}
+.product-price-save{
+  font-size:.65rem;font-weight:700;letter-spacing:.1em;padding:4px 10px;
+  background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.25);
+  color:var(--accent2);border-radius:4px;
+}
+
+/* ============================================================
+   FEATURES
+============================================================ */
+#features{
+  padding:120px 5%;
+  background:linear-gradient(180deg,var(--black) 0%,#07100e 100%);
+}
+.features-inner{max-width:1100px;margin:0 auto;}
+.features-header{text-align:center;margin-bottom:64px;}
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+}
+.feature-card{
+  background:rgba(255,255,255,.02);
+  border:1px solid var(--border);
+  border-radius:16px;padding:32px 24px;
+  text-align:center;
+  position:relative;overflow:hidden;
+  transition:transform .35s, box-shadow .35s, border-color .35s;
+  cursor:default;
+}
+.feature-card::after{
+  content:'';position:absolute;inset:0;
+  border-radius:16px;
+  background:linear-gradient(135deg,rgba(0,229,255,.04) 0%,transparent 60%);
+  opacity:0;transition:opacity .35s;
+}
+.feature-card:hover{
+  transform:translateY(-6px);
+  border-color:rgba(0,229,255,.3);
+  box-shadow:0 20px 60px rgba(0,229,255,.1);
+}
+.feature-card:hover::after{opacity:1;}
+.feature-icon{
+  width:56px;height:56px;border-radius:14px;
+  background:rgba(0,229,255,.08);
+  border:1px solid rgba(0,229,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 18px;font-size:1.4rem;
+  transition:box-shadow .35s;
+}
+.feature-card:hover .feature-icon{box-shadow:0 0 20px var(--glow);}
+.feature-card h3{
+  font-family:var(--font-head);font-size:.95rem;font-weight:700;
+  letter-spacing:.05em;margin-bottom:8px;
+}
+.feature-card p{font-size:.8rem;color:var(--grey);line-height:1.6;}
+
+/* ============================================================
+   TESTIMONIALS
+============================================================ */
+#testimonials{
+  padding:120px 5%;
+  background:var(--black);
+}
+.testi-inner{max-width:1100px;margin:0 auto;}
+.testi-header{text-align:center;margin-bottom:64px;}
+.testi-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:24px;
+}
+.testi-card{
+  background:rgba(255,255,255,.02);
+  border:1px solid var(--border);
+  border-radius:20px;padding:36px 30px;
+  position:relative;overflow:hidden;
+  transition:transform .35s,box-shadow .35s,border-color .35s;
+}
+.testi-card:hover{
+  transform:translateY(-6px);
+  border-color:rgba(0,229,255,.2);
+  box-shadow:0 20px 50px rgba(0,229,255,.08);
+}
+.testi-quote{
+  font-size:3rem;line-height:1;color:var(--accent);opacity:.3;
+  font-family:Georgia,serif;margin-bottom:12px;
+}
+.testi-text{font-size:.9rem;color:var(--light-grey);line-height:1.8;margin-bottom:24px;}
+.testi-stars{display:flex;gap:4px;margin-bottom:18px;}
+.testi-star{color:#ffd700;font-size:.85rem;}
+.testi-author{display:flex;align-items:center;gap:14px;}
+.testi-avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-head);font-size:.95rem;font-weight:900;color:var(--black);
+  flex-shrink:0;
+}
+.testi-name{font-weight:700;font-size:.88rem;}
+.testi-role{font-size:.75rem;color:var(--grey);}
+
+/* ============================================================
+   CONTACT
+============================================================ */
+#contact{
+  padding:120px 5%;
+  background:linear-gradient(180deg,var(--black) 0%,#050a09 100%);
+}
+.contact-inner{
+  max-width:900px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start;
+}
+.contact-info .section-title{margin-bottom:16px;}
+.contact-info p{color:var(--grey);font-size:.9rem;line-height:1.8;margin-bottom:32px;}
+.social-links{display:flex;gap:14px;}
+.social-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 18px;border-radius:8px;
+  font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid var(--border);
+  color:var(--grey);transition:all .3s;
+}
+.social-btn:hover{
+  border-color:var(--accent);color:var(--accent);
+  box-shadow:0 0 15px var(--glow);
+  transform:translateY(-2px);
+}
+.social-btn svg{width:16px;height:16px;}
+.contact-form{display:flex;flex-direction:column;gap:16px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group label{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);}
+.form-group input,
+.form-group textarea{
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border);
+  border-radius:8px;padding:12px 16px;
+  color:var(--white);font-family:var(--font-body);font-size:.88rem;
+  outline:none;transition:border .3s,box-shadow .3s;
+  resize:vertical;
+}
+.form-group input:focus,
+.form-group textarea:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(0,229,255,.08);
+}
+.form-group input::placeholder,
+.form-group textarea::placeholder{color:rgba(255,255,255,.2);}
+.form-error{font-size:.72rem;color:#ff4d6a;display:none;}
+.form-error.show{display:block;}
+.form-success{
+  display:none;text-align:center;padding:20px;
+  background:rgba(0,255,136,.06);
+  border:1px solid rgba(0,255,136,.2);
+  border-radius:12px;color:var(--accent2);
+  font-size:.88rem;font-weight:600;
+}
+.form-success.show{display:block;}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+footer{
+  background:#030303;
+  border-top:1px solid var(--border);
+  padding:60px 5% 30px;
+}
+.footer-inner{max-width:1100px;margin:0 auto;}
+.footer-top{
+  display:grid;grid-template-columns:2fr 1fr 1fr;
+  gap:50px;margin-bottom:50px;
+}
+.footer-brand{}
+.footer-brand-name{
+  font-family:var(--font-head);font-size:1.4rem;font-weight:900;
+  letter-spacing:.15em;text-transform:uppercase;
+  background:linear-gradient(90deg,var(--white),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:14px;
+}
+.footer-desc{font-size:.83rem;color:var(--grey);line-height:1.8;max-width:280px;}
+.footer-col h4{
+  font-family:var(--font-head);font-size:.72rem;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--white);margin-bottom:18px;
+}
+.footer-col ul{display:flex;flex-direction:column;gap:10px;}
+.footer-col ul li a{
+  font-size:.82rem;color:var(--grey);
+  transition:color .25s;
+}
+.footer-col ul li a:hover{color:var(--accent);}
+.footer-bottom{
+  border-top:1px solid var(--border);
+  padding-top:24px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;
+}
+.footer-copy{font-size:.75rem;color:rgba(255,255,255,.25);}
+.footer-made{font-size:.72rem;color:rgba(255,255,255,.15);}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;gap:50px;}
+  .hero-right{order:-1;}
+  .hero-title{font-size:clamp(2.2rem,8vw,3.5rem);}
+  .product-stage{width:280px;height:350px;}
+  .about-inner{grid-template-columns:1fr;gap:50px;}
+  .about-visual{order:-1;}
+  .product-card{grid-template-columns:1fr;padding:36px 28px;gap:40px;}
+  .product-card-visual{order:-1;}
+  .contact-inner{grid-template-columns:1fr;gap:50px;}
+  .footer-top{grid-template-columns:1fr 1fr;gap:36px;}
+  .footer-brand{grid-column:1/-1;}
+}
+@media(max-width:640px){
+  .nav-links{display:none;}
+  .hamburger{display:flex;}
+  .hero-stats{gap:20px;flex-wrap:wrap;}
+  .features-grid{grid-template-columns:1fr 1fr;}
+  .testi-grid{grid-template-columns:1fr;}
+  .footer-top{grid-template-columns:1fr;}
+  .footer-brand{grid-column:auto;}
+  .footer-bottom{flex-direction:column;text-align:center;}
+  .chip1,.chip2,.chip3{display:none;}
+}
+
+/* ============================================================
+   GLOW DIVIDER
+============================================================ */
+.glow-divider{
+  width:100%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,229,255,.3),transparent);
+  margin:0;
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <svg class="loader-logo" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- deer horns -->
+    <path d="M30 8 C28 4, 22 2, 18 6 C16 8, 16 12, 18 14 C16 12, 14 14, 15 17" stroke="#00e5ff" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <path d="M30 8 C32 4, 38 2, 42 6 C44 8, 44 12, 42 14 C44 12, 46 14, 45 17" stroke="#00e5ff" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <!-- triangles -->
+    <polygon points="30,18 24,30 36,30" fill="rgba(0,229,255,0.9)"/>
+    <polygon points="24,32 18,44 30,44" fill="rgba(0,229,255,0.55)"/>
+    <polygon points="36,32 30,44 42,44" fill="rgba(0,255,136,0.55)"/>
+  </svg>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<!-- PARTICLES -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-logo" onclick="scrollToSection('hero')">
+    <svg width="36" height="36" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M30 6 C28 2, 22 0, 18 4 C16 6, 16 10, 18 12 C16 10, 14 12, 15 15" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <path d="M30 6 C32 2, 38 0, 42 4 C44 6, 44 10, 42 12 C44 10, 46 12, 45 15" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <polygon points="30,16 24,28 36,28" fill="#00e5ff"/>
+      <polygon points="24,30 18,42 30,42" fill="rgba(0,229,255,0.5)"/>
+      <polygon points="36,30 30,42 42,42" fill="rgba(0,255,136,0.5)"/>
+    </svg>
+    <span class="nav-logo-text">Prominance</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#product">Product</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#contact" class="nav-cta">Buy Now</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="closeMobileMenu()">About</a>
+  <a href="#product" onclick="closeMobileMenu()">Product</a>
+  <a href="#features" onclick="closeMobileMenu()">Features</a>
+  <a href="#testimonials" onclick="closeMobileMenu()">Reviews</a>
+  <a href="#contact" onclick="closeMobileMenu()">Buy Now</a>
+</div>
+
+<!-- ========================================================
+     HERO
+======================================================== -->
+<section id="hero">
+  <div class="hero-bg">
+    <div class="hero-bg-lines"></div>
+  </div>
+  <div class="hero-inner">
+
+    <!-- LEFT -->
+    <div class="hero-left">
+      <div class="hero-badge">
+        <span></span> New Formula — 2025
+      </div>
+      <div class="hero-product-name">Micronized Creatine Monohydrate</div>
+      <h1 class="hero-title">
+        Unleash<br>
+        <span class="line2">Your True</span>
+        Strength
+      </h1>
+      <p class="hero-tagline">
+        Pharmaceutical-grade creatine engineered for peak performance. Zero fillers. Zero compromise. Pure domination.
+      </p>
+      <div class="hero-price-row">
+        <div class="hero-price">₹999</div>
+        <div class="hero-price-old">₹1,499</div>
+        <div class="hero-price-badge">33% OFF</div>
+      </div>
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          Buy Now
+        </a>
+        <a href="#product" class="btn btn-outline">View Details</a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-num">100<span>%</span></div>
+          <div class="hero-stat-label">Pure Creatine</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">250<span>g</span></div>
+          <div class="hero-stat-label">Per Tub</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">50<span>+</span></div>
+          <div class="hero-stat-label">Servings</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT / PRODUCT -->
+    <div class="hero-right">
+      <div class="product-stage">
+        <div class="product-glow-ring"></div>
+        <div class="product-orbit"><div class="product-orbit-dot"></div></div>
+        <div class="product-container">
+          <div class="product-lid"></div>
+          <div class="product-body-svg">
+            <div class="product-brand-label">Prominance</div>
+            <!-- inline logo -->
+            <div class="product-icon-wrap">
+              <svg width="44" height="44" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M30 6 C28 2, 22 0, 18 4 C16 6, 16 10, 18 12" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <path d="M30 6 C32 2, 38 0, 42 4 C44 6, 44 10, 42 12" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <polygon points="30,16 24,28 36,28" fill="#00e5ff"/>
+                <polygon points="24,30 18,42 30,42" fill="rgba(0,229,255,0.6)"/>
+                <polygon points="36,30 30,42 42,42" fill="rgba(0,255,136,0.6)"/>
+              </svg>
+            </div>
+            <div class="product-name-label">Micronized<br>Creatine</div>
+            <div class="product-weight-label">250g · 50 Servings</div>
+          </div>
+          <div class="product-shine"></div>
+        </div>
+        <!-- chips -->
+        <div class="float-chip chip1"><span class="chip-dot"></span>Lab Tested</div>
+        <div class="float-chip chip2"><span class="chip-dot"></span>No Fillers</div>
+        <div class="float-chip chip3"><span class="chip-dot"></span>Fast Absorb</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- ========================================================
+     ABOUT
+======================================================== -->
+<section id="about">
+  <div class="about-inner">
+    <div class="about-visual reveal">
+      <div>
+        <div class="about-geo">
+          <div class="about-logo-big">
+            <svg width="100" height="110" viewBox="0 0 60 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M30 6 C28 2, 21 0, 17 4 C14 6, 14 10, 17 13 C15 11, 12 13, 13 17" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+              <path d="M30 6 C32 2, 39 0, 43 4 C46 6, 46 10, 43 13 C45 11, 48 13, 47 17" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+              <polygon points="30,20 22,36 38,36" fill="rgba(0,229,255,1)"/>
+              <polygon points="22,39 14,55 30,55" fill="rgba(0,229,255,0.5)"/>
+              <polygon points="38,39 30,55 46,55" fill="rgba(0,255,136,0.5)"/>
+            </svg>
+          </div>
+        </div>
+        <div class="about-pillars" style="margin-top:20px">
+          <div class="about-pillar"><div class="about-pillar-icon">⚡</div><div class="about-pillar-text">Strength</div></div>
+          <div class="about-pillar"><div class="about-pillar-icon">🎯</div><div class="about-pillar-text">Performance</div></div>
+          <div class="about-pillar"><div class="about-pillar-icon">🧬</div><div class="about-pillar-text">Purity</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="about-text reveal" style="transition-delay:.15s">
+      <div class="section-label">Our Story</div>
+      <h2 class="section-title">Built for <span>Elite</span> Athletes</h2>
+      <p>
+        <strong>Prominance</strong> was born from one obsession — giving serious athletes the <strong>cleanest, most effective</strong> performance fuel on the market. No marketing fluff. No proprietary blends designed to hide weak doses.
+      </p>
+      <p>
+        Every batch is <strong>third-party lab tested</strong> for purity and potency. We use pharmaceutical-grade micronized creatine monohydrate because science has proven, again and again, that it works.
+      </p>
+      <div class="highlight-bar">
+        "Dominance isn't given — it's engineered. Prominance is the difference between good and <strong>unstoppable.</strong>"
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- ========================================================
+     PRODUCT
+======================================================== -->
+<section id="product">
+  <div class="product-sec-inner">
+    <div class="product-sec-header reveal">
+      <div class="section-label">The Product</div>
+      <h2 class="section-title">Pure Power <span>Engineered</span></h2>
+      <p class="section-subtitle" style="margin:14px auto 0;">One formula. Proven science. Unmatched results. Everything you need — nothing you don't.</p>
+    </div>
+    <div class="product-card reveal" style="transition-delay:.1s">
+      <div class="product-card-visual">
+        <div style="position:relative">
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,.12) 0%,transparent 70%);"></div>
+          <div class="product-card-container">
+            <div class="product-card-lid"></div>
+            <svg width="36" height="36" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 6px #00e5ff)">
+              <path d="M30 6 C28 2, 22 0, 18 4 C16 6, 16 10, 18 12" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <path d="M30 6 C32 2, 38 0, 42 4 C44 6, 44 10, 42 12" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <polygon points="30,16 24,28 36,28" fill="#00e5ff"/>
+              <polygon points="24,30 18,42 30,42" fill="rgba(0,229,255,0.55)"/>
+              <polygon points="36,30 30,42 42,42" fill="rgba(0,255,136,0.55)"/>
+            </svg>
+            <div style="font-family:var(--font-head);font-size:.65rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--white);text-align:center;line-height:1.3">Micronized<br>Creatine</div>
+            <div style="font-size:.55rem;color:var(--grey);letter-spacing:.1em">250g · Unflavored</div>
+          </div>
+        </div>
+      </div>
+      <div class="product-card-info">
+        <div class="product-card-sub">Prominance — Signature Series</div>
+        <div class="product-card-name">Micronized Creatine<br>Monohydrate</div>
+        <ul class="benefits-list">
+          <li class="benefit-item">
+            <div class="benefit-check"><svg viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/></svg></div>
+            Significantly improves strength & power output
+          </li>
+          <li class="benefit-item">
+            <div class="benefit-check"><svg viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/></svg></div>
+            Enhances athletic performance & endurance
+          </li>
+          <li class="benefit-item">
+            <div class="benefit-check"><svg viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/></svg></div>
+            Accelerates muscle recovery post-workout
+          </li>
+          <li class="benefit-item">
+            <div class="benefit-check"><svg viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/></svg></div>
+            100% pure creatine — zero additives or fillers
+          </li>
+          <li class="benefit-item">
+            <div class="benefit-check"><svg viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/></svg></div>
+            Micronized for superior solubility & absorption
+          </li>
+        </ul>
+        <div class="product-price-row">
+          <div class="product-price">₹999</div>
+          <div class="product-price-old">₹1,499</div>
+          <div class="product-price-save">Save ₹500</div>
+        </div>
+        <a href="#contact" class="btn btn-primary" style="width:100%;justify-content:center">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          Order Now
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- ========================================================
+     FEATURES
+======================================================== -->
+<section id="features">
+  <div class="features-inner">
+    <div class="features-header reveal">
+      <div class="section-label">Why Prominance</div>
+      <h2 class="section-title">The <span>Standard</span> of Purity</h2>
+      <p class="section-subtitle" style="margin:14px auto 0;">Every detail meticulously controlled so you can focus on what matters: training harder.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal" style="transition-delay:.05s">
+        <div class="feature-icon">🧪</div>
+        <h3>100% Pure</h3>
+        <p>No blends, no filler amino acids. Just pharmaceutical-grade creatine monohydrate in every scoop.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:.10s">
+        <div class="feature-icon">🔬</div>
+        <h3>Lab Tested</h3>
+        <p>Third-party verified for purity, potency, and safety. Every batch certified before it reaches you.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:.15s">
+        <div class="feature-icon">🚫</div>
+        <h3>No Fillers</h3>
+        <p>Zero artificial colours, sweeteners, or proprietary blends. Transparent label, every time.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:.20s">
+        <div class="feature-icon">⚡</div>
+        <h3>Fast Absorption</h3>
+        <p>Micronized particles dissolve instantly in water for maximum bioavailability and rapid uptake.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:.25s">
+        <div class="feature-icon">🏆</div>
+        <h3>Trusted Quality</h3>
+        <p>Manufactured in GMP-certified facilities. Built to the standard elite athletes demand.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- ========================================================
+     TESTIMONIALS
+======================================================== -->
+<section id="testimonials">
+  <div class="testi-inner">
+    <div class="testi-header reveal">
+      <div class="section-label">Proof</div>
+      <h2 class="section-title">Athletes <span>Don't Lie</span></h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal" style="transition-delay:.05s">
+        <div class="testi-quote">"</div>
+        <div class="testi-stars">
+          <span class="testi-star">★</span><span class="testi-star">★</span><span class="testi-star">★</span><span class="testi-star">★</span><span class="testi-star">★</span>
+        </div>
+        <p class="testi-text">I've tried four different creatine brands. Prominance is the only one that dissolves completely and actually shows up in my lifts. My bench went up 12 kg within six weeks of loading.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">RK</div>
+          <div><div class="testi-name">Rohan Kulkarni</div><div class="testi-role">Powerlifter · Pune</div></div>
+        </div>
+      </div>
+      <div class="testi-card reveal" style="transition-delay:.12s">
+        <div class="testi-quote">"</div>
+        <div class="testi-stars">
+          <span class="testi-star">★</span><span class="testi-star">★</span><span class="testi-star">★</span><span class="testi-star">★</span><span class="testi-star">★</span>
+        </div>
+        <p class="testi-text">Clean ingredient list, no nonsense. I stack it with my pre-workout and the difference in my sprint recovery is night and day. Premium quality at a price that makes sense.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">AM</div>
+          <div><div class="testi-name">Ananya Mehta</div><div class="testi-role">CrossFit Athlete · Mumbai</div></div>
+        </div>
+      </div>
+      <div class="testi-card reveal" style="transition-delay:.19s">
+        <div class="testi-quote">"</div>
+        <div class="testi-stars">
+          <span class="testi-star">★</span><span class="testi-star">★</span><span class="testi-star">★</span><span class="testi-star">★</span><span class="testi-star">★</span>
+        </div>
+        <p class="testi-text">As a coach I recommend Prominance to all my clients who want to add creatine. The micronized formula means zero bloating complaints — something I couldn't say about cheaper options.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">VS</div>
+          <div><div class="testi-name">Vikram Singh</div><div class="testi-role">Strength Coach · Delhi</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- ========================================================
+     CONTACT
+======================================================== -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="contact-info reveal">
+      <div class="section-label">Get In Touch</div>
+      <h2 class="section-title">Ready to <span>Dominate?</span></h2>
+      <p>Place your order or drop us a message. Our team responds within 24 hours. Follow us for exclusive offers and training content.</p>
+      <div class="social-links">
+        <a href="#" class="social-btn" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          Instagram
+        </a>
+        <a href="#" class="social-btn" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+          WhatsApp
+        </a>
+      </div>
+    </div>
+    <div class="reveal" style="transition-delay:.15s">
+      <div class="contact-form" id="contactForm">
+        <div class="form-group">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" placeholder="Rohan Kulkarni" autocomplete="name"/>
+          <span class="form-error" id="nameError">Please enter your name.</span>
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="you@example.com" autocomplete="email"/>
+          <span class="form-error" id="emailError">Please enter a valid email.</span>
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" rows="4" placeholder="I'd like to order 2 tubs…"></textarea>
+          <span class="form-error" id="msgError">Please enter a message.</span>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="handleFormSubmit()" style="justify-content:center">
+          Send Message
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+        <div class="form-success" id="formSuccess">
+          ✅ Message sent! We'll be in touch within 24 hours.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================
+     FOOTER
+======================================================== -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-brand-name">Prominance</div>
+        <p class="footer-desc">Premium performance nutrition for athletes who demand the best. Engineered for strength. Built for dominance.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#product">Product</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#testimonials">Reviews</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="#contact">Order Now</a></li>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">WhatsApp</a></li>
+          <li><a href="#">support@prominance.in</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 Prominance. All rights reserved.</div>
+      <div class="footer-made">Micronized Creatine Monohydrate — Engineered for Dominance</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+/* ----- LOADER ----- */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hide');
+  }, 2000);
+});
+
+/* ----- PARTICLES ----- */
+(function(){
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  class Particle {
+    constructor(){
+      this.reset();
+    }
+    reset(){
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 1.5 + 0.3;
+      this.speedX = (Math.random() - 0.5) * 0.3;
+      this.speedY = (Math.random() - 0.5) * 0.3;
+      this.opacity = Math.random() * 0.5 + 0.1;
+      this.color = Math.random() > 0.5 ? '0,229,255' : '0,255,136';
+    }
+    update(){
+      this.x += this.speedX;
+      this.y += this.speedY;
+      if(this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${this.color},${this.opacity})`;
+      ctx.fill();
+    }
+  }
+  for(let i = 0; i < 120; i++) particles.push(new Particle());
+  function animate(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+/* ----- NAVBAR SCROLL ----- */
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+/* ----- HAMBURGER ----- */
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  mobileMenu.classList.toggle('open');
+});
+function closeMobileMenu(){
+  hamburger.classList.remove('open');
+  mobileMenu.classList.remove('open');
+}
+
+/* ----- SMOOTH SCROLL ----- */
+function scrollToSection(id){
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth'});
+}
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if(el){ e.preventDefault(); el.scrollIntoView({behavior:'smooth'}); }
+  });
+});
+
+/* ----- SCROLL REVEAL ----- */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin:'0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+/* ----- FORM VALIDATION ----- */
+function handleFormSubmit(){
+  let valid = true;
+  const name = document.getElementById('name');
+  const email = document.getElementById('email');
+  const msg = document.getElementById('message');
+  const nameErr = document.getElementById('nameError');
+  const emailErr = document.getElementById('emailError');
+  const msgErr = document.getElementById('msgError');
+  const success = document.getElementById('formSuccess');
+
+  // reset
+  [nameErr, emailErr, msgErr].forEach(e => e.classList.remove('show'));
+  success.classList.remove('show');
+
+  if(name.value.trim().length < 2){ nameErr.classList.add('show'); valid = false; }
+  const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!emailRx.test(email.value.trim())){ emailErr.classList.add('show'); valid = false; }
+  if(msg.value.trim().length < 5){ msgErr.classList.add('show'); valid = false; }
+
+  if(valid){
+    success.classList.add('show');
+    name.value = ''; email.value = ''; msg.value = '';
+  }
+}
+
+/* ----- PARALLAX HERO ----- */
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  const heroBg = document.querySelector('.hero-bg');
+  if(heroBg) heroBg.style.transform = `translateY(${y * 0.3}px)`;
+});
+</script>
+</body>
+</html>
