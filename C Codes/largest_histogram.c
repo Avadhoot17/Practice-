@@ -4,7 +4,7 @@ int max(int a, int b) {
     return (a > b) ? a : b;
 }
 
-int largestArea(int arr[], int n) {    123
+int largestArea(int arr[], int n) {    1234
     int stack[n], top = -1;
     int maxArea = 0, area, i = 0;
 
