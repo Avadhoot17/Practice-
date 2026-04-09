@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple Watch - Real Time</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#111;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+  .scene{display:flex;justify-content:center;align-items:center;min-height:600px;padding:30px 0}
+  .watch-body{position:relative;width:220px;height:260px}
+  .strap-top,.strap-bottom{position:absolute;left:50%;transform:translateX(-50%);width:170px;background:linear-gradient(90deg,#1a1a1a 0%,#2d2d2d 20%,#3a3a3a 50%,#2d2d2d 80%,#1a1a1a 100%);border-radius:6px}
+  .strap-top{top:-80px;height:90px;border-radius:12px 12px 4px 4px}
+  .strap-bottom{bottom:-80px;height:90px;border-radius:4px 4px 12px 12px}
+  .strap-line{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:160px;height:1px;background:rgba(255,255,255,0.06);border-radius:1px}
+  .strap-line2{position:absolute;top:35px;left:50%;transform:translateX(-50%);width:160px;height:1px;background:rgba(255,255,255,0.06)}
+  .strap-hole{width:8px;height:8px;border-radius:50%;background:#111;border:1px solid #444;position:absolute;left:50%;transform:translateX(-50%)}
+  .strap-hole1{top:50px}.strap-hole2{top:65px}
+  .case-outer{position:absolute;top:0;left:0;right:0;bottom:0;border-radius:42px;background:linear-gradient(145deg,#6a6a6a 0%,#3a3a3a 25%,#2a2a2a 50%,#404040 75%,#5a5a5a 100%);box-shadow:0 2px 0 #888 inset,0 -2px 0 #111 inset,2px 0 0 #555 inset,-2px 0 0 #333 inset,0 20px 60px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.15)}
+  .case-inner{position:absolute;top:3px;left:3px;right:3px;bottom:3px;border-radius:39px;background:#0a0a0a;overflow:hidden}
+  .crown{position:absolute;right:-10px;top:50%;transform:translateY(-40px);width:12px;height:42px;background:linear-gradient(90deg,#5a5a5a,#888,#5a5a5a);border-radius:4px;box-shadow:2px 0 4px rgba(0,0,0,0.5),-1px 0 2px rgba(255,255,255,0.2)}
+  .crown-lines{position:absolute;top:8px;left:2px;right:2px}
+  .crown-line{height:1px;background:rgba(0,0,0,0.4);margin-bottom:3px}
+  .btn-side{position:absolute;right:-8px;top:50%;transform:translateY(20px);width:8px;height:20px;background:linear-gradient(90deg,#4a4a4a,#777,#4a4a4a);border-radius:3px;box-shadow:1px 0 3px rgba(0,0,0,0.5)}
+  .screen{position:absolute;top:3px;left:3px;right:3px;bottom:3px;border-radius:39px;background:radial-gradient(ellipse at 40% 30%,#0f1a2e 0%,#060c14 60%,#000 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+  .screen-shine{position:absolute;top:0;left:0;right:0;bottom:0;border-radius:39px;background:linear-gradient(135deg,rgba(255,255,255,0.08) 0%,transparent 50%);pointer-events:none;z-index:10}
+  .watch-face{position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .date-badge{position:absolute;top:38px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:500;color:#fff;letter-spacing:0.5px}
+  .day-badge{position:absolute;top:60px;font-size:9px;font-weight:400;color:rgba(255,255,255,0.5);letter-spacing:1.5px;text-transform:uppercase}
+  .clock-svg{position:relative;z-index:5}
+  .complication-tl,.complication-tr,.complication-bl,.complication-br{position:absolute;z-index:5}
+  .complication-tl{top:88px;left:20px;text-align:left}
+  .complication-tr{top:88px;right:20px;text-align:right}
+  .complication-bl{bottom:40px;left:22px;text-align:left}
+  .complication-br{bottom:40px;right:22px;text-align:right}
+  .comp-label{font-size:7px;font-weight:500;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase;display:block}
+  .comp-value{font-size:13px;font-weight:300;color:#fff;display:block;line-height:1.2}
+  .battery-bar{width:22px;height:8px;border:1px solid rgba(255,255,255,0.4);border-radius:2px;position:relative;display:inline-block;margin-top:2px}
+  .battery-bar::after{content:'';position:absolute;right:-4px;top:2px;width:3px;height:4px;background:rgba(255,255,255,0.4);border-radius:0 1px 1px 0}
+  .battery-fill{position:absolute;left:1px;top:1px;bottom:1px;width:70%;background:#4cd964;border-radius:1px}
+  .time-digital{position:absolute;bottom:52px;font-size:10px;font-weight:300;color:rgba(255,255,255,0.5);letter-spacing:0.5px}
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="watch-body">
+    <div class="strap-top">
+      <div class="strap-line"></div><div class="strap-line2"></div>
+      <div class="strap-hole strap-hole1"></div>
+      <div class="strap-hole strap-hole2"></div>
+    </div>
+    <div class="strap-bottom">
+      <div class="strap-line"></div><div class="strap-line2"></div>
+    </div>
+    <div class="case-outer">
+      <div class="crown">
+        <div class="crown-lines">
+          <div class="crown-line"></div><div class="crown-line"></div><div class="crown-line"></div>
+          <div class="crown-line"></div><div class="crown-line"></div><div class="crown-line"></div>
+          <div class="crown-line"></div><div class="crown-line"></div>
+        </div>
+      </div>
+      <div class="btn-side"></div>
+      <div class="case-inner">
+        <div class="screen">
+          <div class="screen-shine"></div>
+          <div class="watch-face">
+            <div class="date-badge" id="dateBadge">10</div>
+            <div class="day-badge" id="dayBadge">FRIDAY</div>
+            <div class="complication-tl">
+              <span class="comp-label">UV</span>
+              <span class="comp-value">3</span>
+            </div>
+            <div class="complication-tr">
+              <span class="comp-label">TEMP</span>
+              <span class="comp-value" style="color:#ff9f0a">72°</span>
+            </div>
+            <svg class="clock-svg" width="130" height="130" viewBox="0 0 130 130" id="clockSvg">
+              <circle cx="65" cy="65" r="62" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+              <circle cx="65" cy="65" r="58" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+              <g id="hourMarkers"></g>
+              <g id="minMarkers"></g>
+              <circle id="secArc" cx="65" cy="65" r="58" fill="none" stroke="#e63" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="0 364.4" transform="rotate(-90 65 65)"/>
+              <g id="hourHand"><rect x="-2.5" y="-28" width="5" height="30" rx="2.5" fill="white"/></g>
+              <g id="minuteHand"><rect x="-2" y="-38" width="4" height="40" rx="2" fill="white"/></g>
+              <g id="secondHand">
+                <rect x="-0.7" y="-44" width="1.4" height="52" rx="0.7" fill="#e63"/>
+                <circle cx="0" cy="10" r="3.5" fill="#e63"/>
+                <circle cx="0" cy="0" r="2" fill="#1a1a1a" stroke="#e63" stroke-width="0.5"/>
+              </g>
+              <circle cx="65" cy="65" r="3" fill="white"/>
+            </svg>
+            <div class="complication-bl">
+              <span class="comp-label">BPM</span>
+              <span class="comp-value" style="color:#ff375f" id="bpmVal">72</span>
+            </div>
+            <div class="complication-br">
+              <span class="comp-label">BAT</span>
+              <div class="battery-bar"><div class="battery-fill"></div></div>
+            </div>
+            <div class="time-digital" id="digitalTime">12:00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const DAYS=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+function buildMarkers(){
+  const hg=document.getElementById('hourMarkers');
+  const mg=document.getElementById('minMarkers');
+  for(let i=0;i<60;i++){
+    const angle=i*6*Math.PI/180;
+    const isHour=i%5===0;
+    const r1=isHour?50:55,r2=isHour?44:53;
+    const x1=65+r1*Math.sin(angle),y1=65-r1*Math.cos(angle);
+    const x2=65+r2*Math.sin(angle),y2=65-r2*Math.cos(angle);
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x1);line.setAttribute('y1',y1);
+    line.setAttribute('x2',x2);line.setAttribute('y2',y2);
+    if(isHour){
+      line.setAttribute('stroke','rgba(255,255,255,0.85)');
+      line.setAttribute('stroke-width','2');
+      line.setAttribute('stroke-linecap','round');
+      hg.appendChild(line);
+      if([0,15,30,45].includes(i)){
+        const num=document.createElementNS('http://www.w3.org/2000/svg','text');
+        const vals={0:12,15:3,30:6,45:9};
+        const rr=36;
+        num.setAttribute('x',65+rr*Math.sin(angle));
+        num.setAttribute('y',65-rr*Math.cos(angle)+4);
+        num.setAttribute('text-anchor','middle');
+        num.setAttribute('fill','rgba(255,255,255,0.9)');
+        num.setAttribute('font-size','9');
+        num.setAttribute('font-weight','300');
+        num.setAttribute('font-family','-apple-system,BlinkMacSystemFont,sans-serif');
+        num.textContent=vals[i];
+        hg.appendChild(num);
+      }
+    } else {
+      line.setAttribute('stroke','rgba(255,255,255,0.25)');
+      line.setAttribute('stroke-width','0.8');
+      line.setAttribute('stroke-linecap','round');
+      mg.appendChild(line);
+    }
+  }
+}
+function setHand(id,deg,cx,cy){
+  document.getElementById(id).setAttribute('transform',`translate(${cx},${cy}) rotate(${deg})`);
+}
+let lastSec=-1,bpmBase=72;
+function tick(){
+  const now=new Date();
+  const h=now.getHours(),m=now.getMinutes(),s=now.getSeconds(),ms=now.getMilliseconds();
+  const sFrac=s+ms/1000;
+  setHand('hourHand',(h%12+m/60+s/3600)*30,65,65);
+  setHand('minuteHand',(m+s/60)*6,65,65);
+  setHand('secondHand',sFrac*6,65,65);
+  const circ=2*Math.PI*58;
+  document.getElementById('secArc').setAttribute('stroke-dasharray',`${(sFrac/60)*circ} ${circ}`);
+  const h12=h%12||12,ampm=h>=12?'PM':'AM',mStr=m<10?'0'+m:m;
+  document.getElementById('digitalTime').textContent=`${h12}:${mStr} ${ampm}`;
+  document.getElementById('dateBadge').textContent=now.getDate();
+  document.getElementById('dayBadge').textContent=DAYS[now.getDay()];
+  if(s!==lastSec){lastSec=s;if(s%5===0){bpmBase=68+Math.floor(Math.random()*10);document.getElementById('bpmVal').textContent=bpmBase;}}
+  requestAnimationFrame(tick);
+}
+buildMarkers();tick();
+</script>
+</body>
+</html>
