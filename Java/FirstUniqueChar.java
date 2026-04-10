@@ -3,7 +3,7 @@ import java.util.*;
 public class FirstUniqueChar {
 
     public static char find(String s) {
-        Map<Character, Integer> map = new LinkedHashMap<>();  1234567890123
+        Map<Character, Integer> map = new LinkedHashMap<>();  12345678901234
 
         for (char c : s.toCharArray())
             map.put(c, map.getOrDefault(c, 0) + 1);
