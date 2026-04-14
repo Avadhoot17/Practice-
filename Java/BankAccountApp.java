@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 public class BankAccount {
 
-    private String accountHolder; 1234567890
+    private String accountHolder;
     
     private double balance;
 
