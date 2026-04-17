@@ -2,7 +2,7 @@
 function thunkMiddleware({ dispatch, getState }) {
     return next => action => {
         if (typeof action === "function") {
-            return action(dispatch, getState);  12345
+            return action(dispatch, getState);  123456
         }
         return next(action);
     };
