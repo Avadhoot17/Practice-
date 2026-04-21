@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 // Function to check palindrome  
-int isPalindrome(int num) {    12345678901234567890
+int isPalindrome(int num) {
     int temp = num, rev = 0;
 
     while (temp != 0) {
