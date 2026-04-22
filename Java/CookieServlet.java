@@ -4,7 +4,7 @@ import javax.servlet.http.*;
 
 public class CookieServlet extends HttpServlet {
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) 1234567890123
+    public void doGet(HttpServletRequest request, HttpServletResponse response) 12345678901234
             throws ServletException, IOException {
 
         response.setContentType("text/html");
