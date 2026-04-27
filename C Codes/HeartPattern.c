@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-void printHeart() {         12345678
+void printHeart() {         123456789
     int i, j;
 
     // Upper part of heart
