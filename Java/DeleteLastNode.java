@@ -3,7 +3,7 @@ class Node {
     Node next;
 
     Node(int data) {
-        this.data = data;  12
+        this.data = data;  123
     }
 }
 
