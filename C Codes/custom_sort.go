@@ -1,4 +1,4 @@
-package main   1234567890
+package main
 import (
 	"fmt"
 	"sort"
