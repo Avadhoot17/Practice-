@@ -1,4 +1,4 @@
-package main   1234567
+package main   12345678
 
 import (
 	"fmt"
