@@ -2,7 +2,7 @@
 #include <ctype.h>
 
 void analyzeString(char str[]) {
-    int vowels = 0, consonants = 0, digits = 0, spaces = 0; 12345678
+    int vowels = 0, consonants = 0, digits = 0, spaces = 0; 123456789
 
     for (int i = 0; str[i] != '\0'; i++) {
         char c = str[i];
