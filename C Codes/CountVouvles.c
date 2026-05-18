@@ -2,7 +2,7 @@
 #include <ctype.h>
 
 void analyzeString(char str[]) {
-    int vowels = 0, consonants = 0, digits = 0, spaces = 0; 12
+    int vowels = 0, consonants = 0, digits = 0, spaces = 0; 123
 
     for (int i = 0; str[i] != '\0'; i++) {
         char c = str[i];
