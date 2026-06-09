@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-// Function to print diamond
+// Function to print diamond /
 void printDiamond(int n, int type) {
     int i, j;
 
