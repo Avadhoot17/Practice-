@@ -6,7 +6,7 @@ int main() {
     int top = 0, bottom = n - 1, left = 0, right = n - 1;
     int num = 1, i;
 
-    while (top <= bottom && left <= right) {
+    while (top <= bottom && left <= right) { 
         for (i = left; i <= right; i++)
             arr[top][i] = num++;
         top++;
